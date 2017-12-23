@@ -1,0 +1,167 @@
+\hypertarget{key__gen_8h}{}\section{src/key\+\_\+gen.h File Reference}
+\label{key__gen_8h}\index{src/key\+\_\+gen.\+h@{src/key\+\_\+gen.\+h}}
+
+
+File that contains the key pair generation.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}decoding.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}matrix.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}fichier.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}poly.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}util.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}rng.\+h\char`\"{}}\newline
+Include dependency graph for key\+\_\+gen.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{key__gen_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{key__gen_8h_abd18ce43e4be62524154e3ba889d0840}{disjoint\+\_\+test} (gf $\ast$u, gf $\ast$v)
+\begin{DoxyCompactList}\small\item\em check if the vectors are disjoint \end{DoxyCompactList}\item 
+void \hyperlink{key__gen_8h_a528780956a7c8358c007982fe6653880}{generate\+\_\+random\+\_\+vector} (int m, gf $\ast$vect)
+\begin{DoxyCompactList}\small\item\em Method to generate a random vector. \end{DoxyCompactList}\item 
+void \hyperlink{key__gen_8h_a5baf3fca90a4cff6e17756eabb4b63b0}{init\+\_\+random\+\_\+element} (gf $\ast$U)
+\begin{DoxyCompactList}\small\item\em Method to initialize a vector. \end{DoxyCompactList}\item 
+void \hyperlink{key__gen_8h_a3017dc4a6e1c902b1477aeb7caa0695d}{binary\+\_\+quasi\+\_\+dyadic\+\_\+sig} (int m, int n, int t, int $\ast$b, gf $\ast$h\+\_\+sig, gf $\ast$w)
+\begin{DoxyCompactList}\small\item\em Binary quasi dyadic signature. \end{DoxyCompactList}\item 
+void \hyperlink{key__gen_8h_a3209fb803bf98f133faf4ec56030cc5d}{cauchy\+\_\+support} (gf $\ast$support, gf $\ast$u, gf $\ast$w)
+\begin{DoxyCompactList}\small\item\em Binary Cauchy support. \end{DoxyCompactList}\item 
+int \hyperlink{key__gen_8h_a42acf0c4407e29a615aef53a4dd45952}{key\+\_\+pair} (unsigned char $\ast$pk, unsigned char $\ast$sk)
+\begin{DoxyCompactList}\small\item\em Key pair generation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+File that contains the key pair generation. 
+
+The file contains the key generation elements, i.\+e, The quasi-\/dyadic-\/signature and cauchy support generation. 
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{key__gen_8h_a3017dc4a6e1c902b1477aeb7caa0695d}\label{key__gen_8h_a3017dc4a6e1c902b1477aeb7caa0695d}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!binary\+\_\+quasi\+\_\+dyadic\+\_\+sig@{binary\+\_\+quasi\+\_\+dyadic\+\_\+sig}}
+\index{binary\+\_\+quasi\+\_\+dyadic\+\_\+sig@{binary\+\_\+quasi\+\_\+dyadic\+\_\+sig}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{binary\+\_\+quasi\+\_\+dyadic\+\_\+sig()}{binary\_quasi\_dyadic\_sig()}}
+{\footnotesize\ttfamily void binary\+\_\+quasi\+\_\+dyadic\+\_\+sig (\begin{DoxyParamCaption}\item[{int}]{m,  }\item[{int}]{n,  }\item[{int}]{t,  }\item[{int $\ast$}]{b,  }\item[{gf $\ast$}]{h\+\_\+sig,  }\item[{gf $\ast$}]{w }\end{DoxyParamCaption})}
+
+
+
+Binary quasi dyadic signature. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em m} & size of code word. \\
+\hline
+{\em n} & value to check when stop at the first non-\/zero element of V. \\
+\hline
+{\em t} & \\
+\hline
+{\em b} & auxiliar. \\
+\hline
+{\em h\+\_\+sig} & element that will receive the signature. \\
+\hline
+{\em w} & element to be signed. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{key__gen_8h_a3209fb803bf98f133faf4ec56030cc5d}\label{key__gen_8h_a3209fb803bf98f133faf4ec56030cc5d}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!cauchy\+\_\+support@{cauchy\+\_\+support}}
+\index{cauchy\+\_\+support@{cauchy\+\_\+support}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{cauchy\+\_\+support()}{cauchy\_support()}}
+{\footnotesize\ttfamily void cauchy\+\_\+support (\begin{DoxyParamCaption}\item[{gf $\ast$}]{support,  }\item[{gf $\ast$}]{u,  }\item[{gf $\ast$}]{w }\end{DoxyParamCaption})}
+
+
+
+Binary Cauchy support. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em support} & element to be the support \\
+\hline
+{\em u} & input vector to be used \\
+\hline
+{\em w} & input vector to be used \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{key__gen_8h_abd18ce43e4be62524154e3ba889d0840}\label{key__gen_8h_abd18ce43e4be62524154e3ba889d0840}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!disjoint\+\_\+test@{disjoint\+\_\+test}}
+\index{disjoint\+\_\+test@{disjoint\+\_\+test}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{disjoint\+\_\+test()}{disjoint\_test()}}
+{\footnotesize\ttfamily int disjoint\+\_\+test (\begin{DoxyParamCaption}\item[{gf $\ast$}]{u,  }\item[{gf $\ast$}]{v }\end{DoxyParamCaption})}
+
+
+
+check if the vectors are disjoint 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & -\/ input vector. \\
+\hline
+{\em v} & -\/ the other vector to check.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+if it is disjoint it will be 0 if not wil return -\/1. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{key__gen_8h_a528780956a7c8358c007982fe6653880}\label{key__gen_8h_a528780956a7c8358c007982fe6653880}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!generate\+\_\+random\+\_\+vector@{generate\+\_\+random\+\_\+vector}}
+\index{generate\+\_\+random\+\_\+vector@{generate\+\_\+random\+\_\+vector}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{generate\+\_\+random\+\_\+vector()}{generate\_random\_vector()}}
+{\footnotesize\ttfamily void generate\+\_\+random\+\_\+vector (\begin{DoxyParamCaption}\item[{int}]{m,  }\item[{gf $\ast$}]{vect }\end{DoxyParamCaption})}
+
+
+
+Method to generate a random vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em m} & size of random bits. \\
+\hline
+{\em vect} & pointer that will be written the bits. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{key__gen_8h_a5baf3fca90a4cff6e17756eabb4b63b0}\label{key__gen_8h_a5baf3fca90a4cff6e17756eabb4b63b0}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!init\+\_\+random\+\_\+element@{init\+\_\+random\+\_\+element}}
+\index{init\+\_\+random\+\_\+element@{init\+\_\+random\+\_\+element}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{init\+\_\+random\+\_\+element()}{init\_random\_element()}}
+{\footnotesize\ttfamily void init\+\_\+random\+\_\+element (\begin{DoxyParamCaption}\item[{gf $\ast$}]{U }\end{DoxyParamCaption})}
+
+
+
+Method to initialize a vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em U} & vector that will be initialize. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{key__gen_8h_a42acf0c4407e29a615aef53a4dd45952}\label{key__gen_8h_a42acf0c4407e29a615aef53a4dd45952}} 
+\index{key\+\_\+gen.\+h@{key\+\_\+gen.\+h}!key\+\_\+pair@{key\+\_\+pair}}
+\index{key\+\_\+pair@{key\+\_\+pair}!key\+\_\+gen.\+h@{key\+\_\+gen.\+h}}
+\subsubsection{\texorpdfstring{key\+\_\+pair()}{key\_pair()}}
+{\footnotesize\ttfamily int key\+\_\+pair (\begin{DoxyParamCaption}\item[{unsigned char $\ast$}]{pk,  }\item[{unsigned char $\ast$}]{sk }\end{DoxyParamCaption})}
+
+
+
+Key pair generation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pk} & string that will be stored the public key \\
+\hline
+{\em sk} & string that will be sotred the secret key\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+It will back 0 if it was possible to generate both keys and it will return != 0 if it wasn\textquotesingle{}t possible to generate keys. 
+\end{DoxyReturn}
