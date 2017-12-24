@@ -35,7 +35,6 @@ void polynome_syndrome_1(binmat_t H, const unsigned char *mot, poly_t S)
  */
 binmat_t alternant_matrix(binmat_t H, gf *u)
 {
-    gf_init(6);
     int i, j, k;
     int st = order * pol_deg;
     poly_t Srivastava;
@@ -125,7 +124,6 @@ binmat_t alternant_matrix(binmat_t H, gf *u)
 int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
                unsigned char *code_word)
 {
-    gf_init(6);
     int i, k, j, dr;
     int *LOG_12;
     int st = order * pol_deg;
@@ -133,7 +131,7 @@ int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
     poly_t omega, sigma, re, uu, u, quotient, resto, app, temp;
     poly_t pol, pos;
     gf *ver, pol_gf, tmp, tmp1, o;
-    gf alpha;
+    //gf alpha;
 
     //Compute Syndrome normally
     Syndrome = poly_alloc(st - 1);
@@ -233,9 +231,8 @@ int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
         {
             if (i != j)
             {
-                tmp = gf_mult(ver[pos->coeff[i]],
-                              gf_inv(ver[pos->coeff[j]]));
-                tmp = gf_add(1, tmp);
+                tmp = gf_mult(ver[pos->coeff[i]], gf_inv(ver[pos->coeff[j]]));
+                tmp = 1 ^ tmp;
                 pol_gf = gf_mult(pol_gf, tmp);
             }
         }
@@ -248,7 +245,7 @@ int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
     poly_free(omega);
 
     //Determining the value of the errors
-    alpha = gf_pow(64, 65);
+    //alpha = gf_pow(64, 65);
 
     LOG_12 = (int *)calloc(gf_card, sizeof(int));
     tmp = 1;
@@ -260,13 +257,14 @@ int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
         LOG_12[tmp] = i;
     }
 
+
     k = 0;
     //Reconstruction of the error vector
     for (i = 0; i <= app->deg; i++)
     {
         j = LOG_12[app->coeff[i]];
-        k = j / LOG_12[alpha];
-        error[pos->coeff[i]] = (unsigned char)(gf_Pow_subfield(2, k));
+        k = j / LOG_12[2];
+        error[pos->coeff[i]] = (unsigned char)(gf_pow_subfield(2, k));
         //printf(" %d " ,valeur_erreurs->coeff[i]);
     }
     poly_free(app);

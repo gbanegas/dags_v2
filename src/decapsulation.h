@@ -4,13 +4,13 @@
 #include <sys/types.h>
 #include <stdint.h>
 #include <assert.h>
-#include <keccak/KangarooTwelve.h>
+#include <KangarooTwelve.h>
 
 #include "decoding.h"
-#include "round.h"
-
-#include "fichier.h"
+#include "gf.h"
 #include "util.h"
+#include "param.h"
+
 #define cus_len 4 // I random pick this number to fullfill parameter
 
 /**

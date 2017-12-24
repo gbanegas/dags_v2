@@ -1,6 +1,8 @@
 #ifndef POLY_H
 #define POLY_H
 
+#include "gf.h"
+#include "matrix.h"
 
 typedef struct polynomial {
   int deg, size;

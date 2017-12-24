@@ -4,9 +4,9 @@
 
 #include <time.h>
 #include <math.h>
-#include "matrix.h"
+
+#include "gf.h"
 #include "poly.h"
-#include "fichier.h"
 #include "param.h"
 
 /**

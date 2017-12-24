@@ -21,3 +21,5 @@ void store_pk(binmat_t M, unsigned char *pk);
 void store_sk(binmat_t H_alt, unsigned char *sk);
 
 binmat_t read_sk(const unsigned char *sk);
+
+

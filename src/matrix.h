@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rng.h"
 #include "gf.h"
+#include "rng.h"
 #include "param.h"
+#include "types_def.h"
 
-typedef struct matrix
-{
+typedef struct matrix {
 	unsigned int rown;
 	unsigned int coln;
 	gf **coeff;
@@ -20,7 +20,7 @@ typedef struct matrix
 
 binmat_t matrix_init(int rown, int coln);
 binmat_t matrix_copy(binmat_t A);
-binmat_t mat_Into_base(binmat_t H);
+binmat_t matrix_onto_base_F_q(binmat_t H);
 binmat_t matrix_init_identity(int rown);
 binmat_t matrix_pivot_inversion(binmat_t A);
 binmat_t matrix_transpose(binmat_t A);
@@ -28,7 +28,6 @@ binmat_t matrix_multiplication(binmat_t A, binmat_t B);
 binmat_t matrix_multiplicaion_subfield(binmat_t A, binmat_t B);
 binmat_t matrix_permutation(int *P);
 int matrix_inverse(binmat_t A, binmat_t S);
-
 
 int *test_mat(binmat_t A);
 void mat_free(binmat_t A);
@@ -43,16 +42,13 @@ void aff_mat(binmat_t mat);
 void affiche_vecteur(gf *P, int taille);
 void vector_permutation(int *P, gf *v, int taille);
 void secret_matrix(binmat_t H, gf *u, gf *v, gf *z);
-void quasi_dyadic_bloc_mat(int s, binmat_t M, gf *sig, int ind_col, int ind_rown);
+void quasi_dyadic_bloc_mat(int s, binmat_t M, gf *sig, int ind_col,
+		int ind_rown);
 
-
-
-int syst(binmat_t H);
+int compute_systematic_form(binmat_t H);
 int syst_mat(binmat_t H);
 
-
 //int syst(binmat_t H, binmat_t P);
-
 
 gf *mult_matrix_vector_subfield(binmat_t A, gf *v);
 gf *mult_vector_matrix_subfield(gf *v, binmat_t A);
@@ -63,5 +59,5 @@ gf *mult_matrix_vector(binmat_t A, gf *v);
 gf eltseq(gf a, int k);
 
 
-
+void display_matrix(binmat_t H);
 #endif

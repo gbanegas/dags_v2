@@ -6,9 +6,7 @@
 #include <math.h>
 
 #include "decoding.h"
-#include "decoding.h"
 #include "matrix.h"
-#include "fichier.h"
 #include "poly.h"
 #include "param.h"
 #include "util.h"
@@ -29,7 +27,7 @@
  *
  * @return @result if it is disjoint it will be 0 if not wil return -1.
  */
-int disjoint_test(gf *u, gf *v);
+int is_vectors_disjoint(gf *u, gf *v);
 
 /**
  * @brief Method to generate a random vector.

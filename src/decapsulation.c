@@ -17,7 +17,7 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
 {
 
     int i, test, decode_value;
-    gf_init(6);                                            // Initialize of Log Antilog table
+   // gf_init(6);                                            // Initialize of Log Antilog table
     const unsigned char *custom = (unsigned char *)"DAGs"; // customization = "DAGs";
     unsigned char *mot;
     unsigned char *m1, *rho1;
