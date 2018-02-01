@@ -8,7 +8,7 @@ INCS     =
 CXXINCS  = 
 BIN      = PQCgenKAT_kem
 LFLAGS=
-CFLAGS= -c -Wall -I. 
+CFLAGS= -c -Wall -I. -O3
 RM       = rm -f
 
 .PHONY: all all-before all-after clean clean-custom

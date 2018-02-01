@@ -4,6 +4,7 @@
 
 #include <time.h>
 #include <math.h>
+#include "util.h"
 #include "matrix.h"
 #include "poly.h"
 #include "fichier.h"
@@ -35,3 +36,8 @@ binmat_t alternant_matrix(binmat_t H, gf *u);
  * @return -1 if it is not possible to compute and 1 if it is possible to compute
  */
 int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *e, unsigned char *mot);
+
+int decoding_from_vy(gf* v,gf* y, const unsigned char *c, unsigned char *error,
+               unsigned char *code_word);
+void polynome_syndrome_from_vy(gf* v, gf* y, const unsigned char *mot, poly_t S);
+

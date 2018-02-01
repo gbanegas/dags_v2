@@ -22,12 +22,16 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
     unsigned char *mot;
     unsigned char *m1, *rho1;
     unsigned char *r1, *d1, *rho2, *sigma, *e2, *hash_sigma, *e_prime;
-    binmat_t H_alt;
+    //binmat_t H_alt;
+
+        gf* v = (gf *)calloc(code_length, sizeof(gf));
+        gf* y = (gf *)calloc(code_length, sizeof(gf));
+        set_vy_from_sk(v,y,sk);
 
     /*
     * Read in the alternative matrix from the secret key
     */
-    H_alt = read_sk(sk);
+    //H_alt = read_sk(sk);
 
     /*
    * Step_1 of the decapsulation :  Decode the noisy codeword C received as
@@ -36,9 +40,14 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
    */
     e_prime = (unsigned char *)calloc(code_length, sizeof(unsigned char));
     mot = (unsigned char *)malloc(code_length);
+    
+    
+    //decode_value = decoding_H(H_alt, ct, e_prime, mot);
+    //mat_free(H_alt);
+    decode_value =decoding_from_vy(v,y, ct, e_prime, mot);
+    free(y);
+    free(v);
 
-    decode_value = decoding_H(H_alt, ct, e_prime, mot);
-    mat_free(H_alt);
 
     /*
    * Step_2 of the decapsulation :  Output ⊥ if decoding fails or wt(e) != n0_w
@@ -49,6 +58,7 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
         return -1;
     }
 
+    
     /*
    * Step_3 of the decapsulation :  Recover u_prime = mot and parse it as (rho1||m1)
    */
@@ -60,12 +70,12 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
     memcpy(m1, mot + k_sec, code_dimension - k_sec);
     free(mot);
 
+
     /*
    * Step_4 of the decapsulation :  Compute r1 = G(m1) and d1 = H(m1)
    */
     r1 = (unsigned char *)malloc(code_dimension);
     d1 = (unsigned char *)malloc(k_prime);
-
     // Compute r1 = G(m1) where G is composed of sponge SHA-512 function and extend function.
     // m_extend is no longer required because we are using KangarooTwelve which handles sizing
 
@@ -95,7 +105,6 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
    */
     rho2 = (unsigned char *)malloc(k_sec);
     sigma = (unsigned char *)malloc(code_dimension);
-
     for (i = 0; i < code_dimension; i++)
     {
         if (i < k_sec)
@@ -153,6 +162,8 @@ int decapsulation(unsigned char *ss, const unsigned char *ct,
     assert(test == 0); // Catch Error
     free(m1);
 
+
     return 0;
+
 }
 /*END*/

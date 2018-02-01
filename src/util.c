@@ -207,3 +207,120 @@ binmat_t read_sk(const unsigned char *sk)
 	}
 	return H_alt;
 }
+void set_y_from_uvz(gf * u, gf* v, gf * Z, gf* y){
+
+        gf* z = (gf *)calloc(code_length, sizeof(gf));
+        gf pol,aux;
+	int i,j;
+	//int st = order * pol_deg;
+
+	for (i = 0; i < n0_val; i++)
+	    {
+		for (j = 0; j < order; j++)
+		{
+		    z[i * (order) + j] = Z[i];
+		}
+	    }
+	
+        for (i = 0; i <  code_length; i++)
+        {
+            pol =1;
+            for (j = 0; j < order; j++)
+            {
+		aux = v[i]^u[j];
+                pol = gf_mult(pol,aux);
+            }
+	y[i] = gf_mult(z[i], gf_pow(gf_inv(pol),pol_deg));
+
+        }
+}
+
+void set_sk_from_vy(gf * v, gf * y,unsigned char * sk){
+	int i, a=0;
+	gf c1, c2;
+        //int order1 =(order);
+	unsigned char c;
+
+
+	for(i=0;i<(code_length/2);i++){
+                        c1=v[2*i];
+			c2=v[2*i+1];
+			c=c1>>4;
+			sk[a]=c;
+			a+=1;
+			c1=c1&15;
+			c=(c1<<4)^(c2>>8);
+			sk[a]=c;
+			a+=1;
+			c=c2&255;
+			sk[a]=c;
+			a+=1;
+			}
+	for(i=0;i<(code_length/2);i++){
+                        c1=y[2*i];
+			c2=y[2*i+1];
+			c=c1>>4;
+			sk[a]=c;
+			a+=1;
+			c1=c1&15;
+			c=(c1<<4)^(c2>>8);
+			sk[a]=c;
+			a+=1;
+			c=c2&255;
+			sk[a]=c;
+			a+=1;
+			}
+
+	
+}
+
+
+
+void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk){
+	int i,a=0;
+	unsigned char c;
+	gf c1, c2, c3;
+	for(i=0;i<(code_length/2);i++){
+            c=sk[a];
+            c1=c;
+			a+=1;
+			c=sk[a];
+            c2=c;
+			a+=1;
+			c=sk[a];
+            c3=c;
+			a+=1;
+			v[2*i]=(c1<<4)^(c2>>4);
+			c1=c2&15;
+			v[2*i+1]=(c1<<8)^c3;
+			}
+        for(i=0;i<(code_length/2);i++){
+            c=sk[a];
+            c1=c;
+			a+=1;
+			c=sk[a];
+            c2=c;
+			a+=1;
+			c=sk[a];
+            c3=c;
+			a+=1;
+			y[2*i]=(c1<<4)^(c2>>4);
+			c1=c2&15;
+			y[2*i+1]=(c1<<8)^c3;
+			}
+	
+	
+	
+}
+
+
+
+gf sum_vect_element(gf* w,int length){
+   gf tmp=0;
+   int j=0;
+        for (j = 0; j < length; j++)
+        {
+            tmp ^= w[j];
+        }
+   return tmp;
+}

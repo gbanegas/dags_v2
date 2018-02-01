@@ -7,12 +7,12 @@
 #ifndef __API_H_INCLUDED__
 #define __API_H_INCLUDED__
 
-#define CRYPTO_SECRETKEYBYTES 2973704 //4418 //   8642  //3313.5
+#define CRYPTO_SECRETKEYBYTES 6336 //3314  //4418 //   8642  //3313.5
 #define CRYPTO_PUBLICKEYBYTES 11616   //991232
-#define CRYPTO_CIPHERTEXTBYTES 2144   // 1616
+#define CRYPTO_CIPHERTEXTBYTES 2144    // 1616
 #define CRYPTO_BYTES 64
 
-#define CRYPTO_ALGNAME "DAGS_128"
+#define CRYPTO_ALGNAME "DAGS_5"
 
 int crypto_kem_keypair(
     unsigned char *pk,

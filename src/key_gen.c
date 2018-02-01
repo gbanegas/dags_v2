@@ -246,8 +246,10 @@ int key_pair(unsigned char *pk, unsigned char *sk)
 {
     gf *u, *v, *w, *z;
     int return_value = 1;
-    binmat_t H, H_syst, H_alt;
+    binmat_t H, H_syst;//, H_alt;
     gf_init(6);
+    
+    gf* y = (gf *)calloc(code_length, sizeof(gf));
     while(return_value != 0)
     {
         u = (gf *)calloc(order, sizeof(gf));
@@ -263,8 +265,7 @@ int key_pair(unsigned char *pk, unsigned char *sk)
         H = matrix_init(pol_deg * (order), code_length);
         // construction matrix H
         secret_matrix(H, u, v, z);
-        free(v);
-        free(z);
+        
 
         //cfile_matrix_F12("secret_matrix.txt", H.rown, H.coln, H);
 
@@ -291,10 +292,16 @@ int key_pair(unsigned char *pk, unsigned char *sk)
     store_pk(H_syst, pk);
     mat_free(H_syst);
 
-    H_alt = alternant_matrix(H, u);
+    set_y_from_uvz(u,v,z,y);
+    set_sk_from_vy(v,y,sk);
+
+    //H_alt = alternant_matrix(H, u);
     free(u);
+    free(v);
+    free(z);
     mat_free(H);
-    store_sk(H_alt, sk);
-    mat_free(H_alt);
+
+    //store_sk(H_alt, sk);
+    //mat_free(H_alt);
     return 0;
 }

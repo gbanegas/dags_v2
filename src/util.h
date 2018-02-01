@@ -21,3 +21,8 @@ void store_pk(binmat_t M, unsigned char *pk);
 void store_sk(binmat_t H_alt, unsigned char *sk);
 
 binmat_t read_sk(const unsigned char *sk);
+
+void set_y_from_uvz(gf * u, gf* v, gf * Z, gf* y);
+void set_sk_from_vy(gf * v, gf * y,unsigned char * sk);
+void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk);
+gf sum_vect_element(gf* w,int length);
