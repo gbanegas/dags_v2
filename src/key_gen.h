@@ -55,7 +55,7 @@ void init_random_element(gf *U);
  * @param w element to be signed.
  *
  */
-void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w);
+void binary_quasi_dyadic_sig(int *b, gf *h_sig, gf *w);
 
 /**
  * @brief Binary Cauchy support

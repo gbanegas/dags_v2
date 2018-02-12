@@ -97,10 +97,10 @@ void Remove_From_U(gf elt, gf *U)
     }
 }
 
-void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
+void binary_quasi_dyadic_sig(int *b, gf *h_sig, gf *w)
 {
     int i, j, k, s, p, l, l1, c, r, consistent_root, consistent_support_block;
-    int const C = ((gf_card) / t);
+    int const C = ((gf_card) / order);
     gf *U, *V, *h;
     gf sum_inv_h_i_j_0, sum_inv_h_i_0;
     h = (gf *)calloc(gf_card, sizeof(gf));
@@ -113,7 +113,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
         h[0] = U[1];
         U[1] = 0;
 
-        for (s = 0; s < m; s++)
+        for (s = 0; s < gf_extd; s++)
         {
             i = 1 << s;
             h[i] = U[i + 1];
@@ -144,7 +144,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
         c = 0;
         init_random_element(V);
         consistent_root = 1;
-        for (p = 0; p < t; p++)
+        for (p = 0; p < order; p++)
         {
             consistent_root = consistent_root & (h[p] != 0);
         }
@@ -152,7 +152,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
         {
             b[0] = 0;
             c = 1;
-            for (r = 0; r < t; r++)
+            for (r = 0; r < order; r++)
             {
                 sum_inv_h_i_0 = (gf_inv(h[r])) ^ (gf_inv(h[0]));
                 Remove_From_U(gf_inv(h[r]), V);
@@ -161,7 +161,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
             for (j = 1; j < C; j++)
             {
                 consistent_support_block = 1;
-                for (p = j * t; p < (j + 1) * t; p++)
+                for (p = j * order; p < (j + 1) * order; p++)
                 {
                     consistent_support_block = consistent_support_block & (h[p] != 0);
                 }
@@ -169,7 +169,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
                 {
                     b[c] = j;
                     c = c + 1;
-                    for (l = j * t; l < (j + 1) * t; l++)
+                    for (l = j * order; l < (j + 1) * order; l++)
                     {
                         sum_inv_h_i_0 = (gf_inv(h[l])) ^ (gf_inv(h[0]));
                         Remove_From_U(sum_inv_h_i_0, V);
@@ -177,7 +177,7 @@ void binary_quasi_dyadic_sig(int m, int n, int t, int *b, gf *h_sig, gf *w)
                 }
             }
         }
-    } while (c * t < n);
+    } while (c * order < code_length);
 
     // Computing w: We just one value of omega. So we stop at the first non-zero element of V.
     for (j = 0; j < gf_card; j++)
@@ -217,7 +217,7 @@ void cauchy_support(gf *Support, gf *W, gf *w)
     {
         b = (int *)calloc(gf_card, sizeof(int));
         h = (gf *)calloc(code_length, sizeof(gf));
-        binary_quasi_dyadic_sig(gf_extd, code_length, order, b, h, w);
+        binary_quasi_dyadic_sig(b, h, w);
         for (i = 0; i < code_length; i++)
         {
             sum_inv_h_i_0 = (gf_inv(h[i])) ^ (gf_inv(h[0]));
@@ -248,7 +248,7 @@ int key_pair(unsigned char *pk, unsigned char *sk)
     int return_value = 1;
     binmat_t H, H_syst;//, H_alt;
     gf_init(6);
-    
+
     gf* y = (gf *)calloc(code_length, sizeof(gf));
     while(return_value != 0)
     {
@@ -265,7 +265,7 @@ int key_pair(unsigned char *pk, unsigned char *sk)
         H = matrix_init(pol_deg * (order), code_length);
         // construction matrix H
         secret_matrix(H, u, v, z);
-        
+
 
         //cfile_matrix_F12("secret_matrix.txt", H.rown, H.coln, H);
 
