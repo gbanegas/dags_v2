@@ -233,6 +233,7 @@ void set_y_from_uvz(gf * u, gf* v, gf * Z, gf* y){
 	y[i] = gf_mult(z[i], gf_pow(gf_inv(pol),pol_deg));
 
         }
+        free(z);
 }
 
 void set_sk_from_vy(gf * v, gf * y,unsigned char * sk){

@@ -180,6 +180,7 @@ void Lecture_cfile_matrix_F12(char *file, int dimension, int longueur, binmat_t 
             M.coeff[i][j] = (c1 << 8) ^ c;
         }
     }
+   fclose(fichier); 
 }
 
 void Lecture_cfile_vec_F6_int(char *file, int n, int *L)

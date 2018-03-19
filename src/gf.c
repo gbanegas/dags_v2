@@ -133,16 +133,18 @@ gf gf_pow(gf in, int n)
 // Correct gf_mult
 gf gf_mult(gf x, gf y)
 {
-    gf a1, b1, a2, b2, a3, b3;
+    gf a1, b1, a2, b2, a3, b3, tmp1;
 
     a1 = x >> 6;
     b1 = x & 63;
     a2 = y >> 6;
     b2 = y & 63;
+	
+    tmp1 = gf_Mult_subfield(a1, a2);
 
-    a3 = gf_Mult_subfield(gf_Mult_subfield(a1, a2), 36) ^ gf_Mult_subfield(a1, b2) ^ gf_Mult_subfield(b1, a2);
+    a3 = gf_Mult_subfield_ctrly(tmp1, 36) ^ gf_Mult_subfield(a1, b2) ^ gf_Mult_subfield(b1, a2);
 
-    b3 = gf_Mult_subfield(gf_Mult_subfield(a1, a2), 2) ^ gf_Mult_subfield(b1, b2);
+    b3 = gf_Mult_subfield_ctrly(tmp1, 2) ^ gf_Mult_subfield(b1, b2);
 
     return (a3 << 6) ^ b3;
 }
@@ -150,14 +152,15 @@ gf gf_mult(gf x, gf y)
 // Correct gf_sq
 gf gf_sq(gf x)
 {
-    gf a1, b1, a3, b3;
+    gf a1, b1, a3, b3, tmp1;
 
     a1 = x >> 6;
     b1 = x & 63;
+    tmp1 = gf_Mult_subfield(a1, a1); 
 
-    a3 = gf_Mult_subfield(gf_Mult_subfield(a1, a1), 36);
+    a3 = gf_Mult_subfield_ctrly(tmp1, 36); 
 
-    b3 = gf_Mult_subfield(gf_Mult_subfield(a1, a1), 2) ^ gf_Mult_subfield(b1, b1);
+    b3 = gf_Mult_subfield_ctrly(tmp1, 2) ^ gf_Mult_subfield(b1, b1);
 
     return (a3 << 6) ^ b3;
 }
@@ -221,4 +224,19 @@ int gf_init(int extdeg)
 
     return 1;
 }
+ void gf_free() {
+     if (gf_antilog_sf) {
+         free(gf_antilog_sf);
+     }
+     if (gf_log_sf) {
+         free(gf_log_sf);
+     }
+     if (gf_antilog) {
+         free(gf_antilog);
+     }
+     if (gf_log) {
+         free(gf_log);
+     }   
+ }
+ 
 

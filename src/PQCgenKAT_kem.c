@@ -40,6 +40,7 @@ int main()
     int counter = 0;
     int i;
     uint64_t initial_key_pair, final_key_pair, key_pair_count;
+    uint64_t dec_count_av=0, enc_count_av=0, key_pair_count_av=0;
 
     // Create the REQUEST file
     sprintf(fn_req, "PQCkemKAT_%d.req", CRYPTO_SECRETKEYBYTES);
@@ -111,7 +112,7 @@ int main()
         } while (ret_val != 0);
 
         printf("Key Generation cycles: %" PRId64 "\n", key_pair_count);
-
+	key_pair_count_av=key_pair_count_av+key_pair_count;
         if (ret_val != 0)
         {
             return KAT_CRYPTO_FAILURE;
@@ -128,6 +129,7 @@ int main()
         uint64_t enc_count = final_enc - initial_enc;
 
         printf("Encapsulation cycles: %" PRId64 "\n", enc_count);
+        enc_count_av=enc_count_av+enc_count;
 
         if (ret_val != 0)
         {
@@ -150,6 +152,7 @@ int main()
 
         uint64_t total_cycles = dec_count + key_pair_count + enc_count;
         printf("Total cycles: %" PRId64 "\n\n", total_cycles);
+	dec_count_av=dec_count_av+dec_count;
 
         if ((ret_val) != 0)
         {
@@ -165,8 +168,10 @@ int main()
         counter++;
         free(sk);
     
-    } while (counter < 100);
-
+    } while (counter < 31);
+    printf("AVERAGE Key Generation cycles: %" PRId64 "\n\n", (key_pair_count_av/counter));
+    printf("AVERAGE Encapsulation cycles: %" PRId64 "\n\n", (enc_count_av/counter));
+    printf("AVERAGE Decapsulation cycles: %" PRId64 "\n\n", (dec_count_av/counter));
     fclose(fp_req);
     fclose(fp_rsp);
 

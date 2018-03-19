@@ -9,7 +9,7 @@
 
 #define CRYPTO_SECRETKEYBYTES 6336 //3314  //4418 //   8642  //3313.5
 #define CRYPTO_PUBLICKEYBYTES 11616   //991232
-#define CRYPTO_CIPHERTEXTBYTES 2144    // 1616
+#define CRYPTO_CIPHERTEXTBYTES 2155 // bufferoverflow line 120 in encapsulation.c    // 1616
 #define CRYPTO_BYTES 64
 
 #define CRYPTO_ALGNAME "DAGS_5"

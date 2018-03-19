@@ -48,11 +48,13 @@ gf *gf_antilog;
 
 #define gf_modq_1_sf(d) ((d) % 63)
 
+#define gf_mul_fast_subfield_ctrly(x, y) (gf_antilog_sf[gf_modq_1_sf(gf_log_sf[x] + gf_log_sf[y])])  // SIC
 // Check y is zero, if zero, return 0, else calculate
 #define gf_mul_fast_subfield(x, y) ((y) ? gf_antilog_sf[gf_modq_1_sf(gf_log_sf[x] + gf_log_sf[y])] : 0)
 
 // Multiplication in the field : apha^i*alpha^j=alpha^(i+j)
 // Check x is zero, if zero, return 0, else calculate
+#define gf_Mult_subfield_ctrly(x, y) ((x) ? gf_mul_fast_subfield_ctrly(x, y) : 0)  // SIC
 #define gf_Mult_subfield(x, y) ((x) ? gf_mul_fast_subfield(x, y) : 0)
 
 // In direct way to calculate power in range 2^6.
@@ -70,7 +72,7 @@ gf *gf_antilog;
 #define _gf_modq_1(d) ((d) % 4095)
 
 // Check y is zero, if zero, return 0, else calculate
-#define gf_mul_fast(x, y) ((y) ? gf_antilog[_gf_modq_1(gf_log[x] + gf_log[y])] : 0)
+//#define gf_mul_fast(x, y) ((y) ? gf_antilog[_gf_modq_1(gf_log[x] + gf_log[y])] : 0)
 
 // Check x is zero, if zero, return 0, else calculate
 // Multiplication in the field : apha^i*alpha^j=alpha^(i+j)
@@ -115,5 +117,7 @@ gf gf_pow(gf f, int n);
 
 // Un-nessary use antilog and log table
 int gf_init(int extdeg);
+
+void gf_free(void);
 
 #endif

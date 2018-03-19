@@ -135,11 +135,12 @@ poly_add_free (poly_t r, poly_t a, poly_t b)
   int i;
   if (a->deg == -1){
       r->deg = b->deg;
-      memcpy(r->coeff, b->coeff, b->deg * sizeof(gf));
+      memmove(r->coeff, b->coeff, b->deg * sizeof(gf));
   }
   else if (b->deg == -1){
       r->deg = a->deg;
-    	memcpy(r->coeff, a->coeff, a->deg * sizeof(gf));
+    	//memcpy(r->coeff, a->coeff, a->deg * sizeof(gf));
+	memmove(r->coeff, a->coeff, a->deg * sizeof(gf));
   }
   else{
       if (a->deg == b->deg){
@@ -152,7 +153,8 @@ poly_add_free (poly_t r, poly_t a, poly_t b)
       	r->deg = a->deg;
       	for (i = 0; i < b->deg + 1; i++)
       		r->coeff[i] = (a->coeff[i]) ^ (b->coeff[i]);
-      	memcpy(r->coeff + (b->deg + 1),
+      	//memcpy(r->coeff + (b->deg + 1),
+	memmove(r->coeff + (b->deg + 1),
       			a->coeff + (b->deg + 1),
 						(a->deg - b->deg) * sizeof(gf));
       }

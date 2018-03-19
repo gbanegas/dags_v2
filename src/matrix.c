@@ -402,14 +402,16 @@ int syst(binmat_t H)
     gf temp;
     int n = H.coln;
     int k = H.rown;
+    int w, nb = n - k;
     for (i = 0; i < k; i++)
     {
 
         test = 0;
 
         l = 0;
-        j = i + n - k;
-        if (H.coeff[i][i + n - k] == 0)
+        w = i + nb;
+        j = w;
+        if (H.coeff[i][w] == 0)
         { //We're looking for a non-zero pivot
             test = 1;
             //printf("search Pivot\n");
@@ -443,15 +445,15 @@ int syst(binmat_t H)
         }
         //   Matrix standardization
         gf invPiv = 1, aa;
-        if (H.coeff[i][i + n - k] != 1)
+        if (H.coeff[i][w] != 1)
         {
-            aa = H.coeff[i][i + n - k];
+            aa = H.coeff[i][w];
             invPiv = gf_Inv_subfield(aa);
-            H.coeff[i][i + n - k] = 1;
+            H.coeff[i][ w] = 1;
 
             for (j = 0; j < n; j++)
             {
-                if (j == i + n - k)
+                if (j ==  w)
                 {
                     continue;
                 }
@@ -467,13 +469,14 @@ int syst(binmat_t H)
             {
                 continue;
             }
-            if (H.coeff[l][i + n - k])
+	    piv_align = H.coeff[l][w];
+            if (piv_align)
             {
-                piv_align = H.coeff[l][i + n - k];
+                
 
                 for (j = 0; j < n; j++)
                 {
-                    H.coeff[l][j] = H.coeff[l][j] ^ (gf_Mult_subfield(piv_align, H.coeff[i][j]));
+                    H.coeff[l][j] = H.coeff[l][j] ^ (gf_mul_fast_subfield(piv_align, H.coeff[i][j])); // piv_align is useless because it does before, so you can use gf_mul_fast_subfield directly
                 }
             }
         }
@@ -559,7 +562,7 @@ gf *mult_vector_matrix_Sf(gf *v, binmat_t A)
     {
         for (k = 0; k < A.rown; k++)
         {
-            Res[i] ^= gf_mult(A.coeff[k][i], v[k]);
+            Res[i] ^= gf_Mult_subfield(A.coeff[k][i], v[k]);
         }
     }
     return Res;
