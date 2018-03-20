@@ -16,7 +16,7 @@
 /**
  * @brief Method to perform the decapsulation using secret key
  * @param ss secret shared
- * @param ct
+ * @param ct the ciphertext
  * @param sk secret key to extract the key
  */
 int decapsulation(unsigned char *ss, const unsigned char *ct,

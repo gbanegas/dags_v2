@@ -1,7 +1,7 @@
 /*********************************************************************************************
  * DAGS: Key Encapsulation using Dyadic GS Codes.                             *
  * This code is exclusively intended for submission to the NIST Post=Quantum Cryptography.    *
- * For any other usage , contact the author(s) to ask permission.                             *
+ * For any other usage , contact the author(s) to ask permission.....                            *
  **********************************************************************************************
  */
 
