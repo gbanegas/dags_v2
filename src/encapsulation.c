@@ -9,7 +9,7 @@
 
 int encapsulation(const unsigned char *pk, unsigned char *ct, unsigned char *ss)
 {
-    gf_init(6);
+    gf_init(5);
 
     unsigned char *m, *d, *rho, *sigma, *error_array, *hash_sigma, *r;
     gf *c, *u, *dd;
