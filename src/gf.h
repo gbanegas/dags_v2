@@ -6,28 +6,29 @@
 typedef uint16_t gf;
 typedef uint16_t gf_t;
 
-// Extension degree 12
-#define gf_extd 12
-// Field size 2^12
-#define gf_card (1 << gf_extd)
-// Field Group order 2^12 - 1
-#define gf_ord ((gf_card)-1)
+
+#define gf_extd 10 // extension degree
+#define gf_card (1<<gf_extd) // Field size
+#define gf_ord ((gf_card) - 1) // Group order
+#define m_val 2
+#define gf_extd_sf gf_extd/m_val // subfield extension degree
+#define gf_card_sf (1<<gf_extd_sf) // Field sizeml
+#define gf_ord_sf ((gf_card_sf) - 1) // Group order
+
+
+#define poly_primitif (1<<10)^(gf_antilog_sf[4]<<5)^2
+
+#define primitif_elt_field    gf_antilog_sf[4]
+
+#define poly_primitive_subfield 37
+
 
 // Subfield delaration
 
-// Define subfield degree
 #define m_val 2
-// Subfield degree is 6
-#define gf_extd_sf gf_extd / m_val
-// Subfield size 2^6
-#define gf_card_sf (1 << gf_extd_sf)
-// Subfield Group order 2^6 -1
-#define gf_ord_sf ((gf_card_sf)-1)
 
 // Define Field value
-#define u_val 64
-// Define Poly primitive subfield: X^6 + x + 1
-#define poly_primitive_subfield 67
+#define u_val 32
 
 //int gf_extension_degree, gf_cardinality, gf_multiplicative_order;
 gf_t *gf_log_sf;

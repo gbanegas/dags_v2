@@ -35,7 +35,7 @@ void polynome_syndrome_1(binmat_t H, const unsigned char *mot, poly_t S)
  */
 binmat_t alternant_matrix(binmat_t H, gf *u)
 {
-    gf_init(6);
+    gf_init(5);
     int i, j, k;
     int st = order * pol_deg;
     poly_t Srivastava;
@@ -125,7 +125,7 @@ binmat_t alternant_matrix(binmat_t H, gf *u)
 int decoding_H(binmat_t H_alt, const unsigned char *c, unsigned char *error,
                unsigned char *code_word)
 {
-    gf_init(6);
+    gf_init(5);
     int i, k, j, dr;
     int *LOG_12;
     int st = order * pol_deg;
@@ -291,7 +291,7 @@ int decoding_from_vy(gf* v,gf* y, const unsigned char *c, unsigned char *error,
                unsigned char *code_word)
 {
     
-    gf_init(6);
+    gf_init(5);
     int i, k, j, dr;
     int *LOG_12;
     int st = order * pol_deg;

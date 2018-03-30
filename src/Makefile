@@ -8,8 +8,9 @@ INCS     =
 CXXINCS  = 
 BIN      = PQCgenKAT_kem
 LFLAGS=
-CFLAGS= -c -Wall -I. -O3
+#CFLAGS= -c -Wall -I. 
 RM       = rm -f
+CFLAGS= -c -Wall -I. -O3 -funroll-loops -I/usr/local/include/keccak
 
 .PHONY: all all-before all-after clean clean-custom
 

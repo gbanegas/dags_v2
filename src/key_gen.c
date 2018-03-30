@@ -81,7 +81,7 @@ void init_random_element(gf *U)
         U[v + 1] = tmp;
     }
 
-    free(random_bytes);
+//    free(random_bytes);
 }
 
 void Remove_From_U(gf elt, gf *U)
@@ -247,7 +247,7 @@ int key_pair(unsigned char *pk, unsigned char *sk)
     gf *u, *v, *w, *z;
     int return_value = 1;
     binmat_t H, H_syst;//, H_alt;
-    gf_init(6);
+    gf_init(5);
     
     gf* y = (gf *)calloc(code_length, sizeof(gf));
     while(return_value != 0)
