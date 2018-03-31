@@ -16,10 +16,6 @@ typedef uint16_t gf_t;
 #define gf_ord_sf ((gf_card_sf) - 1) // Group order
 
 
-#define poly_primitif (1<<10)^(gf_antilog_sf[4]<<5)^2
-
-#define primitif_elt_field    gf_antilog_sf[4]
-
 #define poly_primitive_subfield 37
 
 

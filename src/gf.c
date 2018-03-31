@@ -17,30 +17,29 @@ static void gf_init_antilog_sf() {
 	 Build table for faster calculation.
 	 In memory access is faster than calculating.
 	 */
-	/*	int i = 1;
-	 int temp = 1 << (gf_extd_sf - 1);
-	 gf_antilog_sf = (gf_t *) malloc((gf_card_sf * sizeof(gf_t)));
-	 gf_antilog_sf[0] = 1;
-	 for (i = 1; i < gf_ord_sf; ++i) {
-	 gf_antilog_sf[i] = gf_antilog_sf[i - 1] << 1;
-	 if ((gf_antilog_sf[i - 1]) & temp) {
-	 // XOR with 67: X^6 + x + 1
-	 gf_antilog_sf[i] ^= poly_primitive_subfield;
-	 }
-	 }
-	 gf_antilog_sf[gf_ord_sf] = 1;*/
-
 	int i = 1;
-	gf_antilog_sf = (gf_t *) malloc((1 << gf_extd_sf * sizeof(gf_t)));
+	int temp = 1 << (gf_extd_sf - 1);
+	gf_antilog_sf = (gf_t *) malloc((gf_card_sf * sizeof(gf_t)));
 	gf_antilog_sf[0] = 1;
 	for (i = 1; i < gf_ord_sf; ++i) {
-		gf_antilog_sf[i] = gf_antilog_sf[i - 1] << 1; /* (alpha^i=alpha^{i-1}.alpha)       */
-		if ((gf_antilog_sf[i - 1]) & (1 << (gf_extd_sf - 1)))
+		gf_antilog_sf[i] = gf_antilog_sf[i - 1] << 1;
+		if ((gf_antilog_sf[i - 1]) & temp) {
 			gf_antilog_sf[i] ^= poly_primitive_subfield;
-
+		}
 	}
-
 	gf_antilog_sf[gf_ord_sf] = 1;
+
+	/*int i = 1;
+	 gf_antilog_sf = (gf_t *) malloc((1 << gf_extd_sf * sizeof(gf_t)));
+	 gf_antilog_sf[0] = 1;
+	 for (i = 1; i < gf_ord_sf; ++i) {
+	 gf_antilog_sf[i] = gf_antilog_sf[i - 1] << 1;  (alpha^i=alpha^{i-1}.alpha)
+	 if ((gf_antilog_sf[i - 1]) & (1 << (gf_extd_sf - 1)))
+	 gf_antilog_sf[i] ^= poly_primitive_subfield;
+
+	 }
+
+	 gf_antilog_sf[gf_ord_sf] = 1;*/
 }
 
 static void gf_init_log_sf() {
@@ -49,19 +48,19 @@ static void gf_init_log_sf() {
 	 Build table for faster calculation.
 	 In memory access is faster than calculating.
 	 */
-/*	int i = 1;
-	gf_log_sf = (gf_t *) malloc((gf_card_sf * sizeof(gf_t)));
+	/*	int i = 1;
+	 gf_log_sf = (gf_t *) malloc((gf_card_sf * sizeof(gf_t)));
+	 gf_log_sf[0] = -1;
+	 gf_log_sf[1] = 0;
+	 for (i = 1; i < gf_ord_sf; ++i) {
+	 gf_log_sf[gf_antilog_sf[i]] = i;
+	 }*/
+
+	int i = 1;
+	gf_log_sf = (gf_t *) malloc((1 << gf_extd_sf * sizeof(gf_t)));
 	gf_log_sf[0] = -1;
 	gf_log_sf[1] = 0;
 	for (i = 1; i < gf_ord_sf; ++i) {
-		gf_log_sf[gf_antilog_sf[i]] = i;
-	}*/
-
-	int i=1;
-	gf_log_sf = (gf_t *) malloc((1<<gf_extd_sf * sizeof(gf_t)));
-	gf_log_sf[0]=-1;
-	gf_log_sf[1]=0;
-	for (i=1;i<gf_ord_sf;++i){
 		gf_log_sf[gf_antilog_sf[i]] = i;
 	}
 }
