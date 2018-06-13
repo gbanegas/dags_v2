@@ -1,148 +1,138 @@
-/*********************************************************************************************
- * DAGS: Key Encapsulation using Dyadic GS Codes.                            *
- * This code is exclusively intended for submission to the NIST Post=Quantum Cryptography.    *
- * For any other usage , contact the author(s) to ask permission.                             *
- **********************************************************************************************
+/*
+ * encapsulation.c
+ *
+ *  Created on: May 4, 2018
+ *      Author: vader
  */
 
 #include "encapsulation.h"
 
-int encapsulation(const unsigned char *pk, unsigned char *ct, unsigned char *ss)
-{
-    gf_init(6);
+int encapsulation(unsigned char *ciphert_text, unsigned char *secret_shared,
+		const unsigned char *public_key) {
 
-    unsigned char *m, *d, *rho, *sigma, *error_array, *hash_sigma, *r;
-    gf *c, *u, *dd;
-    const unsigned char *custom = (unsigned char *)"DAGs"; // customization = "DAGs";
-    int i;
-    int test; // Catch error
+#ifdef DEBUG_P
+	printf("Creating Matrix G: \n");
+#endif
+	matrix *G = make_matrix(code_dimension, code_length);
+#ifdef DEBUG_P
+	printf("Recovering Matrix G: \n");
+#endif
+	recover_public_key(public_key, G);
+	print_matrix(G);
 
-    /*
-     * Memory's allocation
-     */
-    d = (unsigned char *)calloc(k_prime, sizeof(unsigned char));
-    rho = (unsigned char *)calloc(k_sec, sizeof(unsigned char));
-    sigma = (unsigned char *)calloc(code_dimension - k_sec, sizeof(unsigned char));
-    hash_sigma = (unsigned char *)calloc(code_length, sizeof(unsigned char));
-    u = (gf *)calloc(code_dimension, sizeof(gf));
-    r = (unsigned char *)calloc(code_dimension, sizeof(unsigned char));
-    dd = (gf *)calloc(k_prime, sizeof(gf)); //TODO consider removing dd and using d instead
+	return encrypt(ciphert_text, secret_shared, G);
+}
 
-    /*
-     * Step_1:  Choose randomly  m ←  F_q^k, m is seen as a sequence of k_prime integer
-     * modulo 2^6
-     */
+int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
+		matrix *G) {
 
-    m = random_m(k_prime);
+	int i;
+	unsigned char *m; //[k_prime] = { 0 };
+	m = calloc(code_length, sizeof(unsigned char));
+	unsigned char d[k_prime] = { 0 };
+	unsigned char rho[k_sec] = { 0 };
+	unsigned char error_array[code_length] = { 0 };
+	unsigned char sigma[(code_dimension - k_sec)] = { 0 };
+	unsigned char hash_sigma[code_length] = { 0 };
 
-    /*
-     * Step_2:  Compute r = G(m) and d = H(m) with  G(x) = sponge(x,k) and
-     * H(x) = sponge(x,k_prime)
-     */
+	unsigned char *u = calloc(code_dimension + 1, sizeof(unsigned char));
+	gf c[code_length] = { 0 };
+	unsigned char r[code_dimension] = { 0 };
+	unsigned char dd[k_prime] = { 0 };
+	unsigned char K[ss_length] = { 0 };
 
-    // m: input type unsigned char len k_prime | r: output type unsigned char len code_dimesion
-    test = KangarooTwelve(m, k_prime, r, code_dimension, custom, cus_len);
-    assert(test == 0); // Catch Error
+#ifdef DEBUG_P
+	printf("Generation Random M: \n");
+#endif
+	random_m(m);
 
-    // m: input type unsigned char len k_prime | d: output type unsigned char len k_prime
-    test = KangarooTwelve(m, k_prime, d, k_prime, custom, cus_len);
-    assert(test == 0); // Catch Error
+#ifdef DEBUG_P
+	for(int i = 0; i < k_sec; i++){
+		printf(" %" PRIu16 ", ", m[i]);
+	}
+	printf("Starting hashing: \n");
+#endif
+	SHAKE256(r, code_dimension, m, k_prime);
+	SHAKE256(d, k_prime, m, k_prime);
 
-    // Type conversion
-    for (i = 0; i < k_prime; i++)
-        // Optimize modulo
+	for (i = 0; i < k_prime; i++) {
+		// Optimize modulo
+		dd[i] = (unsigned char) (d[i] & F_q_order);
+	}
 
-        dd[i] = (unsigned char)(d[i] & gf_ord_sf);
+#ifdef DEBUG_P
+	printf("Generating sigma and rho: \n");
+#endif
+	for (i = 0; i < code_dimension; i++) {
+		if (i < k_sec) {
+			// Optimize modulo
 
-    free(d);
+			rho[i] = (unsigned char) (r[i] & F_q_order); //rho recovery
+		} else {
+			// Optimize modulo
 
-    /*
-     * Step_3:  Parse r as (ρ||σ) then set u = (ρ||m)
-     */
-    for (i = 0; i < code_dimension; i++)
-    {
-        if (i < k_sec)
-            // Optimize modulo
+			sigma[i - k_sec] = (unsigned char) (r[i] & F_q_order); // sigma recovery
+		}
+	}
 
-            rho[i] = (unsigned char)(r[i] & gf_ord_sf); //rho recovery
-        else
-            // Optimize modulo
+#ifdef DEBUG_P
+	printf("Expanding m: \n");
+#endif
 
-            sigma[i - k_sec] = (unsigned char)(r[i] & gf_ord_sf); // sigma recovery
-    }
+	for (i = 0; i < code_dimension; i++) {
+		if (i < k_sec) {
+			u[i] = ((unsigned char) rho[i]);
+		} else {
+			u[i] = ((unsigned char) m[i - k_sec]);
+		}
+	}
 
-    for (i = 0; i < code_dimension; i++)
-    {
-        if (i < k_sec)
-        {
-            u[i] = ((unsigned char)rho[i]);
-        }
-        else
-        {
-            u[i] = ((unsigned char)m[i - k_sec]);
-        }
-    }
-    free(r);
-    free(rho);
 
-    /*
-     * Step_4: Generate error vector e of length n and weight w from sigma
-     */
-    // Replace by KangarooTwelve
+#ifdef DEBUG_P
+	printf("Generating error_array: \n");
+#endif
+	SHAKE256(hash_sigma, code_length, sigma, k_prime);
+	random_e(hash_sigma, error_array);
 
-    // sigma: input type unsigned char len k_prime | hash_sigma: output type unsigned char len code_length
-    test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, custom, cus_len);
-    assert(test == 0); // Catch Error
+#ifdef DEBUG_P
+	printf("message:\n");
+	for (i = 0; i < code_dimension-k_sec; i++)
+		printf(" %" PRIu16 ", ", u[i]);
+	printf("\n");
+	printf("encaps_error_array:\n");
+	for (i = 0; i < code_length; i++) {
+		printf(" %" PRIu16 ", ", error_array[i]);
+	}
+	printf("\n");
+#endif
 
-    error_array = random_e(code_length, gf_card_sf, n0_w, hash_sigma);
+#ifdef DEBUG_P
+	//printf("Computing m*G: \n");
+#endif
+	multiply_vector_matrix(u, G, c);
 
-    free(sigma);
-    free(hash_sigma);
+#ifdef DEBUG_P
+	//printf("Computing (m*G) + error: \n");
+#endif
+	for (i = 0; i < code_length + k_prime; i++) {
+		if (i < code_length) {
+			ciphert_text[i] = (((unsigned char) c[i]) ^ error_array[i]); //message*G + error
+		} else {
+			ciphert_text[i] = dd[i - code_length];
+		}
+	}
 
-    /*
-     * Step_5: Recovery of G and Compute c = uG + e
-     */
-    binmat_t G = matrix_init(code_dimension, code_length);
-
-    //set_Public_matrix(pk, code_dimension, code_length-code_dimension, G);
-    recup_pk(pk, G);
-
-    c = mult_vector_matrix_Sf(u, G);
-    mat_free(G);
-    free(u);
-
-    for (i = 0; i < code_length + k_prime; i++)
-    {
-        if (i < code_length)
-        {
-            ct[i] = (unsigned char)((unsigned char)c[i] ^
-                                    (unsigned char)error_array[i]);
-        }
-        else
-        {
-            ct[i] = dd[i - code_length];
-        }
-    }
-    free(c);
-    free(dd);
-    free(error_array);
-
-    /*
-     * Step_6: Compute K = K(m)
-     */
-    unsigned char *K = (unsigned char *)calloc(ss_length, sizeof(unsigned char));
-    // Replace by KangarooTwelve
-
-    // m: input type unsigned char len k_prime | K: output type unsigned char len ss_length
-    test = KangarooTwelve(m, k_prime, K, ss_length, custom, cus_len);
-    assert(test == 0); // Catch Error
-
-    for (i = 0; i < ss_length; i++)
-    {
-        ss[i] = K[i];
-    }
-    free(K);
-    free(m);
-    return 0;
-    /*END*/
+#ifdef DEBUG_P
+	for (i = 0; i < code_length; i++)
+		printf(" %" PRIu16 ", ", ciphert_text[i]);
+	printf("|\n");
+	printf("hashing (m*G) + error: \n");
+#endif
+	SHAKE256(K, ss_length, m, k_prime);
+	for (i = 0; i < ss_length; i++) {
+		secret_shared[i] = K[i];
+	}
+	free(u);
+	free(m);
+	return 0;
 }
