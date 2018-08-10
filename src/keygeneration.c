@@ -150,7 +150,7 @@ void build_dyadic_signature(gf *dyadic_signature, gf *omega) {
 	struct signature_block blocks[nr_blocks];
 
 	for (int i = 0; i < nr_blocks; i++) {
-		blocks[i].signature = (gf*) calloc(signature_block_size,  sizeof(gf)); //TODO: check to remove this malloc
+		blocks[i].signature = (gf*) calloc(signature_block_size, sizeof(gf)); //TODO: check to remove this malloc
 	}
 	int block_nr = 0;
 	for (int i = 0; i < F_q_m_size; i = i + signature_block_size) {
@@ -175,6 +175,30 @@ void build_dyadic_signature(gf *dyadic_signature, gf *omega) {
 		free(blocks[i].signature);
 	}
 
+}
+
+int is_vectors_disjoint(gf *u, gf *v) {
+	int i, j;
+	for (i = 0; i < (signature_block_size); i++) {
+		for (j = 0; j < code_length; j++) {
+			if (u[i] == v[j]) {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int is_vector_disjoint(gf *list, int n) {
+	int i, j;
+	for (i = 0; i < n; i++) {
+		for (j = i + 1; j < n; j++) {
+			if (list[i] == list[j]) {
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 void build_support(gf omega, gf *signature_h, gf *u, gf *v) {
@@ -364,10 +388,12 @@ void key_gen(gf *v, gf *y, matrix *G) {
 	gf signature_h[code_length] = { 0 };
 	gf u[signature_block_size] = { 0 };
 	gf omega[1] = { 0 };
+	do {
+		build_dyadic_signature(signature_h, omega);
 
-	build_dyadic_signature(signature_h, omega);
-
-	build_support(omega[0], signature_h, u, v);
+		build_support(omega[0], signature_h, u, v);
+	} while (is_vectors_disjoint(u, v) || is_vector_disjoint(v, code_length)
+			|| is_vector_disjoint(u, signature_block_size));
 
 	matrix H_cauchy;
 	H_cauchy.rows = signature_block_size * extension;
