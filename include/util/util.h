@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <sodium.h>
 
 #include "../structures/matrix_operations.h"
 

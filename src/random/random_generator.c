@@ -26,7 +26,7 @@ void get_element_F_q_m(gf *set_of_elements) {
 
 int get_random_int(int size) {
 	unsigned char i[1] = { 0 };
-	randombytes(i, 1);
+	randombytes_NIST(i, 1);
 	return (i[0] % size);
 
 }
@@ -36,7 +36,7 @@ void random_elements(gf* set_of_elements_in_F_q_m) {
 	gf tmp;
 	unsigned char *random_bytes = 0;
 	random_bytes = malloc(F_q_m_size * sizeof(gf));
-	randombytes(random_bytes, F_q_m_size * sizeof(gf));
+	randombytes_NIST(random_bytes, F_q_m_size * sizeof(gf));
 	for (i = 1; i <= F_q_m_order; i++) {
 		set_of_elements_in_F_q_m[i - 1] = i;
 	}

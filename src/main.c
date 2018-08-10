@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include <sys/resource.h>
+#include <sodium.h>
 
 #include "../include/api.h"
 #include "../include/keygeneration.h"
@@ -43,6 +44,10 @@ long long t_dec[1001];
 
 #if defined(RUN)
 int main(void) {
+	if (sodium_init() < 0) {
+		/* panic! the library couldn't be initialized, it is not safe to use */
+		return 1;
+	}
 	const rlim_t kStackSize = 64L * 1024L * 1024L;   // min stack size = 64 Mb
 	struct rlimit rl;
 	int result;
@@ -93,7 +98,7 @@ int main(void) {
 	randombytes_init(entropy_input, NULL, 256);
 	for (i = 0; i < EXECUTION_TIMES; i++) {
 		fprintf(fp_req, "count = %d\n", i);
-		randombytes(random_values, 48);
+		randombytes_NIST(random_values, 48);
 		fprintBstr(fp_req, "seed = ", random_values, 48);
 		fprintf(fp_req, "pk =\n");
 		fprintf(fp_req, "sk =\n");
@@ -122,6 +127,8 @@ int main(void) {
 	fprintBstr(fp_rsp, "seed = ", seed, 48);
 
 	randombytes_init(seed, NULL, 256);
+	int success = 0;
+	int fails = 0;
 
 	do {
 		gf v[code_length] = { 0 };
@@ -163,13 +170,16 @@ int main(void) {
 		printf("decaps: %lld", final - start);
 		printf("\n");
 		if (ret_val != 0) {
-			printf("Decaps_FAIL\n");
+			printf("FAIL\n");
+			fails++;
 		} else {
-			printf("SUCCESS\n");
+			//printf("SUCCESS\n");
+			success++;
 		}
 		counter++;
 	} while (counter < 100);
-
+	printf("SUCCESS: %d\n", success);
+	printf("fails: %d\n", fails);
 	//free(sk);
 	return 0;
 }

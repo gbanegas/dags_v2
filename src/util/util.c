@@ -137,13 +137,14 @@ void generate_int_list_of_size(int *list, int length) {
 }
 
 void random_m(unsigned char *m) {
-	int i;
+	const unsigned char seed[32U] = { 1 };
+	randombytes_buf_deterministic(m, k_prime, seed);
 	//randombytes(m, k_prime);
-	unsigned char data_m[] = { 114, 194, 6, 152, 244, 38, 43, 140, 189, 83, 66,
-			48 };
-	for (i = 0; i < k_prime; i++) {
-		m[i] = data_m[i] & F_q_order;
-	}
+	/*unsigned char data_m[] = { 114, 194, 6, 152, 244, 38, 43, 140, 189, 83, 66,
+	 48 };
+	 for (i = 0; i < k_prime; i++) {
+	 m[i] = data_m[i] & F_q_order;
+	 }*/
 }
 
 int indice_in_vec(unsigned int *v, int j, int size) {
@@ -156,45 +157,46 @@ int indice_in_vec(unsigned int *v, int j, int size) {
 }
 
 void random_e(const unsigned char *sigma, unsigned char *error_array) {
-	unsigned char error[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			247, 0, 0, 0, 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
-			0, 0, 0, 0, 0 };
-	for (int i = 0; i < code_length; i++) {
-		error_array[i] = error[i];
-	}
-	/*int i, j = 0, k = 0, jeton = 0;
-	 unsigned int v[code_length] = { 0 };
-	 #ifdef DEBUG_P
-	 printf("error_position: ");
-	 #endif
-	 for (i = 0; i < code_length; i++) {
-	 if (sigma[i] % F_q_size == 0) {
-	 continue;
-	 }
-	 if (j == weight) {
-	 break;
-	 }
-	 do {
-	 jeton = (sigma[k + 1] ^ (sigma[k] << 4)) % code_length;
-	 k++;
-	 } while (indice_in_vec(v, jeton, j + 1) == 1); //Only check j elements
-	 v[j] = jeton;
-	 error_array[jeton] = sigma[i] % F_q_size;
-	 #ifdef DEBUG_P
-	 printf("%d, ", jeton);
-	 #endif
-	 jeton = 0;
-	 j++;
-	 }
-	 #ifdef DEBUG_P
-	 printf("\n");
+	/*unsigned char error[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 247, 0, 0, 0, 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
+	 0, 0, 0, 0, 0 };
 	 for (int i = 0; i < code_length; i++) {
-	 printf("%d, ", error_array[i]);
-	 }
-	 printf("\n");
-	 #endif
-	 */}
+	 error_array[i] = error[i];
+	 }*/
+
+	int i, j = 0, k = 0, jeton = 0;
+	unsigned int v[code_length] = { 0 };
+#ifdef DEBUG_P
+	printf("error_position: ");
+#endif
+	for (i = 0; i < code_length; i++) {
+		if (sigma[i] % F_q_size == 0) {
+			continue;
+		}
+		if (j == weight) {
+			break;
+		}
+		do {
+			jeton = (sigma[k + 1] ^ (sigma[k] << 4)) % code_length;
+			k++;
+		} while (indice_in_vec(v, jeton, j + 1) == 1); //Only check j elements
+		v[j] = jeton;
+		error_array[jeton] = sigma[i] % F_q_size;
+#ifdef DEBUG_P
+		printf("%d, ", jeton);
+#endif
+		jeton = 0;
+		j++;
+	}
+#ifdef DEBUG_P
+	printf("\n");
+	for (int i = 0; i < code_length; i++) {
+		printf("%d, ", error_array[i]);
+	}
+	printf("\n");
+#endif
+}
 
 void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk) {
 	int i, a = 0;
