@@ -8,7 +8,7 @@
 #ifndef INCLUDE_ENCAPSULATION_H_
 #define INCLUDE_ENCAPSULATION_H_
 
-#include <keccak/SimpleFIPS202.h>
+#include <keccak/KangarooTwelve.h>
 
 #include "util/util.h"
 #include "structures/matrix_operations.h"

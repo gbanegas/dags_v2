@@ -233,12 +233,10 @@ void build_support(gf *signature_h, gf *u, gf *v) {
 	}
 	remove_elements(elements_in_F_q_m, aux, code_length);
 
-	gf omega = 0;
-	int pos = 0;
-	do {
-		omega = elements_in_F_q_m[pos];
-		pos++;
-	} while (omega == 0);
+	gf omega = 64319;
+	/*do {
+	 omega = elements_in_F_q_m[randombytes_uniform(code_length-1)];
+	 } while (omega == 0);*/
 
 	for (int i = 0; i < code_length; i++) {
 		if (signature_h[i] != 0) {
@@ -292,9 +290,6 @@ void build_trapdoor(const matrix *H_cauchy, const gf *v, const gf *u, gf *y,
 #endif
 #if defined(RUN)
 	gf z[code_length] = { 0 };
-	gf set_of_elements_in_F_q_m[F_q_m_size] = { 0 };
-
-	generate_elements_in_F_q_m(set_of_elements_in_F_q_m);
 
 	for (int i = 0; i < n0; i++) {
 		gf random_el = 0;
@@ -353,7 +348,6 @@ int generate_systematic_matrix(const matrix* Hbase) {
 	gf temp;
 	int n = Hbase->cols;
 	int k = Hbase->rows;
-	printf("\n");
 	for (i = 0; i < k; i++) {
 		test = 0;
 		l = 0;
@@ -370,7 +364,7 @@ int generate_systematic_matrix(const matrix* Hbase) {
 		}
 		if (l == k && (i != (k - 1))) {
 			printf("Non systematic Matrix %d\n", l);
-			return 1;
+			return -1;
 		}
 		if (test == 1) { // We switches the lines l and i
 			test = 0;
@@ -379,24 +373,25 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			//P[i+n-k]=P[j];
 			//P[j]=temp;
 			for (j = 0; j < n; j++) {
-				temp = Hbase->data[l * n + j];
-				Hbase->data[l * n + j] = Hbase->data[i * n + j];
-				Hbase->data[i * n + j] = temp;
+				temp = Hbase->data[(l * Hbase->cols) + j];
+				Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(i
+						* Hbase->cols) + j];
+				Hbase->data[(i * Hbase->cols) + j] = temp;
 			}
 		}
 		//   Matrix standardization
 		gf invPiv = 1, aa;
-		if (Hbase->data[(i * n) + i + n - k] != 1) {
-			aa = Hbase->data[(i * n) + i + n - k];
+		if (Hbase->data[(i * Hbase->cols) + i + n - k] != 1) {
+			aa = Hbase->data[(i * Hbase->cols) + i + n - k];
 			invPiv = gf_inv(aa);
-			Hbase->data[(i * n) + i + n - k] = 1;
+			Hbase->data[(i * Hbase->cols) + i + n - k] = 1;
 
 			for (j = 0; j < n; j++) {
 				if (j == i + n - k) {
 					continue;
 				}
-				Hbase->data[(i * n) + j] = gf_mult(Hbase->data[(i * n) + j],
-						invPiv);
+				Hbase->data[(i * Hbase->cols) + j] = gf_mult(
+						Hbase->data[(i * Hbase->cols) + j], invPiv);
 			}
 		}
 
@@ -407,11 +402,13 @@ int generate_systematic_matrix(const matrix* Hbase) {
 				continue;
 			}
 			if (Hbase->data[(l * n) + i + n - k]) {
-				piv_align = Hbase->data[(l * n) + i + n - k];
+				piv_align = Hbase->data[(l * Hbase->cols) + i + n - k];
 
 				for (j = 0; j < n; j++) {
-					Hbase->data[l * n + j] = Hbase->data[l * n + j]
-							^ (gf_mult(piv_align, Hbase->data[i * n + j]));
+					Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(l
+							* Hbase->cols) + j]
+							^ (gf_mult(piv_align,
+									Hbase->data[(i * Hbase->cols) + j]));
 				}
 			}
 		}
@@ -496,6 +493,15 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 	return 0;
 }
 
+void print_vector(gf* vector, int size) {
+	printf("[");
+	for (int i = 0; i < size; i++) {
+		printf(" %" PRIu16 " ,", vector[i]);
+	}
+	printf("]\n");
+
+}
+
 void key_gen(gf *v, gf *y, matrix *G) {
 	int ret_value = 0;
 
@@ -507,6 +513,8 @@ void key_gen(gf *v, gf *y, matrix *G) {
 			build_support(signature_h, u, v);
 		} while (is_vectors_disjoint(u, v) || is_vector_disjoint(v, code_length)
 				|| is_vector_disjoint(u, signature_block_size));
+
+		//print_vector(signature_h, code_length);
 
 		matrix H_cauchy;
 		H_cauchy.rows = signature_block_size * extension;
@@ -531,5 +539,6 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		project_H_on_F_q(&H, &Hbase);
 
 		ret_value = generate_public_key(&Hbase, G);
+
 	} while (ret_value);
 }

@@ -137,8 +137,8 @@ void generate_int_list_of_size(int *list, int length) {
 }
 
 void random_m(unsigned char *m) {
-	const unsigned char seed[32U] = { 1 };
-	randombytes_buf_deterministic(m, k_prime, seed);
+	//const unsigned char seed[32U] = { 1 };
+	randombytes_buf(m, k_prime);
 	//randombytes(m, k_prime);
 	/*unsigned char data_m[] = { 114, 194, 6, 152, 244, 38, 43, 140, 189, 83, 66,
 	 48 };
@@ -147,7 +147,7 @@ void random_m(unsigned char *m) {
 	 }*/
 }
 
-int indice_in_vec(unsigned int *v, int j, int size) {
+int index_of_element_in_a_vector(unsigned int *v, int j, int size) {
 	int i;
 	for (i = 0; i < size; i++) {
 		if (v[i] == j)
@@ -157,14 +157,6 @@ int indice_in_vec(unsigned int *v, int j, int size) {
 }
 
 void random_e(const unsigned char *sigma, unsigned char *error_array) {
-	/*unsigned char error[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 247, 0, 0, 0, 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
-	 0, 0, 0, 0, 0 };
-	 for (int i = 0; i < code_length; i++) {
-	 error_array[i] = error[i];
-	 }*/
-
 	int i, j = 0, k = 0, jeton = 0;
 	unsigned int v[code_length] = { 0 };
 #ifdef DEBUG_P
@@ -180,7 +172,7 @@ void random_e(const unsigned char *sigma, unsigned char *error_array) {
 		do {
 			jeton = (sigma[k + 1] ^ (sigma[k] << 4)) % code_length;
 			k++;
-		} while (indice_in_vec(v, jeton, j + 1) == 1); //Only check j elements
+		} while (index_of_element_in_a_vector(v, jeton, j + 1) == 1); //Only check j elements
 		v[j] = jeton;
 		error_array[jeton] = sigma[i] % F_q_size;
 #ifdef DEBUG_P

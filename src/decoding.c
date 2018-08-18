@@ -20,7 +20,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 	//Compute Syndrome normally
 #ifdef DEBUG_P
-	printf("Computing syndrom");
+	printf("Decoding:Computing syndrom");
 
 	printf("\n");
 #endif
@@ -108,11 +108,17 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	for (i = 0; i < F_q_m_size; i++) {
 		gf result = polynomial_evaluation(sigma, aux_perm[i]);
 		if (!result) {
-			aux_position[j] = index_of_element(v, gf_q_m_inv(aux_perm[i]));
+			int pos =  index_of_element(v, gf_q_m_inv(aux_perm[i]));
+#ifdef DEBUG_P
+	printf("%d,", pos);
+#endif
+			aux_position[j] = pos;
 			j += 1;
 		}
 	}
-
+#ifdef DEBUG_P
+	printf("\n");
+#endif
 	polynomial_free(sigma);
 
 	//Element for determining the value of errors

@@ -172,6 +172,7 @@ int main(void) {
 		if (ret_val != 0) {
 			printf("FAIL\n");
 			fails++;
+			return -1;
 		} else {
 			//printf("SUCCESS\n");
 			success++;
