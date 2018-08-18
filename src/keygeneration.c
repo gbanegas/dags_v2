@@ -233,10 +233,10 @@ void build_support(gf *signature_h, gf *u, gf *v) {
 	}
 	remove_elements(elements_in_F_q_m, aux, code_length);
 
-	gf omega = 64319;
-	/*do {
-	 omega = elements_in_F_q_m[randombytes_uniform(code_length-1)];
-	 } while (omega == 0);*/
+	gf omega = 0;
+	do {
+		omega = elements_in_F_q_m[randombytes_uniform(code_length - 1)];
+	} while (omega == 0);
 
 	for (int i = 0; i < code_length; i++) {
 		if (signature_h[i] != 0) {
@@ -264,7 +264,7 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
 		}
 	}
 
-	for (int k = 1; k < extension + 1; k++) {
+	for (int k = 1; k < pol_deg + 1; k++) {
 		for (int i = 0; i < signature_block_size; i++) {
 			for (int j = 0; j < code_length; j++) {
 				gf result = gf_pow_f_q_m((H->data[i * H->cols + j]), k);
@@ -318,7 +318,7 @@ void build_trapdoor(const matrix *H_cauchy, const gf *v, const gf *u, gf *y,
 		gf pol = 1;
 		for (int j = 0; j < signature_block_size; j++) {
 			gf sum_u_v = (v[i] ^ u[j]);
-			gf result = gf_pow_f_q_m(sum_u_v, extension);
+			gf result = gf_pow_f_q_m(sum_u_v, pol_deg);
 			pol = gf_q_m_mult(pol, result);
 		}
 		gf div = gf_div_f_q_m(z[i], pol);
