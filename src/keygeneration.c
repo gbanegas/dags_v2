@@ -267,7 +267,8 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
 	for (int k = 1; k < pol_deg + 1; k++) {
 		for (int i = 0; i < signature_block_size; i++) {
 			for (int j = 0; j < code_length; j++) {
-				gf result = gf_pow_f_q_m((H->data[i * H->cols + j]), k);
+				gf element = (H->data[i * H->cols + j]);
+				gf result = gf_pow_f_q_m(element, k);
 				H_cauchy->data[((k - 1) * signature_block_size + i) * H->cols
 						+ j] = result;
 
@@ -517,26 +518,29 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		//print_vector(signature_h, code_length);
 
 		matrix H_cauchy;
-		H_cauchy.rows = signature_block_size * extension;
+		H_cauchy.rows = signature_block_size * pol_deg;
 		H_cauchy.cols = code_length;
-		gf data_cauchy[signature_block_size * extension * code_length] = { 0 };
+
+		gf data_cauchy[signature_block_size * pol_deg * code_length] = { 0 };
 		H_cauchy.data = data_cauchy;
 		build_cauchy_matrix(u, v, &H_cauchy);
 
+		//TODO: check the size of matrices! Pol_deg or extension.
 		matrix H;
-		H.rows = signature_block_size * extension;
+		H.rows = signature_block_size * pol_deg;
 		H.cols = code_length;
-		gf data_H[signature_block_size * extension * code_length] = { 0 };
+		gf data_H[signature_block_size * pol_deg * code_length] = { 0 };
 		H.data = data_H;
 		build_trapdoor(&H_cauchy, v, u, y, &H);
 
 		matrix Hbase;
-		Hbase.rows = (signature_block_size * extension) * extension;
+		Hbase.rows = (signature_block_size * pol_deg) * extension;
 		Hbase.cols = code_length;
-		gf data_Hbase[signature_block_size * extension * code_length * extension] =
+		gf data_Hbase[signature_block_size * pol_deg * code_length * extension] =
 				{ 0 };
 		Hbase.data = data_Hbase;
 		project_H_on_F_q(&H, &Hbase);
+
 
 		ret_value = generate_public_key(&Hbase, G);
 

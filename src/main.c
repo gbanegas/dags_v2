@@ -135,10 +135,10 @@ int main(void) {
 		gf y[code_length] = { 0 };
 		matrix G;
 		G.cols = code_length;
-		G.rows = code_length - ((signature_block_size * extension) * extension);
+		G.rows = code_length - ((signature_block_size * pol_deg) * extension);
 		gf data_G[code_length
 				* (code_length
-						- ((signature_block_size * extension) * extension))] = {
+						- ((signature_block_size * pol_deg) * extension))] = {
 				0 };
 		G.data = data_G;
 		int ret_val = 0;
