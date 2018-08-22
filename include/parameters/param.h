@@ -8,7 +8,6 @@
 #ifndef SRC_PARAMETERS_PARAM_H_
 #define SRC_PARAMETERS_PARAM_H_
 
-#define DYADIC 2
 #if defined(DAGS_5) || defined(DAGS_3) || defined(DAGS_TOY)
 #define field 8 //2^8
 #endif
@@ -81,12 +80,12 @@
 #define irreducible_polynomial_field 65581
 // Define Poly primitive subfield: x^8 + x^4+ x^3 + x + 1
 #define primitive_polynomial_subfield 283
-#define code_length 64
-#define code_dimension 48 // number of line of each block matrix
+#define code_length 120
+#define code_dimension 88 // number of line of each block matrix
 #define k_prime  32
-#define signature_block_size 4
-#define pol_deg 2 //block number 11
-#define weight 4
+#define signature_block_size 8
+#define pol_deg 2//block number 11
+#define weight 8
 #define ss_length 64
 #define k_sec 12
 #define n0 (code_length/signature_block_size)

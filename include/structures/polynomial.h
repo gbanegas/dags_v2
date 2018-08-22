@@ -52,7 +52,7 @@ extern polynomial* poly_quo(polynomial* p, polynomial* d);
 
 extern void print_polynomial(polynomial *p);
 
-extern gf sum_vect_element(gf* w, int length);
+extern gf sum_vector(gf* w, int length);
 
 extern polynomial* p_div(polynomial* n, polynomial* d);
 

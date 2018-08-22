@@ -415,30 +415,7 @@ int generate_systematic_matrix(const matrix* Hbase) {
 		}
 	}
 	return 0;
-	/*matrix * aux_A = submatrix(Hbase, 0, 0, r, (n - r));
 
-	 matrix * aux_B = submatrix(Hbase, 0, (n - r), r, r);
-
-	 matrix * aux_H = augment(aux_B, aux_A);
-	 free_matrix(aux_A);
-	 free_matrix(aux_B);
-
-	 print_matrix(aux_H);
-
-	 echelon_form(aux_H);
-
-	 print_matrix(aux_H);
-
-	 matrix *matrix_M = submatrix(aux_H, 0, r, r, (n - r));
-
-	 free_matrix(aux_H);
-	 matrix *m_temp = make_matrix(r, r);
-	 for (int i = 0; i < r; i++)
-	 m_temp->data[i * r + i] = 1;
-
-	 matrix *H = augment(matrix_M, m_temp);
-	 free_matrix(matrix_M);
-	 free_matrix(m_temp);*/
 
 }
 
@@ -482,9 +459,9 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 	gf y[code_length] = { 0 };
 	matrix G;
 	G.cols = code_length;
-	G.rows = code_length - ((signature_block_size * extension) * extension);
+	G.rows = code_length - ((signature_block_size * pol_deg) * extension);
 	gf data_G[code_length
-			* (code_length - ((signature_block_size * extension) * extension))] =
+			* (code_length - ((signature_block_size * pol_deg) * extension))] =
 			{ 0 };
 	G.data = data_G;
 	key_gen(v, y, &G);
@@ -525,7 +502,6 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		H_cauchy.data = data_cauchy;
 		build_cauchy_matrix(u, v, &H_cauchy);
 
-		//TODO: check the size of matrices! Pol_deg or extension.
 		matrix H;
 		H.rows = signature_block_size * pol_deg;
 		H.cols = code_length;
@@ -539,6 +515,7 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		gf data_Hbase[signature_block_size * pol_deg * code_length * extension] =
 				{ 0 };
 		Hbase.data = data_Hbase;
+
 		project_H_on_F_q(&H, &Hbase);
 
 

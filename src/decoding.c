@@ -56,7 +56,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 		poly_set(re, syndrom); // re = p
 
-		poly_set(syndrom, rest); // p = mpd_re
+		poly_set(syndrom, rest); // p = mo2d_re
 
 		poly_set(app, uu); // app = UU
 
@@ -95,7 +95,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 	gf aux_perm[F_q_m_size] = { 0 };
 	for (i = 0; i < F_q_m_size; i++) {
-		aux_perm[i] = gf_pow_f_q_m(2, i);
+		aux_perm[i] = i;
 	}
 
 	int aux_position[weight] = { -1 };
@@ -108,9 +108,9 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	for (i = 0; i < F_q_m_size; i++) {
 		gf result = polynomial_evaluation(sigma, aux_perm[i]);
 		if (!result) {
-			int pos =  index_of_element(v, gf_q_m_inv(aux_perm[i]));
+			int pos = index_of_element(v, gf_q_m_inv(aux_perm[i]));
 #ifdef DEBUG_P
-	printf("%d,", pos);
+			printf("%d,", pos);
 #endif
 			aux_position[j] = pos;
 			j += 1;
@@ -145,7 +145,6 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	printf("Computing evaluating error position");
 	printf("\n");
 #endif
-	/// H_alt = produit_matrix(H_alt,PP);
 	app = create_polynomial(pos->degree);
 	for (j = 0; j <= pos->degree; j++) {
 		pol_gf = 1;
@@ -159,8 +158,10 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 		}
 		o = polynomial_evaluation(omega, gf_q_m_inv(v[pos->coefficient[j]]));
 		tmp1 = gf_q_m_mult(y[pos->coefficient[j]], pol_gf);
-		if (tmp1 != 0)
-			app->coefficient[j] = gf_q_m_mult(o, gf_q_m_inv(tmp1));
+		if (tmp1 != 0) {
+			gf result_tmp = gf_div_f_q_m(o, tmp1);
+			app->coefficient[j] = result_tmp;
+		}
 	}
 	polynomial_get_update_degree(app);
 	polynomial_free(omega);
@@ -179,7 +180,6 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	//Reconstruction of the error vector
 	for (i = 0; i <= app->degree; i++) {
 		k = discrete_logarithm(app->coefficient[i], alpha);
-
 		gf correction = gf_pow_f_q(2, k);
 		error[pos->coefficient[i]] = correction;
 
@@ -190,9 +190,9 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 #ifdef DEBUG_P
 	printf("decoding_error:\n");
 	/*for (i = 0; i < code_length; i++) {
-		printf(" %" PRIu16 ", ", error[i]);
-	}
-	printf("\n");*/
+	 printf(" %" PRIu16 ", ", error[i]);
+	 }
+	 printf("\n");*/
 #endif
 	//Reconstruction of code_word
 	for (i = 0; i < code_length; i++) {

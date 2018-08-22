@@ -7,7 +7,7 @@
 
 #include "structures/polynomial.h"
 
-gf sum_vect_element(gf* w, int length) {
+gf sum_vector(gf* w, int length) {
 	gf tmp = 0;
 	int j = 0;
 	for (j = 0; j < length; j++) {
@@ -42,16 +42,16 @@ void compute_syndrom(const gf* v, const gf* y, const unsigned char *cipher_text,
 		w[j] = result;
 
 	}
-	result = sum_vect_element(w, code_length);
+	result = sum_vector(w, code_length);
 
 	//gf result = sum_vect_element(w, code_length);
 	s->coefficient[0] = result;
-	for (i = 1; i < st; i++) {
+	for (i = 1; i < st+1; i++) {
 		for (j = 0; j < code_length; j++) {
 			w[j] = gf_q_m_mult(v[j], w[j]);
 		}
 
-		result = sum_vect_element(w, code_length);
+		result = sum_vector(w, code_length);
 		//s->coefficient[i] = tmp;
 		s->coefficient[i] = result;
 	}
