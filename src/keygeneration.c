@@ -123,10 +123,10 @@ void build_dyadic_signature(gf *dyadic_signature) {
 	}
 	int count_part = 0;
 	if (!contains_zero(temp_list, signature_block_size)) {
-		block_position[0] = 0;
+		block_position[0] = ll;
 		ll++;
 
-		while (ll * signature_block_size < code_length) {
+		while (ll * signature_block_size != code_length) {
 			int j = 0;
 
 			do {
