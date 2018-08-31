@@ -176,7 +176,7 @@ gf gf_inv(gf in) {
 }
 
 gf gf_q_m_inv(gf in) {
-	gf out = gf_pow_f_q_m(in, 254);
+	gf out = gf_pow_f_q_m(in, 4094);
 	return out;
 }
 #endif

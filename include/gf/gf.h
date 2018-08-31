@@ -212,7 +212,7 @@ static inline gf gf_q_m_mult(gf in0, gf in1) {
 	tmp = tmp & 0x7FFFFF;	// tmp & 0111 1111 1111 1111
 	//first step of reduction
 	gf reduction = (tmp >> 12);
-	tmp = tmp & 0x1FFF;
+	tmp = tmp & 0xFFF;
 	tmp = tmp ^ (reduction << 6);
 	tmp = tmp ^ (reduction << 4);
 	tmp = tmp ^ reduction << 1;
