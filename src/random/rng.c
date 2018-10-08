@@ -10,7 +10,7 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 
-#include "random/rng.h"
+#include "../../include/random/rng.h"
 
 AES256_CTR_DRBG_struct  DRBG_ctx;
 

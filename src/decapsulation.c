@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "decapsulation.h"
+#include "../include/decapsulation.h"
 
 #define cus_len 4
 

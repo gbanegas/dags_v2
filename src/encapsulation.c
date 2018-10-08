@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "encapsulation.h"
+#include "../include/encapsulation.h"
 #define cus_len 4
 int encapsulation(unsigned char *ciphert_text, unsigned char *secret_shared,
 		const unsigned char *public_key) {

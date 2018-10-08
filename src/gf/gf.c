@@ -1,4 +1,4 @@
-#include "../include/gf/gf.h"
+#include "../../include/gf/gf.h"
 
 //TODO: Change this
 gf gf_pow_f_q_m(gf in, gf power) {
