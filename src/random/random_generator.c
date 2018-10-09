@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "random/random_generator.h"
+#include "../../include/random/random_generator.h"
 
 void random_elements_fix(gf* set_of_elements_in_F_q_m) {
 	gf random_set_of_elements_in_F_q_m[] = { 24531, 57323, 43273, 56025, 22976,

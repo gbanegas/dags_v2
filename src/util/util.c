@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "../include/util/util.h"
+#include "../../include/util/util.h"
 
 void store(matrix *src, unsigned char *dst) {
 	int i, j, k, p, d, a = 0;

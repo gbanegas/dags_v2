@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "../include/structures/matrix_operations.h"
+#include "../../include/structures/matrix_operations.h"
 
 #define min(a,b) (((a)<(b))?(a):(b))
 

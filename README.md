@@ -2,6 +2,10 @@
 
 The instruction is applied for Linux/Ubuntu. 
 
+### REQUIRED LIBS
+
+crypto m sodium keccak
+
 ### INSTALLATION 
 
 You will need to Keccak libraries have the software run. 
@@ -24,6 +28,8 @@ Although we leave keccak in the build, but it might be obsolete someday so we re
 
 ### BUILD
 
+Select the desired version of DAGS you would like to build by editing
+the makefile 
 To build the binary, just run:
 
 ```bash
@@ -36,5 +42,5 @@ make
 
 ### RUN 
 
-To run, `./PQCgenKAT_kem` 
+To run, `./dags` 
 

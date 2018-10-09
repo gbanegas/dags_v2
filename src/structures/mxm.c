@@ -1,4 +1,4 @@
-#include "../include/structures/mxm.h"
+#include "../../include/structures/mxm.h"
 
 #define BLK_SIZE 128
 #define min(a,b) (((a)<(b))?(a):(b))

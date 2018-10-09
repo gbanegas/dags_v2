@@ -13,7 +13,7 @@
 #include <math.h>
 #include <inttypes.h>
 
-#include "definitions.h"
+#include "../definitions.h"
 #include "../parameters/param.h"
 
 static gf gf_mult(gf in0, gf in1);

@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "structures/polynomial.h"
+#include "../../include/structures/polynomial.h"
 
 gf sum_vector(gf* w, int length) {
 	gf tmp = 0;

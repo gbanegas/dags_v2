@@ -5,11 +5,17 @@
 -include ../makefile.init
 
 RM := rm -rf
+CC=gcc
+#Select the desired dags you would like to build
+DAGSVER=-DDAGS_1
+#DAGSVER=-DDAGS_3
+#DAGSVER=-DDAGS_5
 
+CFLAGS=-O3 -g3 -Wall -DRUN 
+LIBS=-lcrypto -lm -lsodium -lkeccak
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/util/subdir.mk
--include src/unit_tests/subdir.mk
 -include src/structures/subdir.mk
 -include src/random/subdir.mk
 -include src/gf/subdir.mk
@@ -24,23 +30,22 @@ endif
 endif
 
 -include ../makefile.defs
-
+SRC=$(wildcard src/*.c src/gf/*.c src/random/*.c src/structures/*.c src/util/*.c)
 # Add inputs and outputs from these tool invocations to the build variables 
-
 # All Target
-all: dags_n
+all: dags
 
 # Tool invocations
-dags_n: $(OBJS) $(USER_OBJS)
+dags: $(SRC)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C Linker'
-	gcc  -o "dags_n" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: Cross GCC Linker'
+	$(CC) $(CFLAGS) $(DAGSVER) $  -o "dags" $(SRC)  $(LIBS) 
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) dags_n
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) dags *.o
 	-@echo ' '
 
 .PHONY: all clean dependents

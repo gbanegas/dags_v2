@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "decoding.h"
+#include "../include/decoding.h"
 
 int decoding(const gf* v, const gf* y, const unsigned char *c,
 		unsigned char *error, unsigned char *code_word) {
