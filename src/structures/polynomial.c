@@ -87,6 +87,8 @@ polynomial* create_polynomial(int degree) {
 
 	return poly;
 }
+
+
 gf poly_eval_aux(gf * coeff, gf a, int d) {
 	gf b;
 	b = coeff[d--];

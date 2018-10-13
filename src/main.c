@@ -178,7 +178,7 @@ int main(void) {
 			success++;
 		}
 		counter++;
-	} while (counter < 100);
+	} while (counter < 1);
 	printf("SUCCESS: %d\n", success);
 	printf("fails: %d\n", fails);
 	//free(sk);

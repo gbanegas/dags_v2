@@ -5,13 +5,13 @@
 -include ../makefile.init
 
 RM := rm -rf
-CC=gcc
+CC=clang
 #Select the desired dags you would like to build
-DAGSVER=-DDAGS_1
-#DAGSVER=-DDAGS_3
+#DAGSVER=-DDAGS_1
+DAGSVER=-DDAGS_3
 #DAGSVER=-DDAGS_5
 
-CFLAGS=-O3 -g3 -Wall -DRUN 
+CFLAGS=-O3 -g3 -Wall -DRUN -march=native
 LIBS=-lcrypto -lm -lsodium -lkeccak
 # All of the sources participating in the build are defined here
 -include sources.mk

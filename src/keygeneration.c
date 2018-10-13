@@ -156,8 +156,12 @@ void build_dyadic_signature(gf *dyadic_signature) {
 	int nr_blocks = floor(F_q_m_size / signature_block_size);
 	struct signature_block blocks[nr_blocks];
 
+	gf* whole_blocks = malloc(signature_block_size*nr_blocks*sizeof(gf));
+
 	for (int i = 0; i < nr_blocks; i++) {
-		blocks[i].signature = (gf*) calloc(signature_block_size, sizeof(gf)); //TODO: check to remove this malloc
+		
+		blocks[i].signature = whole_blocks + signature_block_size*i;
+		//TODO: check to remove this malloc
 	}
 	int block_nr = 0;
 	for (int i = 0; i < F_q_m_size; i = i + signature_block_size) {
@@ -178,9 +182,7 @@ void build_dyadic_signature(gf *dyadic_signature) {
 		}
 	}
 
-	for (int i = 0; i < nr_blocks; i++) {
-		free(blocks[i].signature);
-	}
+	free(whole_blocks);
 
 }
 

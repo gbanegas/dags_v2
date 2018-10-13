@@ -1,0 +1,421 @@
+Starting iteration: 0
+Key pair generation: 13 588 552 373
+Encaps: 8 861 444
+decaps: 280 729 103
+Starting iteration: 1
+Key pair generation: 14063120502
+Encaps: 9397740
+decaps: 286927704
+Starting iteration: 2
+
+
+
+========================
+
+
+Starting iteration: 0
+Key pair generation: 13 794 538 790
+Encaps: 8 758 534
+decaps: 283 881 304
+Starting iteration: 1
+Key pair generation: 13892950705
+Encaps: 8581108
+decaps: 268983106
+Starting iteration: 2
+Key pair generation: 14126626646
+Encaps: 8639098
+decaps: 275787448
+Starting iteration: 3
+Key pair generation: 13915081178
+Encaps: 9413270
+decaps: 279745820
+Starting iteration: 4
+
+
+===================================
+
+
+
+y_0 = x_0 + x_8 + x_9 + x_a + x_b + x_c; 
+y_1 = x_2 + x_3 + x_4 + x_5 + x_8 + x_b + x_d + x_e;
+y_2 = x_4 + x_6 + x_8 + x_b + x_d + x_e;
+y_3 = x_3 + x_5 + x_8 + x_9 + x_a + x_b + x_f;
+y_4 = x_6 + x_7 + x_8 + x_9 + x_a;
+y_5 = x_4 + x_5 + x_6 + x_7 + x_8 + x_a + x_b + x_c + x_d + x_f;
+
+y_6 = x_6 + x_7 + x_8 + x_9 + x_a + x_c + x_e;
+y_7 = x_5 + x_7 + x_8 + x_9 + x_d + x_e + x_f;
+y_8 = x_1 + x_2 + x_3 + x_4 + x_7 + x_a + x_c + x_d + x_f;
+
+y_9 = x_3 + x_5 + x_8 + x_9 + x_b + x_c + x_d + x_f;
+y_a = x_2 + x_4 + x_b + x_e + x_f;
+y_b = x_5 + x_6 + x_a + x_b + x_f;
+y_c = x_3 + x_4 + x_5 + x_6 + x_7 + x_9 + x_a + x_b + x_c + x_e + x_f;
+
+y_d = x_5 + x_6 + x_7 + x_8 + x_9 + x_b + x_d;
+y_e = x_4 + x_6 + x_7 + x_8 + x_c + x_d + x_e + x_f;
+y_f = x_7 + x_8 + x_9 + x_a + x_b + x_f;
+
+
+[('8', 12), ('b', 11), ('f', 10), ('a', 9), ('7', 9), ('9', 9)
+
+A = x_8 + x_b
+
+
+y_0 = x_0 + x_8 + x_9 + x_a + x_b + x_c; 
+=> y_0 = x_0 + A + x_9  + x_a + x_c
+
+
+
+
+345679abcef 089abc -----4> 9abc
+345679abcef 23458bde -----5> 345be
+345679abcef 468bde -----4> 46be
+345679abcef 3589abf -----6> 359abf
+345679abcef 6789a -----4> 679a
+345679abcef 45678abcdf -----8> 4567abcf
+345679abcef 6789ace -----6> 679ace
+345679abcef 5789def -----5> 579ef
+345679abcef 12347acdf -----6> 347acf
+345679abcef 3589bcdf -----6> 359bcf
+345679abcef 24bef -----4> 4bef
+345679abcef 56abf -----5> 56abf
+345679abcef 56789bd -----5> 5679b
+345679abcef 4678cdef -----6> 467cef
+345679abcef 789abf -----5> 79abf
+79 5.266666666666667 5.0 ModeResult(mode=array([5]), count=array([5])) 15
+============
+
+In [112]: ''.join(mm)
+Out[112]: '9abc345be46be359abf679a4567abcf679ace579ef347acf359bcf4bef56abf5679b467cef79abf'
+
+In [114]: print Counter( ''.join(mm) ).most_common(10)
+[('b', 10), ('f', 9), ('a', 8), ('7', 8), ('9', 8), ('5', 7), ('6', 7), ('c', 6), ('e', 6), ('4', 6)]
+
+Counter({'b': 10, 'f': 9, 'a': 8, '7': 8, '9': 8, '5': 7, '6': 7, 'c': 6, 'e': 6, '4': 6, '3': 4})
+============11 
+
+
+4567abcf 9abc -----3> abc
+4567abcf 345be -----3> 45b
+4567abcf 46be -----3> 46b
+4567abcf 359abf -----4> 5abf
+4567abcf 679a -----3> 67a
+4567abcf 679ace -----4> 67ac
+4567abcf 579ef -----3> 57f
+4567abcf 347acf -----5> 47acf
+4567abcf 359bcf -----4> 5bcf
+4567abcf 4bef -----3> 4bf
+4567abcf 56abf -----5> 56abf
+4567abcf 5679b -----4> 567b
+4567abcf 467cef -----5> 467cf
+4567abcf 79abf -----4> 7abf
+53 3.7857142857142856 4.0 ModeResult(mode=array([3]), count=array([6])) 14
+===================
+
+
+45678abcdf 089abc -----4> 8abc
+45678abcdf 23458bde -----5> 458bd
+45678abcdf 468bde -----5> 468bd
+45678abcdf 3589abf -----5> 58abf
+45678abcdf 6789a -----4> 678a
+45678abcdf 6789ace -----5> 678ac
+45678abcdf 5789def -----5> 578df
+45678abcdf 12347acdf -----6> 47acdf
+45678abcdf 3589bcdf -----6> 58bcdf
+45678abcdf 24bef -----3> 4bf
+45678abcdf 56abf -----5> 56abf
+45678abcdf 345679abcef -----8> 4567abcf
+45678abcdf 56789bd -----6> 5678bd
+45678abcdf 4678cdef -----7> 4678cdf
+45678abcdf 789abf -----5> 78abf
+79 5.266666666666667 5.0 ModeResult(mode=array([5]), count=array([7])) 15
+==========
+In [115]: nn  = ['8abc','458bd','468bd','58abf','678a','678ac','578df','47acdf','58bcdf','4bf','56abf','4567abcf','5678bd','4678cdf','78abf',]
+
+In [116]: print Counter( ''.join(nn) ).most_common(10)
+[('8', 11), ('b', 10), ('f', 9), ('a', 8), ('7', 8), ('d', 7), ('5', 7), ('6', 7), ('c', 6), ('4', 6)]
+
+Counter({'8': 11, 'b': 10, 'f': 9, 'a': 8, '7': 8, 'd': 7, '5': 7, '6': 7, 'c': 6, '4': 6})
+==========10 
+8bf 
+a7
+s45
+c4 
+
+
+4567abcf 8abc -----3> abc
+4567abcf 458bd -----3> 45b
+4567abcf 468bd -----3> 46b
+4567abcf 58abf -----4> 5abf
+4567abcf 678a -----3> 67a
+4567abcf 678ac -----4> 67ac
+4567abcf 578df -----3> 57f
+4567abcf 47acdf -----5> 47acf
+4567abcf 58bcdf -----4> 5bcf
+4567abcf 4bf -----3> 4bf
+4567abcf 56abf -----5> 56abf
+4567abcf 5678bd -----4> 567b
+4567abcf 4678cdf -----5> 467cf
+4567abcf 78abf -----4> 7abf
+53 3.7857142857142856 4.0 ModeResult(mode=array([3]), count=array([6])) 14
+==========
+
+
+
+AFTER COVERGING 
+
+56abf abc -----2> ab
+56abf 45b -----2> 5b
+56abf 46b -----2> 6b
+56abf 5abf -----4> 5abf
+56abf 67a -----2> 6a
+56abf 67ac -----2> 6a
+56abf 57f -----2> 5f
+56abf 47acf -----2> af
+56abf 5bcf -----3> 5bf
+56abf 4bf -----2> bf
+56abf 567b -----3> 56b
+56abf 467cf -----2> 6f
+56abf 7abf -----3> abf
+31 2.3846153846153846 2.0 ModeResult(mode=array([2]), count=array([9])) 13
+
+
+5bf 5b -----2> 5b
+5bf 5abf -----3> 5bf
+5bf 5f -----2> 5f
+5bf bf -----2> bf
+5bf 56b -----2> 5b
+5bf abf -----2> bf
+13 2.1666666666666665 2.0 ModeResult(mode=array([2]), count=array([5])) 6
+
+
+
+Path 1: 
+
+45678abcdf 089abc -----4> 8abc
+45678abcdf 23458bde -----5> 458bd
+45678abcdf 468bde -----5> 468bd
+45678abcdf 3589abf -----5> 58abf
+45678abcdf 6789a -----4> 678a
+45678abcdf 6789ace -----5> 678ac
+45678abcdf 5789def -----5> 578df
+45678abcdf 12347acdf -----6> 47acdf
+45678abcdf 3589bcdf -----6> 58bcdf
+45678abcdf 24bef -----3> 4bf
+45678abcdf 56abf -----5> 56abf
+45678abcdf 345679abcef -----8> 4567abcf
+45678abcdf 56789bd -----6> 5678bd
+45678abcdf 4678cdef -----7> 4678cdf
+45678abcdf 789abf -----5> 78abf
+79 5.266666666666667 5.0 ModeResult(mode=array([5]), count=array([7])) 15
+
+
+4567abcf 8abc -----3> abc
+4567abcf 458bd -----3> 45b
+4567abcf 468bd -----3> 46b
+4567abcf 58abf -----4> 5abf
+4567abcf 678a -----3> 67a
+4567abcf 678ac -----4> 67ac
+4567abcf 578df -----3> 57f
+4567abcf 47acdf -----5> 47acf
+4567abcf 58bcdf -----4> 5bcf
+4567abcf 4bf -----3> 4bf
+4567abcf 56abf -----5> 56abf
+4567abcf 5678bd -----4> 567b
+4567abcf 4678cdf -----5> 467cf
+4567abcf 78abf -----4> 7abf
+53 3.7857142857142856 4.0 ModeResult(mode=array([3]), count=array([6])) 14
+
+
+Path 2:
+
+345679abcef 089abc -----4> 9abc
+345679abcef 23458bde -----5> 345be
+345679abcef 468bde -----4> 46be
+345679abcef 3589abf -----6> 359abf
+345679abcef 6789a -----4> 679a
+345679abcef 45678abcdf -----8> 4567abcf
+345679abcef 6789ace -----6> 679ace
+345679abcef 5789def -----5> 579ef
+345679abcef 12347acdf -----6> 347acf
+345679abcef 3589bcdf -----6> 359bcf
+345679abcef 24bef -----4> 4bef
+345679abcef 56abf -----5> 56abf
+345679abcef 56789bd -----5> 5679b
+345679abcef 4678cdef -----6> 467cef
+345679abcef 789abf -----5> 79abf
+79 5.266666666666667 5.0 ModeResult(mode=array([5]), count=array([5])) 15
+==========
+
+
+4567abcf 9abc -----3> abc
+4567abcf 345be -----3> 45b
+4567abcf 46be -----3> 46b
+4567abcf 359abf -----4> 5abf
+4567abcf 679a -----3> 67a
+4567abcf 679ace -----4> 67ac
+4567abcf 579ef -----3> 57f
+4567abcf 347acf -----5> 47acf
+4567abcf 359bcf -----4> 5bcf
+4567abcf 4bef -----3> 4bf
+4567abcf 56abf -----5> 56abf
+4567abcf 5679b -----4> 567b
+4567abcf 467cef -----5> 467cf
+4567abcf 79abf -----4> 7abf
+53 3.7857142857142856 4.0 ModeResult(mode=array([3]), count=array([6])) 14
+
+
+2 path COVERGING:
+
+56abf abc -----2> ab
+56abf 45b -----2> 5b
+56abf 46b -----2> 6b
+56abf 5abf -----4> 5abf
+56abf 67a -----2> 6a
+56abf 67ac -----2> 6a
+56abf 57f -----2> 5f
+56abf 47acf -----2> af
+56abf 5bcf -----3> 5bf
+56abf 4bf -----2> bf
+56abf 567b -----3> 56b
+56abf 467cf -----2> 6f
+56abf 7abf -----3> abf
+31 2.3846153846153846 2.0 ModeResult(mode=array([2]), count=array([9])) 13
+=====================================
+
+5bf 5b -----2> 5b
+5bf 5abf -----3> 5bf
+5bf 5f -----2> 5f
+5bf bf -----2> bf
+5bf 56b -----2> 5b
+5bf abf -----2> bf
+13 2.1666666666666665 2.0 ModeResult(mode=array([2]), count=array([5])) 6
+=====================================
+
+
+tt = ['089abc','23458bde', '468bde','389aB','6789a','4678acdB','6789ace','5789def','12347acdf','389cdB','24bef','56C','34679aceB','56789bd','4678cdef','789C']
+
+B = 5bf 
+C = abf 
+
+2nd filtering 
+
+4678cdef 089abc -----2> 8c
+4678cdef 23458bde -----4> 48de
+4678cdef 468bde -----5> 468de
+4678cdef 6789a -----3> 678
+4678cdef 4678acdB -----6> 4678cd
+4678cdef 6789ace -----5> 678ce
+4678cdef 5789def -----5> 78def
+4678cdef 12347acdf -----5> 47cdf
+4678cdef 389cdB -----3> 8cd
+4678cdef 24bef -----3> 4ef
+4678cdef 34679aceB -----5> 467ce
+4678cdef 56789bd -----4> 678d
+4678cdef 789C -----2> 78
+
+4678cd 8c -----2> 8c
+4678cd 48de -----3> 48d
+4678cd 468de -----4> 468d
+4678cd 678 -----3> 678
+4678cd 678ce -----4> 678c
+4678cd 78def -----3> 78d
+4678cd 47cdf -----4> 47cd
+4678cd 8cd -----3> 8cd
+4678cd 467ce -----4> 467c
+4678cd 678d -----4> 678d
+4678cd 78 -----2> 78
+
+
+34679aceB 089abc -----3> 9ac
+34679aceB 23458bde -----3> 34e
+34679aceB 468bde -----3> 46e
+34679aceB 389aB -----4> 39Ba
+34679aceB 6789a -----4> 679a
+34679aceB 4678acdB -----6> 467Bac
+34679aceB 6789ace -----6> 679ace
+34679aceB 5789def -----3> 79e
+34679aceB 12347acdf -----5> 347ac
+34679aceB 389cdB -----4> 39Bc
+34679aceB 24bef -----2> 4e
+34679aceB 56789bd -----3> 679
+34679aceB 4678cdef -----5> 467ce
+34679aceB 789C -----2> 79
+
+
+
+679ace 9ac -----3> 9ac
+679ace 46e -----2> 6e
+679ace 39Ba -----2> 9a
+679ace 679a -----4> 679a
+679ace 467Bac -----4> 67ac
+679ace 79e -----3> 79e
+679ace 347ac -----3> 7ac
+679ace 39Bc -----2> 9c
+679ace 679 -----3> 679
+679ace 467ce -----4> 67ce
+679ace 79 -----2> 79
+32 2.909090909090909 3.0 ModeResult(mode=array([2]), count=array([4])) 11
+
+679a 9ac -----2> 9a
+679a 9a -----2> 9a
+679a 67ac -----3> 67a
+679a 79e -----2> 79
+679a 7ac -----2> 7a
+679a 679 -----3> 679
+679a 67ce -----2> 67
+679a 79 -----2> 79
+18 2.25 2.0 ModeResult(mode=array([2]), count=array([6])) 8
+
+
+JE      0b
+MH      2b
+H       46b
+AE      35a
+EF      a
+JAFP    48
+JEF     e
+EP      7ef
+J       12347df
+AEP     3c
+A       24e
+A       56a
+JAFM    9e
+EFP     b
+HF      4cf
+E       7a
+
+A = bf 
+E = 89 
+F = 67 
+H = 8de 
+J = ac 
+M = 345 
+P = 5d 
+
+
+Will continue this 
+
+Replace Calloc by malloc 
+
+ ~/W/2/c/dags   *…  ./dags                                                                      6.3s  Fri 12 Oct 2018 12:53:19 AM EDT
+Starting iteration: 0
+Key pair generation: 13 271 542 852
+Encaps: 8314556
+decaps: 275962770
+SUCCESS: 1
+fails: 0
+
+Starting iteration: 0
+Key pair generation: 13 510 899 593
+Encaps: 8 897 916
+decaps: 275495682
+SUCCESS: 1
+fails: 0
+ ~/W/2/c/da
+
+Starting iteration: 0
+Key pair generation: 104 103 468 833
+Encaps: 53 338 684
+decaps: 1528270095
