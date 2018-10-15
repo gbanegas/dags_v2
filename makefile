@@ -11,7 +11,7 @@ CC=clang
 DAGSVER=-DDAGS_3
 #DAGSVER=-DDAGS_5
 
-CFLAGS=-O3 -g3 -Wall -DRUN -march=native
+CFLAGS= -g3 -Wall -DRUN -march=native -O3
 LIBS=-lcrypto -lm -lsodium -lkeccak
 # All of the sources participating in the build are defined here
 -include sources.mk

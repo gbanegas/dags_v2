@@ -419,3 +419,108 @@ Starting iteration: 0
 Key pair generation: 104 103 468 833
 Encaps: 53 338 684
 decaps: 1528270095
+
+
+
+ ~/W/2/c/dags   *$+  ./dags                                                                     7.2s  Sun 14 Oct 2018 11:30:00 PM EDT
+Starting iteration: 0
+unroll16 m = 352, n = 1216, p = 1216 
+Key pair generation: 10 662 731 222
+Encaps: 8253880
+decaps: 264814156
+SUCCESS: 1
+fails: 0
+
+
+ ~/W/2/c/dags   *$+  ./dags                                                                     5.3s  Sun 14 Oct 2018 11:36:02 PM EDT
+Starting iteration: 0
+m = 352, n = 1216, p = 1216 
+Key pair generation: 7 011 685 292
+Encaps: 8085658
+decaps: 252535862
+SUCCESS: 1
+fails: 0
+
+
+ ~/W/2/c/dags   *$+  ./dags                                                                     6.1s  Sun 14 Oct 2018 11:44:06 PM EDT
+Starting iteration: 0
+unroll16 m = 352, n = 1216, p = 1216 
+Key pair generation: 9245 894 624
+Encaps: 7929006
+decaps: 248387276
+SUCCESS: 1
+fails: 0
+
+
+ 
+Starting iteration: 0
+m = 352, n = 1216, p = 1216 
+Key pair generation: 2 803 363 792
+Encaps: 7995656
+decaps: 245202496
+SUCCESS: 1
+fails: 0
+
+
+uf = 16 | unroll16 m = 352, n = 1216, p = 1216 
+Key pair generation: 9069797365
+Encaps: 8486584
+decaps: 249930044
+SUCCESS: 1
+fails: 0
+
+Starting iteration: 0
+uf = 16 | unroll8 m = 352, n = 1216, p = 1216 
+Key pair generation: 8532991364
+Encaps: 8132070
+decaps: 248235284
+SUCCESS: 1
+fails: 0
+
+
+Starting iteration: 0
+uf = 16 | unroll4 m = 352, n = 1216, p = 1216 
+Key pair generation: 9066629454
+Encaps: 8346950
+decaps: 246930846
+SUCCESS: 1
+fails: 0
+
+Starting iteration: 0
+uf = 16 | unroll4 m = 352, n = 1216, p = 1216 
+Key pair generation: 8959033552
+Encaps: 10377148
+decaps: 251252736
+SUCCESS: 1
+fails: 0
+
+
+ ~/W/2/c/dags   *$+  ./dags                                                                   4154ms  Sun 14 Oct 2018 11:53:13 PM EDT
+Starting iteration: 0
+uf = 16 | unroll2 m = 352, n = 1216, p = 1216 
+Key pair generation: 9206052488
+Encaps: 7941096
+decaps: 250946430
+SUCCESS: 1
+fails: 0
+
+
+ ~/W/2/c/dags   *$+  ./dags                                                                   1388ms  Sun 14 Oct 2018 11:53:52 PM EDT
+Starting iteration: 0
+uf = 16 | reuse m = 352, n = 1216, p = 1216 
+Key pair generation: 2 795 399 124
+Encaps: 8430198
+decaps: 261957140
+SUCCESS: 1
+fails: 0
+
+if I turn off static inline gf_q_m_mult
+
+ ~/W/2/c/dags   *$+  ./dags                                                                   3699ms  Sun 14 Oct 2018 11:57:19 PM EDT
+Starting iteration: 0
+uf = 16 | reuse m = 352, n = 1216, p = 1216 
+Key pair generation: 2875000614
+Encaps: 8156158
+decaps: 247201872
+SUCCESS: 1
+fails: 0

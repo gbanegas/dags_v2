@@ -37,8 +37,9 @@ extern void print_F_q_element(gf a);
 extern void print_F_q_m_element(gf a);
 
 #if defined(DAGS_3) || defined(DAGS_5) || defined(DAGS_TOY)
-static inline gf gf_mult(gf in0, gf in1) {
-	uint64_t i, tmp, t0 = in0, t1 = in1;
+// static inline 
+gf gf_mult(gf in0, gf in1) {
+	uint32_t i, tmp, t0 = in0, t1 = in1;
 
 	//Multiplication
 	tmp = t0 * (t1 & 1);
@@ -67,12 +68,15 @@ static inline gf gf_mult(gf in0, gf in1) {
 	return tmp;
 }
 //todo: finish here
-static inline gf gf_q_m_mult(gf in0, gf in1) {
-	uint64_t i, tmp, t0 = in0, t1 = in1;
+static inline 
+gf gf_q_m_mult(gf in0, gf in1) {
+	uint32_t i, tmp, t0 = in0, t1 = in1;
 
 	//Multiplication
 	tmp = t0 * (t1 & 1);
 
+	// Do not unroll this loop, let the compiler vectorize it!!!
+	// I tried, it take longer if you unroll this!! Do not unroll!!!
 	for (i = 1; i < 18; i++)
 	tmp ^= (t0 * (t1 & (1 << i)));
 
@@ -83,20 +87,21 @@ static inline gf gf_q_m_mult(gf in0, gf in1) {
 	tmp = tmp & 0xFFFF;
 	tmp = tmp ^ (reduction << 5);
 	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ reduction << 2;
+	tmp = tmp ^ (reduction << 2);
 	tmp = tmp ^ reduction;
 	//second step of reduction
 	reduction = (tmp >> 16);
 	tmp = tmp ^ (reduction << 5);
 	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ reduction << 2;
+	tmp = tmp ^ (reduction << 2);
 	tmp = tmp ^ reduction;
 
 	tmp = tmp & 0xFFFF;
 	return tmp;
 }
 
-static inline gf relative_field_representation(gf a, int k) {
+// static inline 
+gf relative_field_representation(gf a, int k) {
 	gf x[extension] = {0};
 	gf b_0_t = a & 0x1;
 	gf b_1_t = (a & 0x2) >> 1;
@@ -157,7 +162,8 @@ static inline gf relative_field_representation(gf a, int k) {
 	return x[k];
 }
 
-static inline gf absolut_field_representation(gf *element) {
+// static inline 
+gf absolut_field_representation(gf *element) {
 	gf beta = 788;
 	gf tmp1 = 0, tmp2 = 0, in0 = element[0], in1 = element[1];
 
@@ -199,7 +205,8 @@ static inline gf gf_mult(gf in0, gf in1) {
 	return tmp;
 }
 
-static inline gf gf_q_m_mult(gf in0, gf in1) {
+// static inline 
+gf gf_q_m_mult(gf in0, gf in1) {
 	uint64_t i, tmp, t0 = in0, t1 = in1;
 
 	//Multiplication
@@ -215,13 +222,13 @@ static inline gf gf_q_m_mult(gf in0, gf in1) {
 	tmp = tmp & 0xFFF;
 	tmp = tmp ^ (reduction << 6);
 	tmp = tmp ^ (reduction << 4);
-	tmp = tmp ^ reduction << 1;
+	tmp = tmp ^ (reduction << 1);
 	tmp = tmp ^ reduction;
 	//second step of reduction
 	reduction = (tmp >> 12);
 	tmp = tmp ^ (reduction << 6);
 	tmp = tmp ^ (reduction << 4);
-	tmp = tmp ^ reduction << 1;
+	tmp = tmp ^ (reduction << 1);
 	tmp = tmp ^ reduction;
 
 	tmp = tmp & 0x1FFF;
