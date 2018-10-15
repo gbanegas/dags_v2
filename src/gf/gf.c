@@ -85,42 +85,44 @@ gf gf_inv(gf in) {
 
 gf gf_q_m_inv(gf in) {
 	gf out = gf_pow_f_q_m(in, 65534);
-	/*gf tmp_11;
-	 gf tmp_111;
-	 gf tmp_1111;
+	/*
+	gf tmp_11;
+	gf tmp_111;
+	gf tmp_1111;
 
-	 gf out = in;
-	 gf tmp_a_2 = gf_q_m_mult(out, out); //a^2
-	 tmp_111 = tmp_a_2; //a^2
-	 tmp_11 = gf_q_m_mult(tmp_a_2, in); //a^2*a = a^3
+	gf out = in;
+	gf tmp_a_2 = gf_q_m_mult(out, out); //a^2
+	tmp_111 = tmp_a_2; //a^2
+	tmp_11 = gf_q_m_mult(tmp_a_2, in); //a^2*a = a^3
 
-	 out = gf_q_m_mult(tmp_11, tmp_11);//a^3*a^3 = a^6
+	out = gf_q_m_mult(tmp_11, tmp_11);//a^3*a^3 = a^6
 
-	 out = gf_q_m_mult(out, out);//a^6*a^6 = a^12
-	 gf tmp_a14 = gf_q_m_mult(out, tmp_a_2); //a^14
-	 out = gf_q_m_mult(out, out);//a^3*a^6 = a^24
-	 gf tmp_b = gf_q_m_mult(out, out);//a^3*a^6 = a^48
-	 out = gf_q_m_mult(out, tmp_b);//a^3*a^6 = a^96
+	out = gf_q_m_mult(out, out);//a^6*a^6 = a^12
+	gf tmp_a14 = gf_q_m_mult(out, tmp_a_2); //a^14
+	out = gf_q_m_mult(out, out);//a^3*a^6 = a^24
+	gf tmp_b = gf_q_m_mult(out, out);//a^3*a^6 = a^48
+	out = gf_q_m_mult(out, tmp_b);//a^3*a^6 = a^96
 
-	 out = gf_q_m_mult(out, out);//a^3*a^6 = a^192
+	out = gf_q_m_mult(out, out);//a^3*a^6 = a^192
 
-	 gf tmp_a = gf_q_m_mult(out, tmp_b); //a^240
+	gf tmp_a = gf_q_m_mult(out, tmp_b); //a^240
 
-	 out = gf_q_m_mult(out, out);//a^3*a^6 = a^384
+	out = gf_q_m_mult(out, out);//a^3*a^6 = a^384
 
-	 gf tmp_768 = gf_q_m_mult(out, out);//a^3*a^6 = a^768
-	 out = gf_q_m_mult(out, tmp_768);//a^3*a^6 = a^1536
-	 tmp_11 = gf_q_m_mult(out, out);//a^3*a^6 = a^3072
-	 out = gf_q_m_mult(out, tmp_11);//a^3*a^6 = a^6144
-	 tmp_111 = gf_q_m_mult(out, out);//a^3*a^6 = a^12288
-	 out = gf_q_m_mult(out, tmp_111);//a^3*a^6 = a^24576
-	 out = gf_q_m_mult(out, out);//a^3*a^6 = a^49152
+	gf tmp_768 = gf_q_m_mult(out, out);//a^3*a^6 = a^768
+	out = gf_q_m_mult(out, tmp_768);//a^3*a^6 = a^1536
+	tmp_11 = gf_q_m_mult(out, out);//a^3*a^6 = a^3072
+	out = gf_q_m_mult(out, tmp_11);//a^3*a^6 = a^6144
+	tmp_111 = gf_q_m_mult(out, out);//a^3*a^6 = a^12288
+	out = gf_q_m_mult(out, tmp_111);//a^3*a^6 = a^24576
+	out = gf_q_m_mult(out, out);//a^3*a^6 = a^49152
 
-	 gf tmp_l = gf_q_m_mult(tmp_a, tmp_a14);//a^254
-	 out = gf_q_m_mult(out, tmp_l); // 49406
-	 tmp_1111 = gf_q_m_mult(tmp_111, tmp_11);//a^15360
-	 out = gf_q_m_mult(out, tmp_1111);//64766
-	 out = gf_q_m_mult(out, tmp_768);//65534*/
+	gf tmp_l = gf_q_m_mult(tmp_a, tmp_a14);//a^254
+	out = gf_q_m_mult(out, tmp_l); // 49406
+	tmp_1111 = gf_q_m_mult(tmp_111, tmp_11);//a^15360
+	out = gf_q_m_mult(out, tmp_1111);//64766
+	out = gf_q_m_mult(out, tmp_768);//65534
+	*/
 
 	return out;
 

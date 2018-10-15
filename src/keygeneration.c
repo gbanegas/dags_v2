@@ -24,9 +24,9 @@ void remove_element(gf element, gf* list) {
 	}
 }
 
-void remove_element_int(int element, int* list, int lenght) {
+void remove_element_int(int element, int* list, int length) {
 	int i;
-	for (i = 0; i < lenght; i++) {
+	for (i = 0; i < length; i++) {
 		if (list[i] == element) {
 			list[i] = 0;
 			return;
@@ -66,19 +66,18 @@ int vector_contains(gf *signature_h, gf random_e, int length) {
 }
 
 void build_dyadic_signature(gf *dyadic_signature) {
-	gf signature_h[F_q_m_size] = { 0 };
-	int block_position[n0] = { 0 };
-	gf temp_list[signature_block_size] = { 0 };
+	gf signature_h[F_q_m_size];
+	
 
 	gf h0 = 0;
 	do {
 		h0 = randombytes_uniform(F_q_m_size - 1);
 	} while (h0 == 0);
-#if defined(TEST)
-	h0 = element_test[0];
-	int count = 1;
-	int counter_vector_int = 0;
-#endif
+// #if defined(TEST)
+// 	h0 = element_test[0];
+// 	int count = 1;
+// 	int counter_vector_int = 0;
+// #endif
 	gf h0_inverse = gf_q_m_inv(h0);
 	signature_h[0] = h0;
 
@@ -89,15 +88,14 @@ void build_dyadic_signature(gf *dyadic_signature) {
 			random_e = randombytes_uniform(F_q_m_size - 1);
 		} while (random_e == 0
 				|| vector_contains(signature_h, random_e, code_length));
-#if defined(TEST)
-		random_e = element_test[count];
-		count++;
-#endif
+// #if defined(TEST)
+// 		random_e = element_test[count];
+// 		count++;
+// #endif
 		signature_h[i] = random_e;
 		for (int j = 1; j < i; j++) {
 			if (signature_h[i] != 0 && signature_h[j] != 0) {
-				gf temp = gf_q_m_inv(signature_h[i])
-						^ gf_q_m_inv(signature_h[j]) ^ h0_inverse;
+				gf temp = gf_q_m_inv(signature_h[i]) ^ gf_q_m_inv(signature_h[j]) ^ h0_inverse;
 				if (temp != 0) {
 					gf temp_inv = gf_q_m_inv(temp);
 					signature_h[i + j] = temp_inv;
@@ -113,6 +111,8 @@ void build_dyadic_signature(gf *dyadic_signature) {
 	int ll = 0;
 	int size_part = (F_q_m_size / signature_block_size) - 1;
 	int part[(F_q_m_size / signature_block_size) - 1] = { 0 };
+	gf temp_list[signature_block_size];
+	int block_position[n0];
 
 	for (int i = 0; i < signature_block_size; i++) {
 		temp_list[i] = signature_h[i];
@@ -135,11 +135,11 @@ void build_dyadic_signature(gf *dyadic_signature) {
 			} while (j == 0);
 
 			remove_integer(j, part, size_part);
-#if defined(TEST)
-			j = int_vector_test[counter_vector_int];
-			counter_vector_int++;
-#endif
-			gf aux_list[signature_block_size] = { 0 };
+// #if defined(TEST)
+// 			j = int_vector_test[counter_vector_int];
+// 			counter_vector_int++;
+// #endif
+			gf aux_list[signature_block_size] ;
 			for (int i = 0; i < signature_block_size; i++) {
 				aux_list[i] = signature_h[(j * signature_block_size) + i];
 			}
@@ -178,6 +178,7 @@ void build_dyadic_signature(gf *dyadic_signature) {
 		for (int j = 0; j < signature_block_size; j++) {
 			gf value = block.signature[j];
 			dyadic_signature[aux_count_transfer_block] = value;
+			// dyadic_signature[aux_count_transfer_block] = block.signature[j];
 			aux_count_transfer_block++;
 		}
 	}
@@ -210,9 +211,9 @@ int is_vector_disjoint(gf *list, int n) {
 	return 0;
 }
 
-void remove_elements(gf *to_remove, gf *elements, int lenght) {
-	for (int i = 0; i < lenght; i++) {
-		for (int j = 0; j < lenght; j++) {
+void remove_elements(gf *to_remove, gf *elements, int length) {
+	for (int i = 0; i < length; i++) {
+		for (int j = 0; j < length; j++) {
 			if (to_remove[i] == elements[j]) {
 				to_remove[i] = 0;
 			}
@@ -226,7 +227,7 @@ void build_support(gf *signature_h, gf *u, gf *v) {
 
 	gf elements_in_F_q_m[F_q_m_size] = { 0 };
 	generate_elements_in_F_q_m(elements_in_F_q_m);
-	gf aux[code_length] = { 0 };
+	gf aux[code_length];
 	gf h0_inv = gf_q_m_inv(signature_h[0]);
 
 	for (int i = 0; i < code_length; i++) {
@@ -271,8 +272,7 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
 			for (int j = 0; j < code_length; j++) {
 				gf element = (H->data[i * H->cols + j]);
 				gf result = gf_pow_f_q_m(element, k);
-				H_cauchy->data[((k - 1) * signature_block_size + i) * H->cols
-						+ j] = result;
+				H_cauchy->data[((k - 1) * signature_block_size + i) * H->cols+ j] = result;
 
 			}
 		}
@@ -282,15 +282,15 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
 
 void build_trapdoor(const matrix *H_cauchy, const gf *v, const gf *u, gf *y,
 		matrix *H) {
-#if defined(TEST)
-	gf z[] = {65011, 65011, 65011, 65011, 53089, 53089, 53089, 53089, 53419,
-		53419, 53419, 53419, 49545, 49545, 49545, 49545, 1425, 1425, 1425,
-		1425, 50395, 50395, 50395, 50395, 36862, 36862, 36862, 36862, 56849,
-		56849, 56849, 56849, 48210, 48210, 48210, 48210, 25635, 25635,
-		25635, 25635, 4586, 4586, 4586, 4586, 36597, 36597, 36597, 36597,
-		28058, 28058, 28058, 28058, 33475, 33475, 33475, 33475, 19604,
-		19604, 19604, 19604, 24979, 24979, 24979, 24979};
-#endif
+// #if defined(TEST)
+// 	gf z[] = {65011, 65011, 65011, 65011, 53089, 53089, 53089, 53089, 53419,
+// 		53419, 53419, 53419, 49545, 49545, 49545, 49545, 1425, 1425, 1425,
+// 		1425, 50395, 50395, 50395, 50395, 36862, 36862, 36862, 36862, 56849,
+// 		56849, 56849, 56849, 48210, 48210, 48210, 48210, 25635, 25635,
+// 		25635, 25635, 4586, 4586, 4586, 4586, 36597, 36597, 36597, 36597,
+// 		28058, 28058, 28058, 28058, 33475, 33475, 33475, 33475, 19604,
+// 		19604, 19604, 19604, 24979, 24979, 24979, 24979};
+// #endif
 #if defined(RUN)
 	gf z[code_length] = { 0 };
 
@@ -336,13 +336,11 @@ void project_H_on_F_q(const matrix *H, matrix *Hbase) {
 		for (int i = 0; i < nr_rows; i++) {
 			for (int j = 0; j < nr_cols; j++) {
 				gf element_in_f_q_m = H->data[i * H->cols + j];
-				gf element_in_f_q = relative_field_representation(
-						element_in_f_q_m, k);
+				gf element_in_f_q = relative_field_representation(element_in_f_q_m, k);
 				Hbase->data[(k * nr_rows + i) * H->cols + j] = element_in_f_q;
 			}
 		}
 	}
-
 }
 
 int generate_systematic_matrix(const matrix* Hbase) {
@@ -390,11 +388,10 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			Hbase->data[(i * Hbase->cols) + i + n - k] = 1;
 
 			for (j = 0; j < n; j++) {
-				if (j == i + n - k) {
-					continue;
+				if (j != i + n - k) {
+					// continue;
+					Hbase->data[(i * Hbase->cols) + j] = gf_mult(Hbase->data[(i * Hbase->cols) + j], invPiv);
 				}
-				Hbase->data[(i * Hbase->cols) + j] = gf_mult(
-						Hbase->data[(i * Hbase->cols) + j], invPiv);
 			}
 		}
 
@@ -408,10 +405,8 @@ int generate_systematic_matrix(const matrix* Hbase) {
 				piv_align = Hbase->data[(l * Hbase->cols) + i + n - k];
 
 				for (j = 0; j < n; j++) {
-					Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(l
-							* Hbase->cols) + j]
-							^ (gf_mult(piv_align,
-									Hbase->data[(i * Hbase->cols) + j]));
+					Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(l	* Hbase->cols) + j]
+							^ (gf_mult(piv_align, Hbase->data[(i * Hbase->cols) + j]));
 				}
 			}
 		}
@@ -484,7 +479,7 @@ void print_vector(gf* vector, int size) {
 
 void key_gen(gf *v, gf *y, matrix *G) {
 	int ret_value = 0;
-
+	gf count = 0;
 	do {
 		gf signature_h[code_length] = { 0 };
 		gf u[signature_block_size] = { 0 };
@@ -514,14 +509,14 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		matrix Hbase;
 		Hbase.rows = (signature_block_size * pol_deg) * extension;
 		Hbase.cols = code_length;
-		gf data_Hbase[signature_block_size * pol_deg * code_length * extension] =
-				{ 0 };
+		gf data_Hbase[signature_block_size * pol_deg * code_length * extension] ={ 0 };
 		Hbase.data = data_Hbase;
 
 		project_H_on_F_q(&H, &Hbase);
 
 
 		ret_value = generate_public_key(&Hbase, G);
-
+		count ++;
+		printf("Number of tries in key_gen: %d \n", count);
 	} while (ret_value);
 }

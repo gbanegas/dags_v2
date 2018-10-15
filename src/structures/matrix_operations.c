@@ -42,9 +42,10 @@ matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
 
 	int count = 0;
 
-	for (i = 0; i < min(n_rows, n_cols); i++)
-		m->data[i * n_cols + i] = z[count++];
-
+	for (i = 0; i < min(n_rows, n_cols); i++){
+		m->data[i * n_cols + i] = z[count];
+		count++;
+	}
 	return m;
 }
 

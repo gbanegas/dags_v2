@@ -42,6 +42,7 @@ gf gf_mult(gf in0, gf in1) {
 	uint32_t i, tmp, t0 = in0, t1 = in1;
 
 	//Multiplication
+	// tmp = 0;
 	tmp = t0 * (t1 & 1);
 
 	for (i = 1; i < 10; i++)
@@ -73,6 +74,7 @@ gf gf_q_m_mult(gf in0, gf in1) {
 	uint32_t i, tmp, t0 = in0, t1 = in1;
 
 	//Multiplication
+	// tmp = 0;
 	tmp = t0 * (t1 & 1);
 
 	// Do not unroll this loop, let the compiler vectorize it!!!
