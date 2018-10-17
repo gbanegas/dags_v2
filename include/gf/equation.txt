@@ -1,0 +1,20 @@
+y_0 = x_0 + x_8 + x_9 + x_a + x_b + x_c;  5 
+y_1 = x_2 + x_3 + x_4 + x_5 + x_8 + x_b + x_d + x_e; 7 
+y_2 = x_4 + x_6 + x_8 + x_b + x_d + x_e; 5 
+y_3 = x_3 + x_5 + x_8 + x_9 + x_a + x_b + x_f; 6 
+y_4 = x_6 + x_7 + x_8 + x_9 + x_a; 4 
+y_5 = x_4 + x_5 + x_6 + x_7 + x_8 + x_a + x_b + x_c + x_d + x_f; 9 
+
+y_6 = x_6 + x_7 + x_8 + x_9 + x_a + x_c + x_e; 6 
+y_7 = x_5 + x_7 + x_8 + x_9 + x_d + x_e + x_f; 6 
+y_8 = x_1 + x_2 + x_3 + x_4 + x_7 + x_a + x_c + x_d + x_f; 8 
+
+y_9 = x_3 + x_5 + x_8 + x_9 + x_b + x_c + x_d + x_f; 7
+y_a = x_2 + x_4 + x_b + x_e + x_f; 4
+y_b = x_5 + x_6 + x_a + x_b + x_f; 4
+y_c = x_3 + x_4 + x_5 + x_6 + x_7 + x_9 + x_a + x_b + x_c + x_e + x_f; 10
+
+y_d = x_5 + x_6 + x_7 + x_8 + x_9 + x_b + x_d; 6
+y_e = x_4 + x_6 + x_7 + x_8 + x_c + x_d + x_e + x_f; 7 
+y_f = x_7 + x_8 + x_9 + x_a + x_b + x_f; 5
+
