@@ -120,7 +120,6 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	printf("\n");
 #endif
 	polynomial_free(sigma);
-
 	//Element for determining the value of errors
 	if (check_positions(aux_position, st / 2)) {
 		return -1;

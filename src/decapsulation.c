@@ -90,10 +90,10 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	for (i = 0; i < code_dimension; i++) {
 		if (i < k_sec) {
 			// Optimize modulo
-			rho2[i] = r1[i]; //rho2 recovery
+			rho2[i] = r1[i] % F_q_size; //rho2 recovery
 		} else {
 			// Optimize modulo
-			sigma[i - k_sec] = r1[i]; // sigma1 recovery
+			sigma[i - k_sec] = r1[i] % F_q_size; // sigma1 recovery
 		}
 	}
 
