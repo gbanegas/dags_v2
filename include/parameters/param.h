@@ -87,7 +87,7 @@
 #define pol_deg 11//block number 11
 #define weight 176
 #define ss_length 64
-#define k_sec 12
+#define k_sec (code_dimension - k_prime)
 #define n0 (code_length/signature_block_size)
 #endif
 

@@ -224,7 +224,7 @@ static inline gf gf_q_m_mult(gf in0, gf in1) {
 	tmp = tmp ^ reduction << 1;
 	tmp = tmp ^ reduction;
 
-	tmp = tmp & 0x1FFF;
+	tmp = tmp & 0xFFF;
 	return tmp;
 }
 

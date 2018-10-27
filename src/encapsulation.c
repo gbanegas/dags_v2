@@ -45,6 +45,9 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	printf("Generation Random M: \n");
 #endif
 	random_m(m);
+	for (i = 0; i < k_prime; i++) {
+		m[i] = m[i] % F_q_size;
+	}
 
 #ifdef DEBUG_P
 
@@ -64,7 +67,7 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	// Type conversion
 	for (i = 0; i < k_prime; i++)
 		// Optimize modulo
-		dd[i] = (unsigned char) (d[i]);
+		dd[i] = (unsigned char) (d[i] % F_q_size);
 	/*SHAKE256(r, code_dimension, m, k_prime);
 	 SHAKE256(d, k_prime, m, k_prime);
 
@@ -80,11 +83,11 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		if (i < k_sec) {
 			// Optimize modulo
 
-			rho[i] = (unsigned char) (r[i]); //rho recovery
+			rho[i] = (unsigned char) (r[i] % F_q_size); //rho recovery
 		} else {
 			// Optimize modulo
 
-			sigma[i - k_sec] = (unsigned char) (r[i]); // sigma recovery
+			sigma[i - k_sec] = (unsigned char) (r[i] % F_q_size); // sigma recovery
 		}
 	}
 
