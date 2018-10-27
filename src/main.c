@@ -42,7 +42,6 @@ long long t_gen[1001];
 long long t_enc[1001];
 long long t_dec[1001];
 
-#if defined(RUN)
 int main(void) {
 	if (sodium_init() < 0) {
 		/* panic! the library couldn't be initialized, it is not safe to use */
@@ -69,10 +68,9 @@ int main(void) {
 	unsigned char entropy_input[48];
 
 	int count = 0;
-	unsigned char pk[CRYPTO_PUBLICKEYBYTES];
-	unsigned char ct[CRYPTO_CIPHERTEXTBYTES], ss[CRYPTO_BYTES],
-			ss1[CRYPTO_BYTES];
-	unsigned char *sk;
+	//unsigned char pk[CRYPTO_PUBLICKEYBYTES];
+	unsigned char ct[CRYPTO_CIPHERTEXTBYTES], ss[CRYPTO_BYTES];//, ss1[CRYPTO_BYTES];
+	//unsigned char *sk;
 	int byte_count = 48;
 	int counter = 0;
 	int i;
@@ -148,15 +146,13 @@ int main(void) {
 		key_gen(v, y, &G);
 		//int ret_val = key_pair_generation(pk, sk);
 		long long final = cpucycles();
-		printf("Key pair generation: %lld", final - start);
-		printf("\n");
+		printf("Key pair generation: %lld\n", final - start);
 		start = cpucycles();
 		//ret_val = encapsulation(ct, ss, pk);
 		encrypt(ct, ss, &G);
 		final = cpucycles();
 
-		printf("Encaps: %lld", final - start);
-		printf("\n");
+		printf("Encaps: %lld\n", final - start);
 		if (ret_val != 0) {
 			printf("fail encrypt");
 			return KAT_CRYPTO_FAILURE;
@@ -167,14 +163,13 @@ int main(void) {
 		ret_val = decrypt(ss, ct, v, y);
 		final = cpucycles();
 
-		printf("decaps: %lld", final - start);
-		printf("\n");
+		printf("decaps: %lld\n", final - start);
 		if (ret_val != 0) {
 			printf("FAIL\n");
 			fails++;
 			return -1;
 		} else {
-			//printf("SUCCESS\n");
+			printf("SUCCESS\n\n");
 			success++;
 		}
 		counter++;
@@ -184,7 +179,6 @@ int main(void) {
 	//free(sk);
 	return 0;
 }
-#endif
 
 int FindMarker(FILE *infile, const char *marker) {
 	char line[MAX_MARKER_LEN];
