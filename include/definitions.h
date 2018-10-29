@@ -50,7 +50,7 @@ typedef struct polynomial polynomial;
 	#define print_vector(vector, size) {\
 		PRINT_DEBUG("[");\
 		for (int i = 0; i < size; i++) {\
-			PRINT_DEBUG(" %" PRIu16 " ,", vector[i]);\
+			PRINT_DEBUG(" %" PRIu16 " ,", ((gf*)vector)[i]);\
 		}\
 		PRINT_DEBUG("]\n");\
 	}

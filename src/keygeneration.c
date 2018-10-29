@@ -76,10 +76,11 @@ int vector_contains(gf *signature_h, gf random_e, int length) {
 }
 
 int build_dyadic_signature(gf *dyadic_signature) {
-	PRINT_DEBUG("Build_dyadic_signature start\n");
+	//PRINT_DEBUG("Build_dyadic_signature start\n");
 
 	int block_position[n0] = { 0 };
 	gf signature_h[F_q_m_size] = { 0 };
+	int i, aux_count_transfer_block = 0;
 
 	if (EXIT_SUCCESS != build_dyadic_signature_part_1(&signature_h))
 	{
@@ -93,13 +94,14 @@ int build_dyadic_signature(gf *dyadic_signature) {
 		return EXIT_FAILURE;
 	}
 
-	if (EXIT_SUCCESS != build_dyadic_signature_part3(&signature_h, &block_position, dyadic_signature))
-	{
-		PRINT_DEBUG("build_dyadic_signature_part_3 failed\n");
-		return EXIT_FAILURE;
+	for (i = 0; i < n0; i++) {
+		memcpy(&dyadic_signature[aux_count_transfer_block],
+				&signature_h[signature_block_size * block_position[i]],
+				signature_block_size * sizeof(gf));
+		aux_count_transfer_block += signature_block_size;
 	}
-	return EXIT_SUCCESS;
 
+	return EXIT_SUCCESS;
 }
 
 static int build_dyadic_signature_part_1(gf *signature_h)
@@ -202,57 +204,10 @@ int build_dyadic_signature_part2(gf *signature_h, int * block_position)
 	return EXIT_SUCCESS;
 }
 
-static int build_dyadic_signature_part3(gf *signature_h, int * block_position, gf *dyadic_signature)
-{
-	int nr_blocks = F_q_m_size / signature_block_size;
-	struct signature_block blocks[nr_blocks];
-	int t, i, j; //for loop variables
-	int aux_count_transfer_block = 0, block_nr = 0;
-
-	for (i = 0; i < nr_blocks; i++) {
-		if (NULL == (blocks[i].signature = (gf*) calloc(signature_block_size, sizeof(gf)))){
-			PRINT_DEBUG("Failed to calloc space for block signatures\n");
-			return EXIT_FAILURE;
-		}
-	}
-
-	for (i = 0; i < F_q_m_size; i = i + signature_block_size) {
-		for (j = 0; j < signature_block_size; j++) {
-			blocks[block_nr].signature[j] = signature_h[i + j];
-		}
-		block_nr++;
-
-	}
-	gf trash_h[code_length];
-	for (i = 0; i < n0; i++) {
-		struct signature_block block = blocks[block_position[i]];
-		for (int j = 0; j < signature_block_size; j++) {
-			dyadic_signature[aux_count_transfer_block] = block.signature[j];
-			aux_count_transfer_block++;
-		}
-		/*memcpy(&trash_h[aux_count_transfer_block], &blocks[i],
-				signature_block_size * sizeof(gf));
-		aux_count_transfer_block += signature_block_size;
-		for( j =0; j < code_length; j++)
-		{
-			PRINT_DEBUG("%d:%d vs %d \n",j trash_h[i])
-		}*/
-	}
-
-
-	for (int i = 0; i < nr_blocks; i++) {
-		free(blocks[i].signature);
-	}
-	PRINT_DEBUG("Returning\n");
-	return EXIT_SUCCESS;
-
-}
-
-
 
 int is_vectors_disjoint(gf *u, gf *v) {
 	int i, j;
-	PRINT_DEBUG("is_vector_disjoint\n");
+	//PRINT_DEBUG("is_vector_disjoint\n");
 	for (i = 0; i < (signature_block_size); i++) {
 		for (j = 0; j < code_length; j++) {
 			if (u[i] == v[j]) {
@@ -297,11 +252,11 @@ void build_support(gf *signature_h, gf *u, gf *v) {
 	gf aux[code_length] = { 0 };
 	gf h0_inv = gf_q_m_inv(signature_h[0]);
 	int i;
-	gf omega = 0, sum_inv;
+	gf omega = 0;
 
 	generate_elements_in_F_q_m(elements_in_F_q_m);
 
-	PRINT_DEBUG("build_support start\n");
+	//PRINT_DEBUG("build_support start\n");
 	for (i = 0; i < code_length; i++) {
 		aux[i] = h0_inv ^ gf_q_m_inv(signature_h[i]);
 	}
@@ -559,7 +514,9 @@ void key_gen(gf *v, gf *y, matrix *G) {
 				build_dyadic_sig_failures ++;
 				build_support_failures--;
 			}
-			PRINT_DEBUG("interations %ld vs %d\n",build_support_failures, build_dyadic_sig_failures);
+			if (build_support_failures %100 == 0){
+				PRINT_DEBUG("interations %ld vs %d\n",build_support_failures, build_dyadic_sig_failures);
+			}
 
 		} while (ret_value != EXIT_SUCCESS || is_vectors_disjoint(u, v) || is_vector_disjoint(v, code_length)
 				|| is_vector_disjoint(u, signature_block_size));
