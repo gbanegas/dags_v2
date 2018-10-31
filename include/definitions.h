@@ -18,6 +18,8 @@ typedef uint32_t gf_p;
 typedef int bool;
 #define true 1
 #define false 0
+#define EXIT_FAILURE 1
+#define EXIT_SUCCESS 0
 
 struct signature_block {
 	gf* signature;
@@ -37,5 +39,23 @@ struct polynomial {
   gf * coefficient;
 };
 typedef struct polynomial polynomial;
+
+#ifdef DEBUG
+	#define PRINT_DEBUG(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
+#else
+	#define PRINT_DEBUG(s, ...) do {} while (0)
+#endif
+
+#ifdef DEBUG
+	#define print_vector(vector, size) {\
+		PRINT_DEBUG("[");\
+		for (int i = 0; i < size; i++) {\
+			PRINT_DEBUG(" %" PRIu16 " ,", ((gf*)vector)[i]);\
+		}\
+		PRINT_DEBUG("]\n");\
+	}
+#else
+	#define print_vector(vector, size){return;}
+#endif
 
 #endif /* SRC_DEFINITIONS_H_ */
