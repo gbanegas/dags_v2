@@ -9,6 +9,15 @@
 
 #define min(a,b) (((a)<(b))?(a):(b))
 
+/*
+ * make_matrix
+ * 	Creates a matrix initially with all zeros
+ * param:
+ *   n_rows				Provide the number of rows
+ *   n_cols       Provide the number of columns
+ * return:
+ * 	Returns a pointer to the matrix
+ */
 matrix* make_matrix(int n_rows, int n_cols) {
 
 	matrix * m = (matrix *) malloc(sizeof(matrix));
@@ -17,35 +26,37 @@ matrix* make_matrix(int n_rows, int n_cols) {
 	m->cols = n_cols;
 
 	// allocate a double array of length rows * cols
-	m->data = (gf *) malloc(n_rows * n_cols * sizeof(gf));
-	// set all data to 0
-	int i;
-	for (i = 0; i < n_rows * n_cols; i++)
-		m->data[i] = 0;
+	m->data = (gf *) calloc(n_rows * n_cols, sizeof(gf));
 
 	return m;
 }
 
 matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
 	int i;
-	matrix * m = (matrix *) malloc(sizeof(matrix));
+	matrix *ret_val = NULL;
+	matrix *m;
+
+	if (NULL == (m = (matrix *) malloc(sizeof(matrix)))){
+		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix\n");
+	}
 
 	// set dimensions
 	m->rows = n_rows;
 	m->cols = n_cols;
 
 	// allocate a double array of length rows * cols
-	m->data = (gf *) malloc(n_rows * n_cols * sizeof(gf));
-	// set all data to 0
-	for (i = 0; i < n_rows * n_cols; i++)
-		m->data[i] = 0;
+	if (NULL == (m->data = (gf *)calloc(n_rows * n_cols, sizeof(gf)))){
+		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix");
+		goto failout;
+	}
 
-	int count = 0;
+	for (i = 0; i < min(n_rows, n_cols); i++) {
+		m->data[i * n_cols + i] = z[i];
+	}
 
-	for (i = 0; i < min(n_rows, n_cols); i++)
-		m->data[i * n_cols + i] = z[count++];
-
-	return m;
+	ret_val = m;
+failout:
+	return ret_val;
 }
 
 matrix* matrix_multiply(const matrix *a, const matrix *b) {
@@ -55,11 +66,15 @@ matrix* matrix_multiply(const matrix *a, const matrix *b) {
 
 }
 
+/*
+ * free_matrix
+ * 	Frees the memory that was allocated by make_matrix
+ */
 void free_matrix(matrix* mtx) {
-
-	assert(mtx->data);
-	free(mtx->data);
-	free(mtx);
+	if (NULL != mtx){
+		free(mtx->data);
+		free(mtx);
+	}
 }
 
 matrix* submatrix(const matrix* m, int i, int j, int nr_row, int nr_col) {

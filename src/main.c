@@ -4,12 +4,13 @@
  *  Created on: May 3, 2018
  *      Author: Gustavo
  */
-
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <unistd.h>
 #include <sys/resource.h>
 #include <sodium.h>
 
@@ -90,7 +91,11 @@ int main(void) {
 
 	FILE *fp_urandom;
 	fp_urandom = fopen("/dev/urandom", "r");
-	fread(&entropy_input, 1, byte_count, fp_urandom);
+	if (0 == fread(&entropy_input, 1, byte_count, fp_urandom))
+	{
+		PRINT_DEBUG("Failed to read in entropy input\n");
+		return EXIT_FAILURE;
+	}
 	fclose(fp_urandom);
 
 	randombytes_init(entropy_input, NULL, 256);
@@ -115,7 +120,11 @@ int main(void) {
 
 	//sk = malloc(CRYPTO_SECRETKEYBYTES);
 
-	fscanf(fp_req, "%d", &count);
+	if(EOF == fscanf(fp_req, "%d", &count))
+	{
+		PRINT_DEBUG("Failed to fscanf %d:%s\n", errno, strerror(errno));
+		return EXIT_FAILURE;
+	}
 
 	fprintf(fp_rsp, "count = %d\n", count);
 

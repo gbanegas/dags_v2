@@ -10,7 +10,7 @@
 
 static int build_dyadic_signature_part_1(gf *signature_h);
 static int build_dyadic_signature_part2(gf *signature_h, int * block_position);
-static int build_dyadic_signature_part3(gf *signature_h, int * block_position, gf *dyadic_signature);
+
 
 /*
  * contains_zero:
@@ -75,6 +75,18 @@ int vector_contains(gf *signature_h, gf random_e, int length) {
 	return EXIT_SUCCESS;
 }
 
+
+/*
+ * build_dyadic_signature function
+ *   This function is used to create the dyadic matrix required for the key_gen.
+ *
+ * Param:
+ * 	dyadic_signature  The dyadic_signature is returned in this provided array.
+ *
+ * Return:
+ * 	EXIT_SUCCESS if the signature was created correctly. If the matrix will fail
+ * 	to be dyadic return EXIT_FAILURE so additional checks do not have to be performed.
+ */
 int build_dyadic_signature(gf *dyadic_signature) {
 	//PRINT_DEBUG("Build_dyadic_signature start\n");
 
@@ -82,13 +94,13 @@ int build_dyadic_signature(gf *dyadic_signature) {
 	gf signature_h[F_q_m_size] = { 0 };
 	int i, aux_count_transfer_block = 0;
 
-	if (EXIT_SUCCESS != build_dyadic_signature_part_1(&signature_h))
+	if (EXIT_SUCCESS != build_dyadic_signature_part_1(signature_h))
 	{
 		PRINT_DEBUG("build_dyadic_signature_part_1 failed\n");
 		return EXIT_FAILURE;
 	}
 
-	if(EXIT_SUCCESS != build_dyadic_signature_part2(&signature_h, &block_position))
+	if(EXIT_SUCCESS != build_dyadic_signature_part2(signature_h, block_position))
 	{
 		PRINT_DEBUG("build_dyadic_signature_part_2 failed\n");
 		return EXIT_FAILURE;
@@ -159,7 +171,7 @@ static int build_dyadic_signature_part_1(gf *signature_h)
 
 int build_dyadic_signature_part2(gf *signature_h, int * block_position)
 {
-	int t, i, j; //for loop variables
+	int i, j; //for loop variables
 	int ll = 0;
 	int size_part = (F_q_m_size / signature_block_size) - 1;
 	int part[(F_q_m_size / signature_block_size) - 1] = { 0 };
@@ -204,36 +216,55 @@ int build_dyadic_signature_part2(gf *signature_h, int * block_position)
 	return EXIT_SUCCESS;
 }
 
-
+/*
+ * is_vectors_disjoint:
+ * 	Goes through value of u and ensure that no value of v is the same
+ * param:
+ * 		u	vector u from Cauchy support
+ * 		v vector v from the Cauchy support
+ * 	Return:
+ * 		Return EXIT_SUCCESS if there are no matches otherwise EXIT_FAILURE
+ */
 int is_vectors_disjoint(gf *u, gf *v) {
 	int i, j;
 	//PRINT_DEBUG("is_vector_disjoint\n");
 	for (i = 0; i < (signature_block_size); i++) {
 		for (j = 0; j < code_length; j++) {
 			if (u[i] == v[j]) {
-				return 1;
+				return EXIT_FAILURE;
 			}
 		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-int is_vector_disjoint(gf *list, int n) {
+/*
+ * is_vector_disjoint:
+ *   Go through the vector and ensure that there are no duplicate entries
+ * param:
+ * 	list 	provide a vector
+ * 	size	provide the size of the vector to check
+ *
+ * Return:
+ * 	Return EXIT_SUCCESS if the values are not the same otherwise EXIT_FAILURE
+ *
+ */
+int is_vector_disjoint(gf *list, int size) { //TODO consider wrapping these tests to one function
 	int i, j;
-	for (i = 0; i < n; i++) {
-		for (j = i + 1; j < n; j++) {
+	for (i = 0; i < size; i++) {
+		for (j = i + 1; j < size; j++) {
 			if (list[i] == list[j]) {
-				return 1;
+				return EXIT_FAILURE;
 			}
 		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 
 /*
  * For loop through both arrays and if remove elements from the to_remove array
- * if they exist in they elements array.
+ * exists in they elements array then remove it.
  */
 void remove_elements(gf *to_remove, gf *elements, int length) {
 	int i, j;
@@ -247,18 +278,32 @@ void remove_elements(gf *to_remove, gf *elements, int length) {
 	}
 }
 
-void build_support(gf *signature_h, gf *u, gf *v) {
-	gf elements_in_F_q_m[F_q_m_size] = { 0 };
+/*
+ * build_support
+ * 	This function is used to generate the u and v vectors from the signature_h
+ *
+ * params:
+ * 	signature_h  Provide the signature vector
+ * 	u and v			 Provide allocated vectors
+ * 	elements		 Provide the generated elements vector to be copied from.
+ *
+ * 	Returns:
+ * 	Vectors u and v are filled in appropriately
+ */
+void build_support(gf *signature_h, gf *u, gf *v, gf *elements) {
+	gf elements_in_F_q_m[code_length];
+	gf signature_h_inv[code_length];
 	gf aux[code_length] = { 0 };
 	gf h0_inv = gf_q_m_inv(signature_h[0]);
 	int i;
 	gf omega = 0;
 
-	generate_elements_in_F_q_m(elements_in_F_q_m);
+	memcpy(elements_in_F_q_m, elements, code_length);
 
 	//PRINT_DEBUG("build_support start\n");
 	for (i = 0; i < code_length; i++) {
-		aux[i] = h0_inv ^ gf_q_m_inv(signature_h[i]);
+		signature_h_inv[i] = gf_q_m_inv(signature_h[i]);
+		aux[i] = h0_inv ^ signature_h_inv[i];
 	}
 	remove_elements(elements_in_F_q_m, aux, code_length);
 
@@ -269,92 +314,118 @@ void build_support(gf *signature_h, gf *u, gf *v) {
 
 	for (i = 0; i < code_length; i++) {
 		if (signature_h[i] != 0) {
-			v[i] = gf_q_m_inv(signature_h[i]) ^ h0_inv ^ omega;
-		}
-	}
-
-	for (i = 0; i < signature_block_size; i++) {
-		if (signature_h[i] != 0) {
-			gf sum_inv = gf_q_m_inv(signature_h[i]) ^ omega;
-			u[i] = sum_inv;
-		}
-	}
-
-}
-
-void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
-
-	matrix *H = make_matrix(signature_block_size, code_length);
-	for (int i = 0; i < signature_block_size; i++) {
-		for (int j = 0; j < code_length; j++) {
-			gf inv = gf_q_m_inv((u[i] ^ v[j]));
-			H->data[i * H->cols + j] = inv;
-		}
-	}
-
-	for (int k = 1; k < pol_deg + 1; k++) {
-		for (int i = 0; i < signature_block_size; i++) {
-			for (int j = 0; j < code_length; j++) {
-				gf element = (H->data[i * H->cols + j]);
-				gf result = gf_pow_f_q_m(element, k);
-				H_cauchy->data[((k - 1) * signature_block_size + i) * H->cols
-						+ j] = result;
-
+			if (i < signature_block_size){
+				u[i] = signature_h_inv[i] ^ omega;
+				v[i] = u[i] ^ h0_inv;
+			}
+			else
+			{
+				v[i] =  signature_h_inv[i] ^ h0_inv ^ omega;
 			}
 		}
 	}
-	free_matrix(H);
 }
 
-void build_trapdoor(const matrix *H_cauchy, const gf *v, const gf *u, gf *y,
-		matrix *H) {
-	PRINT_DEBUG("build_trapdoor start\n");
-	gf z[code_length] = { 0 };
+/*
+ * build_cauchy_matrix
+ * 	This function builds the cauchy matrix using the provided u and v vectors
+ *
+ * 	param:
+ * 		v				Provide the v vector used to generate the cauchy matrix
+ * 		u				Provide the u vector used to generate the cauchy matrix
+ * 		H_cauchy Provide the cauchy matrix to be filled in
+ *
+ * 	Results:
+ * 		The cauchy matrix is calculated and stored in the pointer
+ */
+void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
+	int i, j, k;
 
-	for (int i = 0; i < n0; i++) {
-		gf random_el = 0;
+	PRINT_DEBUG("Building the cauchy matrix\n");
+	for (k = 0; k < pol_deg; k++) {
+		for (i = 0; i < signature_block_size; i++) {
+			for (j = 0; j < code_length; j++) {
+				H_cauchy->data[(k * signature_block_size + i) * code_length + j] =
+						gf_pow_f_q_m(gf_q_m_inv((u[i] ^ v[j])), k + 1);
+			}
+		}
+	}
+}
+
+/*
+ * build_trapdoor:
+ * 	This function builds the trap vector y and returns int in the pointer y
+ *
+ * param:
+ * 	H_cauchy 			Provide the cauchy matrix
+ * 	v and u				Provide the vectors v and u
+ * 	y							A pointer to return the trapdoor in
+ * 	H							A matrix to be filled out with the data
+ *
+ * Return:
+ * 	EXIT_SUCCES if trapdoor is build otherwise EXIT_FAILURE
+ */
+int build_trapdoor(const matrix *H_cauchy, const gf *v,
+		const gf *u, gf *y,	matrix *H) {
+	gf z[code_length] = { 0 };
+	gf random_el = 0;
+	gf pol, sum_u_v, result;
+	int i, j, ret_val = EXIT_FAILURE;
+	matrix *diagonal_z_matrix = NULL, *H3 = NULL;
+
+	PRINT_DEBUG("build_trapdoor start\n");
+
+	for (i = 0; i < n0; i++) {
 		do {
 			random_el = randombytes_uniform(F_q_m_size - 1);
+			//TODO this vector_contains function could be optimized but very little gained
+			// only need to check every signature_block_size element to see if it matches
 		} while (random_el == 0 || vector_contains(z, random_el, code_length));
 
-		z[i * signature_block_size] = random_el;
-		for (int j = 1; j < signature_block_size; j++) {
-			z[(i * signature_block_size) + j] = z[i * signature_block_size];
+		// This cannot be shortened with a memset because gf not full byte size;
+		for (j = 0; j < signature_block_size; j++) {
+			z[(i * signature_block_size) + j] = random_el;
 		}
 	}
-	matrix *diagonal_z_matrix = diagonal_matrix(z, code_length, code_length);
-	matrix *H3 = matrix_multiply(H_cauchy, diagonal_z_matrix);
 
-	for (int i = 0; i < H3->rows; i++) {
-		for (int j = 0; j < H3->cols; j++) {
-			H->data[i * H->cols + j] = H3->data[i * H->cols + j];
-		}
+	if (NULL == (diagonal_z_matrix = diagonal_matrix(z, code_length, code_length))){
+		PRINT_DEBUG("Failed to create diagonal_matrix\n");
+		goto failout;
 	}
+	H3 = matrix_multiply(H_cauchy, diagonal_z_matrix);
+
+	memcpy(H->data, H3->data, sizeof(gf) * H3->rows * H3->cols);
 	free_matrix(H3);
 	free_matrix(diagonal_z_matrix);
+	H3 = NULL;
+	diagonal_z_matrix = NULL;
 
-	for (int i = 0; i < code_length; i++) {
-		gf pol = 1;
-		for (int j = 0; j < signature_block_size; j++) {
-			gf sum_u_v = (v[i] ^ u[j]);
-			gf result = gf_pow_f_q_m(sum_u_v, pol_deg);
+	for (i = 0; i < code_length; i++) {
+		pol = 1;
+		for (j = 0; j < signature_block_size; j++) {
+			sum_u_v = (v[i] ^ u[j]);
+			result = gf_pow_f_q_m(sum_u_v, pol_deg);
 			pol = gf_q_m_mult(pol, result);
 		}
-		gf div = gf_div_f_q_m(z[i], pol);
-		y[i] = div;
+		y[i] = gf_div_f_q_m(z[i], pol);
 	}
+	ret_val = EXIT_SUCCESS;
+failout:
+	free_matrix(H3);
+	free_matrix(diagonal_z_matrix);
+	return ret_val;
 }
 
 void project_H_on_F_q(const matrix *H, matrix *Hbase) {
+	int k, i, j;
 	int nr_rows = H->rows;
 	int nr_cols = H->cols;
-	for (int k = 0; k < extension; k++) {
-		for (int i = 0; i < nr_rows; i++) {
-			for (int j = 0; j < nr_cols; j++) {
-				gf element_in_f_q_m = H->data[i * H->cols + j];
-				gf element_in_f_q = relative_field_representation(
-						element_in_f_q_m, k);
-				Hbase->data[(k * nr_rows + i) * H->cols + j] = element_in_f_q;
+	PRINT_DEBUG("project_H on f_q\n");
+	for (k = 0; k < extension; k++) {
+		for (i = 0; i < nr_rows; i++) {
+			for (j = 0; j < nr_cols; j++) {
+				Hbase->data[(k * nr_rows + i) * nr_cols + j] =
+						relative_field_representation(H->data[i * nr_cols + j], k);
 			}
 		}
 	}
@@ -365,48 +436,50 @@ int generate_systematic_matrix(const matrix* Hbase) {
 
 	int i, j, l = 0, test = 0;
 	gf temp;
-	int n = Hbase->cols;
-	int k = Hbase->rows;
-	for (i = 0; i < k; i++) {
+	int num_cols = Hbase->cols;
+	int num_rows = Hbase->rows;
+	gf invPiv = 1, piv_align;
+
+	for (i = 0; i < num_rows; i++) {
 		test = 0;
 		l = 0;
-		j = i + n - k;
-		if (Hbase->data[(i * n) + i + n - k] == 0) { //We're looking for a non-zero pivot
+		j = i + num_cols - num_rows;
+		if (Hbase->data[(i * num_cols) + i + num_cols - num_rows] == 0) { //We're looking for a non-zero pivot
 			test = 1;
 			//printf("search Pivot\n");
-			for (l = i + 1; l < k; l++) {
-				if (Hbase->data[l * n + j]) {
+			for (l = i + 1; l < num_rows; l++) {
+				if (Hbase->data[l * num_cols + j]) {
 					//printf("Find Pivot\n");
 					break;
 				}
 			}
 		}
-		if (l == k && (i != (k - 1))) {
-			printf("Non systematic Matrix %d\n", l);
-			return -1;
+		if (l == num_rows && (i != (num_rows - 1))) {
+			printf("Non systematic Matrix %d\num_cols", l);
+			return EXIT_FAILURE;
 		}
 		if (test == 1) { // We switches the lines l and i
 			test = 0;
 			//printf("Permut line\n");
-			//temp=P[i+n-k];
-			//P[i+n-k]=P[j];
+			//temp=P[i+n-num_rows];
+			//P[i+n-num_rows]=P[j];
 			//P[j]=temp;
-			for (j = 0; j < n; j++) {
-				temp = Hbase->data[(l * Hbase->cols) + j];
-				Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(i
-						* Hbase->cols) + j];
+			for (j = 0; j < num_cols; j++) {
+				temp = Hbase->data[(l * num_cols) + j];
+				Hbase->data[(l * num_cols) + j] = Hbase->data[(i
+						* num_cols) + j];
 				Hbase->data[(i * Hbase->cols) + j] = temp;
 			}
 		}
-		//   Matrix standardization
-		gf invPiv = 1, aa;
-		if (Hbase->data[(i * Hbase->cols) + i + n - k] != 1) {
-			aa = Hbase->data[(i * Hbase->cols) + i + n - k];
-			invPiv = gf_inv(aa);
-			Hbase->data[(i * Hbase->cols) + i + n - k] = 1;
 
-			for (j = 0; j < n; j++) {
-				if (j == i + n - k) {
+
+		//   Matrix standardization
+		if (Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows] != 1) {
+			invPiv = gf_inv(Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows]);
+			Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows] = 1;
+
+			for (j = 0; j < num_cols; j++) {
+				if (j == i + num_cols - num_rows) {
 					continue;
 				}
 				Hbase->data[(i * Hbase->cols) + j] = gf_mult(
@@ -414,20 +487,17 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			}
 		}
 
-		//Here we do the elimination on column i + n-k
-		gf piv_align;
-		for (l = 0; l < k; l++) {
+		//Here we do the elimination on column i + n-num_rows
+		for (l = 0; l < num_rows; l++) {
 			if (l == i) {
 				continue;
 			}
-			if (Hbase->data[(l * n) + i + n - k]) {
-				piv_align = Hbase->data[(l * Hbase->cols) + i + n - k];
+			if (Hbase->data[(l * num_cols) + i + num_cols - num_rows]) {
+				piv_align = Hbase->data[(l * Hbase->cols) + i + num_cols - num_rows];
 
-				for (j = 0; j < n; j++) {
-					Hbase->data[(l * Hbase->cols) + j] = Hbase->data[(l
-							* Hbase->cols) + j]
-							^ (gf_mult(piv_align,
-									Hbase->data[(i * Hbase->cols) + j]));
+				for (j = 0; j < num_cols; j++) {
+					Hbase->data[(l * Hbase->cols) + j] ^=
+							(gf_mult(piv_align,	Hbase->data[(i * Hbase->cols) + j]));
 				}
 			}
 		}
@@ -437,38 +507,44 @@ int generate_systematic_matrix(const matrix* Hbase) {
 
 }
 
+/*
+ * generate_public_key
+ * 	Function used to generate the public key
+ */
 int generate_public_key(const matrix *Hbase, matrix *G) {
+	int num_cols, num_rows, i;
+	matrix *M, *m_temp, *m_transposed, *final;
 
-	int ret_val = generate_systematic_matrix(Hbase);
-	if (ret_val) {
-		return 1;
+	if(EXIT_FAILURE == generate_systematic_matrix(Hbase)){
+		return EXIT_FAILURE;
 	}
-	int n = Hbase->cols;
-	int r = Hbase->rows;
 
-	matrix *M = submatrix(Hbase, 0, 0, r, (n - r));
+	num_cols = Hbase->cols;
+	num_rows = Hbase->rows;
 
-	//free_matrix(HH);
 
-	matrix *m_temp = make_matrix((n - r), (n - r));
-	for (int i = 0; i < (n - r); i++)
-		m_temp->data[i * (n - r) + i] = 1;
+	M = submatrix(Hbase, 0, 0, num_rows, (num_cols - num_rows));
 
-	matrix *m_transposed = transpose_matrix(M);
+	m_transposed = transpose_matrix(M);
 
 	free_matrix(M);
 
-	matrix *final = augment(m_temp, m_transposed);
+
+	m_temp = make_matrix((num_cols - num_rows), (num_cols - num_rows));
+	for (i = 0; i < (num_cols - num_rows); i++)
+		m_temp->data[i * (num_cols - num_rows) + i] = 1;
+
+
+	// TODO augment is only used here. We could save memory usages by passing in
+	// G to this function
+	final = augment(m_temp, m_transposed);
 	free_matrix(m_temp);
 	free_matrix(m_transposed);
 
-	for (int i = 0; i < final->rows; i++) {
-		for (int j = 0; j < final->cols; j++) {
-			G->data[i * G->cols + j] = final->data[i * final->cols + j];
-		}
-	}
+	memcpy(G->data, final->data, final->rows * final->cols * sizeof(gf));
+
 	free_matrix(final);
-	return 0;
+	return EXIT_SUCCESS;
 
 }
 
@@ -494,11 +570,40 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 void key_gen(gf *v, gf *y, matrix *G) {
 	int ret_value = 0;
 	gf signature_h[code_length];
+	gf *elements_in_F_q_m;
 	gf u[signature_block_size];
 	long build_support_failures = 0;
 	long build_dyadic_sig_failures =0;
 
+	matrix H_cauchy;
+	gf data_cauchy[signature_block_size * pol_deg * code_length] = { 0 };
+	H_cauchy.rows = signature_block_size * pol_deg;
+	H_cauchy.cols = code_length;
+	H_cauchy.data = data_cauchy;
+
+	matrix H; // TODO H.data is filled allocated in build_trapdoor
+	gf data_H[signature_block_size * pol_deg * code_length] = { 0 };
+	H.rows = signature_block_size * pol_deg;
+	H.cols = code_length;
+	H.data = data_H;
+
+	matrix Hbase;
+	Hbase.rows = (signature_block_size * pol_deg) * extension;
+	Hbase.cols = code_length;
+	gf data_Hbase[signature_block_size * pol_deg * code_length * extension] =
+			{ 0 };
+	Hbase.data = data_Hbase;
+
+
 	PRINT_DEBUG("Key Gen start\n");
+
+	if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))
+	{
+		PRINT_DEBUG("Failed to allocate memory for elements_in_F_q_m");
+		goto failout;
+	}
+	// Only generate_elements in F_q_m once and copied when used in build_support()
+	generate_elements_in_F_q_m(elements_in_F_q_m);
 
 	do {
 		memset(signature_h, 0, code_length * sizeof(gf));
@@ -507,7 +612,7 @@ void key_gen(gf *v, gf *y, matrix *G) {
 			build_support_failures ++;
 			ret_value = build_dyadic_signature(signature_h);
 			if (ret_value == EXIT_SUCCESS){
-				build_support(signature_h, u, v);
+				build_support(signature_h, u, v, elements_in_F_q_m);
 			}
 			else
 			{
@@ -515,42 +620,29 @@ void key_gen(gf *v, gf *y, matrix *G) {
 				build_support_failures--;
 			}
 			if (build_support_failures %100 == 0){
-				PRINT_DEBUG("interations %ld vs %d\n",build_support_failures, build_dyadic_sig_failures);
+				PRINT_DEBUG("interations %ld vs %ld\n",build_support_failures, build_dyadic_sig_failures);
 			}
 
 		} while (ret_value != EXIT_SUCCESS || is_vectors_disjoint(u, v) || is_vector_disjoint(v, code_length)
 				|| is_vector_disjoint(u, signature_block_size));
 
-		//print_vector(signature_h, code_length);
-		PRINT_DEBUG("Starting cauchy\n");
-		matrix H_cauchy;
-		H_cauchy.rows = signature_block_size * pol_deg;
-		H_cauchy.cols = code_length;
+		free(elements_in_F_q_m);
+		elements_in_F_q_m = NULL;
 
-		gf data_cauchy[signature_block_size * pol_deg * code_length] = { 0 };
-		H_cauchy.data = data_cauchy;
 		build_cauchy_matrix(u, v, &H_cauchy);
 
-		matrix H;
-		H.rows = signature_block_size * pol_deg;
-		H.cols = code_length;
-		gf data_H[signature_block_size * pol_deg * code_length] = { 0 };
-		H.data = data_H;
-		PRINT_DEBUG("Calling build_trapdoor\n");
-		build_trapdoor(&H_cauchy, v, u, y, &H);
+		if (EXIT_FAILURE == (ret_value = build_trapdoor(&H_cauchy, v, u, y, &H))){
+			PRINT_DEBUG("Failed to build_trapdoor\n");
+			continue;
+		}
 
-		matrix Hbase;
-		Hbase.rows = (signature_block_size * pol_deg) * extension;
-		Hbase.cols = code_length;
-		gf data_Hbase[signature_block_size * pol_deg * code_length * extension] =
-				{ 0 };
-		Hbase.data = data_Hbase;
-		PRINT_DEBUG("Calling project_H_on_F_q\n");
 		project_H_on_F_q(&H, &Hbase);
 
 		PRINT_DEBUG("Generating public_key\n");
 		ret_value = generate_public_key(&Hbase, G);
-		PRINT_DEBUG("generate_public_key returned %d\n",ret_value);
 
 	} while (ret_value);
+failout:
+	free(elements_in_F_q_m);
+	return;
 }
