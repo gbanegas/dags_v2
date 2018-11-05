@@ -19,11 +19,8 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	gf alpha;
 
 	//Compute Syndrome normally
-#ifdef DEBUG_P
-	printf("Decoding:Computing syndrom");
+	PRINT_DEBUG("Decoding:Computing syndrom\n");
 
-	printf("\n");
-#endif
 	syndrom = create_polynomial(st - 1);
 	compute_syndrom(v, y, c, syndrom);
 
@@ -44,11 +41,8 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	u->degree = 0;
 
 	dr = syndrom->degree;
-#ifdef DEBUG_P
-	printf("Computing re,u,quotient");
 
-	printf("\n");
-#endif
+	PRINT_DEBUG("Computing re,u,quotient\n");
 	while (dr >= (st / 2)) {
 
 		quotient = poly_quo(re, syndrom);
@@ -78,11 +72,9 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(uu);
 	polynomial_free(app);
 
-#ifdef DEBUG_P
-	printf("Computing delta, omega, sigma");
 
-	printf("\n");
-#endif
+	PRINT_DEBUG("Computing delta, omega, sigma\n");
+
 	delta = create_polynomial(0);
 	gf u_over_z = polynomial_evaluation(u, 0); // z=0
 	delta->coefficient[0] = gf_q_m_inv(u_over_z);
@@ -101,35 +93,33 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	int aux_position[weight] = { -1 };
 	j = 0;
 
-#ifdef DEBUG_P
-	printf("Computing error position");
-	printf("\n");
-#endif
+	PRINT_DEBUG("Computing error position\n");
+
 	for (i = 0; i < F_q_m_size; i++) {
 		gf result = polynomial_evaluation(sigma, aux_perm[i]);
 		if (!result) {
 			int pos = index_of_element(v, gf_q_m_inv(aux_perm[i]));
-#ifdef DEBUG_P
-			printf("%d,", pos);
-#endif
+
+			PRINT_DEBUG("%d,", pos);
+
 			aux_position[j] = pos;
 			j += 1;
 		}
 	}
-#ifdef DEBUG_P
-	printf("\n");
-#endif
+
+	PRINT_DEBUG("\n");
+
 	polynomial_free(sigma);
 	//Element for determining the value of errors
 	if (check_positions(aux_position, st / 2)) {
 		return -1;
 	}
-#ifdef DEBUG_P
-	printf("decoding error_position: ");
+#ifdef DEBUG
+	PRINT_DEBUG("decoding error_position: ");
 	for (int i = 0; i < weight; i++) {
-		printf("%d, ", aux_position[i]);
+		PRINT_DEBUG("%d, ", aux_position[i]);
 	}
-	printf("\n");
+	PRINT_DEBUG("\n");
 #endif
 	pos = create_polynomial(st / 2);
 	for (i = 0; i < st / 2; i++) {
@@ -140,10 +130,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 		return -1;
 	}
 
-#ifdef DEBUG_P
-	printf("Computing evaluating error position");
-	printf("\n");
-#endif
+	PRINT_DEBUG("Computing evaluating error position\n");
 	app = create_polynomial(pos->degree);
 	for (j = 0; j <= pos->degree; j++) {
 		pol_gf = 1;
@@ -167,14 +154,12 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 #if defined(DAGS_TOY) | defined(DAGS_3) | defined(DAGS_5)
 	gf exp_alpha = (F_q_m_size - 1) / (F_q_size - 1);
 	alpha = gf_pow_f_q_m(2, exp_alpha); //b^((q^m)-1)/(q-1)
-#endif
-#if defined(DAGS_1)
+#elif defined(DAGS_1)
 	alpha = 197;
 #endif
-#ifdef DEBUG_P
-	printf("Reconstruction of the error vector");
-	printf("\n");
-#endif
+
+	PRINT_DEBUG("Reconstruction of the error vector\n");
+
 	k = 0;
 	//Reconstruction of the error vector
 	for (i = 0; i <= app->degree; i++) {
@@ -186,13 +171,6 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(app);
 	polynomial_free(pos);
 
-#ifdef DEBUG_P
-	printf("decoding_error:\n");
-	/*for (i = 0; i < code_length; i++) {
-	 printf(" %" PRIu16 ", ", error[i]);
-	 }
-	 printf("\n");*/
-#endif
 	//Reconstruction of code_word
 	for (i = 0; i < code_length; i++) {
 		code_word[i] = (c[i] ^ error[i]) & F_q_m_order;
