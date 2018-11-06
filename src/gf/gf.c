@@ -59,7 +59,8 @@ gf gf_div(gf a, gf b) {
 #if defined(DAGS_3) || defined(DAGS_5) || defined(DAGS_TOY)
 // Correct gf_Inv
 gf gf_inv(gf in) {
-	//gf out = gf_pow_f_q(in, 254);
+	gf out = gf_pow_f_q(in, 254);
+	/*
 	gf tmp_11;
 	gf tmp_111;
 	gf tmp_1111;
@@ -79,6 +80,7 @@ gf gf_inv(gf in) {
 	out = gf_mult(out, out);//(a^60)^2 = a^120
 	out = gf_mult(out, out);//(a^120)^2 = a^240
 	out = gf_mult(out, tmp_111);//a^240*a^14 = a^254
+	*/
 	return out;
 
 }
