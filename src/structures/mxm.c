@@ -170,6 +170,8 @@ void mxm(gf *C, const gf *A, const gf *B, int m, int n, int p, int uf) {
 
 // Cmxp = Amxn * Bnxp
 void mxm_product(gf *dest, const gf *a, const gf *b, int m, int n, int p) {
+	mxm_block_reorder_reuse(dest, a, b, m, n, p);
+	/*
 	int uf;
 
 	if (p % 16 == 0)
@@ -183,10 +185,11 @@ void mxm_product(gf *dest, const gf *a, const gf *b, int m, int n, int p) {
 	else
 		uf = 0;
 
-	/*printf("Matrix dimensions %dx%d\n", m, n);
+	printf("Matrix dimensions %dx%d\n", m, n);
 	printf("Block size: %d\n", BLK_SIZE);
-	printf("Unrolls: %d\n", uf);*/
+	printf("Unrolls: %d\n", uf);
 
 	//mxm_naive(dest, a, b, m, n, p);
 	mxm(dest, a, b, m, n, p, uf);
+	*/
 }

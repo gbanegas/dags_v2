@@ -55,7 +55,7 @@ typedef struct polynomial polynomial;
 		PRINT_DEBUG("]\n");\
 	}
 #else
-	#define print_vector(vector, size){return;}
+	#define print_vector(vector, size){return 1;}
 #endif
 
 #endif /* SRC_DEFINITIONS_H_ */

@@ -434,17 +434,16 @@ void project_H_on_F_q(const matrix *H, matrix *Hbase) {
 
 int generate_systematic_matrix(const matrix* Hbase) {
 
-	int i, j, l = 0, test = 0;
-	gf temp;
+	int mm, i, j, l = 0, test = 0;
 	int num_cols = Hbase->cols;
 	int num_rows = Hbase->rows;
-	gf invPiv = 1, piv_align;
+	gf invPiv = 1;
 
 	for (i = 0; i < num_rows; i++) {
 		test = 0;
 		l = 0;
 		j = i + num_cols - num_rows;
-		if (Hbase->data[(i * num_cols) + i + num_cols - num_rows] == 0) { //We're looking for a non-zero pivot
+		if (Hbase->data[(i * num_cols) + j] == 0) { //We're looking for a non-zero pivot
 			test = 1;
 			//printf("search Pivot\n");
 			for (l = i + 1; l < num_rows; l++) {
@@ -464,40 +463,39 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			//temp=P[i+n-num_rows];
 			//P[i+n-num_rows]=P[j];
 			//P[j]=temp;
-			for (j = 0; j < num_cols; j++) {
-				temp = Hbase->data[(l * num_cols) + j];
-				Hbase->data[(l * num_cols) + j] = Hbase->data[(i
-						* num_cols) + j];
-				Hbase->data[(i * Hbase->cols) + j] = temp;
+
+			for (mm = 0; mm < num_cols; mm++) {
+				Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
+				Hbase->data[(i * num_cols) + mm] ^= Hbase->data[(l * num_cols) + mm];
+				Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
 			}
 		}
 
 
 		//   Matrix standardization
-		if (Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows] != 1) {
-			invPiv = gf_inv(Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows]);
-			Hbase->data[(i * Hbase->cols) + i + num_cols - num_rows] = 1;
+		if (Hbase->data[(i * num_cols) + j] != 1) {
+			invPiv = gf_inv(Hbase->data[(i * num_cols) + j]);
+			Hbase->data[(i * num_cols) + j] = 1;
 
-			for (j = 0; j < num_cols; j++) {
-				if (j == i + num_cols - num_rows) {
-					continue;
+			for (mm = 0; mm < num_cols; mm++) {
+				if (mm != j) {
+					// continue;
+					Hbase->data[(i * num_cols) + mm] = gf_mult(
+							Hbase->data[(i * num_cols) + mm], invPiv);
 				}
-				Hbase->data[(i * Hbase->cols) + j] = gf_mult(
-						Hbase->data[(i * Hbase->cols) + j], invPiv);
 			}
 		}
 
-		//Here we do the elimination on column i + n-num_rows
+		//Here we do the elimination on column i + num_cols-num_rows
+		// TODO: BLOCKING LOOP
+		gf piv_align;
 		for (l = 0; l < num_rows; l++) {
-			if (l == i) {
-				continue;
-			}
-			if (Hbase->data[(l * num_cols) + i + num_cols - num_rows]) {
-				piv_align = Hbase->data[(l * Hbase->cols) + i + num_cols - num_rows];
-
-				for (j = 0; j < num_cols; j++) {
-					Hbase->data[(l * Hbase->cols) + j] ^=
-							(gf_mult(piv_align,	Hbase->data[(i * Hbase->cols) + j]));
+			if (l != i) {				
+				if (Hbase->data[(l * num_cols) + j]) {
+					piv_align = Hbase->data[(l * num_cols) + j];
+					for (mm = 0; mm < num_cols; mm++) {
+						Hbase->data[(l * num_cols) + mm] ^= gf_mult(piv_align,Hbase->data[(i * num_cols) + mm]);
+					}
 				}
 			}
 		}
