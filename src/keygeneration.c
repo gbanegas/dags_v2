@@ -29,18 +29,6 @@ int contains_zero(gf *list, int length) {
 }
 
 /*
- * generate_elements_in_F_q_m:
- * 	The list that is generated is a list of elements 1,2,3 ...
- * 	all the way up to F_q_m
- */
-void generate_elements_in_F_q_m(gf * set_of_elements_in_F_q_m) {
-	int i;
-	for (i = 1; i < F_q_m_size; i++) {
-		set_of_elements_in_F_q_m[i - 1] = i;
-	}
-}
-
-/*
  * remove_integer:
  * 	This functions goes through a list and sets the element that is equal
  * 	to the @element variable to -1
@@ -603,7 +591,8 @@ void key_gen(gf *v, gf *y, matrix *G) {
 		goto failout;
 	}
 	// Only generate_elements in F_q_m once and copied when used in build_support()
-	generate_elements_in_F_q_m(elements_in_F_q_m_constant);
+	// With starting value of 1
+	generate_elements_in_F_q_m(elements_in_F_q_m_constant, 1);
 
 	do {
 		if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))
