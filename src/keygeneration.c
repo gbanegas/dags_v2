@@ -29,18 +29,6 @@ int contains_zero(gf *list, int length) {
 }
 
 /*
- * generate_elements_in_F_q_m:
- * 	The list that is generated is a list of elements 1,2,3 ...
- * 	all the way up to F_q_m
- */
-void generate_elements_in_F_q_m(gf * set_of_elements_in_F_q_m) {
-	int i;
-	for (i = 1; i < F_q_m_size; i++) {
-		set_of_elements_in_F_q_m[i - 1] = i;
-	}
-}
-
-/*
  * remove_integer:
  * 	This functions goes through a list and sets the element that is equal
  * 	to the @element variable to -1
@@ -514,6 +502,7 @@ int generate_public_key(const matrix *Hbase, matrix *G) {
 	matrix *M, *m_temp, *m_transposed, *final;
 
 	if(EXIT_FAILURE == generate_systematic_matrix(Hbase)){
+		PRINT_DEBUG("Failed to generate_systematic_matrix\n");
 		return EXIT_FAILURE;
 	}
 
@@ -568,7 +557,8 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 void key_gen(gf *v, gf *y, matrix *G) {
 	int ret_value = 0;
 	gf signature_h[code_length];
-	gf *elements_in_F_q_m;
+	gf *elements_in_F_q_m = NULL;
+	gf *elements_in_F_q_m_constant = NULL;
 	gf u[signature_block_size];
 	long build_support_failures = 0;
 	long build_dyadic_sig_failures =0;
@@ -595,15 +585,22 @@ void key_gen(gf *v, gf *y, matrix *G) {
 
 	PRINT_DEBUG("Key Gen start\n");
 
-	if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))
+	if (NULL == (elements_in_F_q_m_constant = calloc(F_q_m_size, sizeof(gf))))
 	{
 		PRINT_DEBUG("Failed to allocate memory for elements_in_F_q_m");
 		goto failout;
 	}
 	// Only generate_elements in F_q_m once and copied when used in build_support()
-	generate_elements_in_F_q_m(elements_in_F_q_m);
+	// With starting value of 1
+	generate_elements_in_F_q_m(elements_in_F_q_m_constant, 1);
 
 	do {
+		if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))
+		{
+			PRINT_DEBUG("Failed to allocate memory for elements_in_F_q_m");
+			goto failout;
+		}
+		memcpy(elements_in_F_q_m, elements_in_F_q_m_constant, F_q_m_size * sizeof(gf));
 		memset(signature_h, 0, code_length * sizeof(gf));
 		memset(u, 0, signature_block_size * sizeof(gf));
 		do {
@@ -642,5 +639,6 @@ void key_gen(gf *v, gf *y, matrix *G) {
 	} while (ret_value);
 failout:
 	free(elements_in_F_q_m);
+	free(elements_in_F_q_m_constant);
 	return;
 }

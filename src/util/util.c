@@ -133,7 +133,18 @@ void generate_int_list_of_size(int *list, int length) {
 	for (int i = 0; i < length; i++) {
 		list[i] = i;
 	}
+}
 
+/*
+ * generate_elements_in_F_q_m:
+ * 	The list that is generated is a list of elements 1,2,3 ...
+ * 	all the way up to F_q_m
+ */
+void generate_elements_in_F_q_m(gf * set_of_elements_in_F_q_m, int start_value) {
+	int i;
+	for (i = 0; i < F_q_m_size; i++) {
+		set_of_elements_in_F_q_m[i] = start_value + i;
+	}
 }
 
 void random_m(unsigned char *m) {
@@ -259,14 +270,28 @@ void permute(gf *array, int i, int length) {
 	return;
 }
 
+/*
+ * check_positions
+ * 	This function checks all of the values of an array to ensure that they
+ * 	are no longer set to -1
+ *
+ * 	param:
+ * 		pos		  Provide an interger array
+ * 		size		Provide the number of elements in the array to check
+ *
+ * 	Results:
+ * 		Returns EXIT_SUCCESS if there are no longer any values that are -1.
+ * 		Otherwise EXIT_FAILURE
+ */
+
 int check_positions(const int *pos, const int size) {
 	int i = 0;
 	for (i = size; i > -1; i--) {
 		if (pos[i] == -1) {
-			return 1;
+			return EXIT_FAILURE;
 		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int multiplicative_order(const int a) {

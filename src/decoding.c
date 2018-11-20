@@ -6,10 +6,17 @@
  */
 
 #include "../include/decoding.h"
+/*
+ * Decoding:
+ * 	This function is used to find the error vector and the code_word.
+ *
+ * Return:
+ * 	Return EXIT_SUCCESS if the successful at decoding otherwise EXIT_FAILURE
+ */
 
 int decoding(const gf* v, const gf* y, const unsigned char *c,
 		unsigned char *error, unsigned char *code_word) {
-	int i, k, j, dr;
+	int i, k, j, dr, position;
 	int st = (signature_block_size * pol_deg);
 	polynomial *syndrom;
 	polynomial *omega, *sigma, *re, *uu, *u, *quotient, *rest, *app, *temp,
@@ -18,17 +25,26 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	gf pol_gf, tmp, tmp1, o;
 	gf alpha;
 
-	//Compute Syndrome normally
-#ifdef DEBUG_P
-	printf("Decoding:Computing syndrom");
+	int aux_position[weight];
+	gf aux_perm[F_q_m_size];
 
-	printf("\n");
+	memset(aux_position, -1, weight * sizeof(int));
+
+#if defined(DAGS_TOY) | defined(DAGS_3) | defined(DAGS_5)
+	gf exp_alpha = (F_q_m_size - 1) / (F_q_size - 1);
+	alpha = gf_pow_f_q_m(2, exp_alpha); //b^((q^m)-1)/(q-1)
+#elif defined(DAGS_1)
+	alpha = 197;
 #endif
+
+	//Compute Syndrome normally
+	PRINT_DEBUG_DEC("Decoding:Computing syndrom\n");
+
 	syndrom = create_polynomial(st - 1);
 	compute_syndrom(v, y, c, syndrom);
 
 	if (syndrom->degree == -1) {
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	//Resolution of the key equation
@@ -44,11 +60,8 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	u->degree = 0;
 
 	dr = syndrom->degree;
-#ifdef DEBUG_P
-	printf("Computing re,u,quotient");
 
-	printf("\n");
-#endif
+	PRINT_DEBUG_DEC("Computing re,u,quotient\n");
 	while (dr >= (st / 2)) {
 
 		quotient = poly_quo(re, syndrom);
@@ -78,14 +91,12 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(uu);
 	polynomial_free(app);
 
-#ifdef DEBUG_P
-	printf("Computing delta, omega, sigma");
 
-	printf("\n");
-#endif
+	PRINT_DEBUG_DEC("Computing delta, omega, sigma\n");
+
 	delta = create_polynomial(0);
-	gf u_over_z = polynomial_evaluation(u, 0); // z=0
-	delta->coefficient[0] = gf_q_m_inv(u_over_z);
+	// u over z with z = 0
+	delta->coefficient[0] = gf_q_m_inv(polynomial_evaluation(u, 0));
 	omega = poly_multiplication(syndrom, delta);
 	polynomial_free(syndrom);
 	sigma = poly_multiplication(u, delta);
@@ -93,43 +104,37 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(delta);
 	polynomial_free(u);
 
-	gf aux_perm[F_q_m_size] = { 0 };
-	for (i = 0; i < F_q_m_size; i++) {
-		aux_perm[i] = i;
-	}
+	generate_elements_in_F_q_m(aux_perm, 0);
 
-	int aux_position[weight] = { -1 };
 	j = 0;
 
-#ifdef DEBUG_P
-	printf("Computing error position");
-	printf("\n");
-#endif
+	PRINT_DEBUG_DEC("Computing error position\n");
+
 	for (i = 0; i < F_q_m_size; i++) {
-		gf result = polynomial_evaluation(sigma, aux_perm[i]);
-		if (!result) {
-			int pos = index_of_element(v, gf_q_m_inv(aux_perm[i]));
-#ifdef DEBUG_P
-			printf("%d,", pos);
-#endif
-			aux_position[j] = pos;
+		// If the polynomial evaluates to zero
+		if (!polynomial_evaluation(sigma, aux_perm[i])) {
+			position = index_of_element(v, gf_q_m_inv(aux_perm[i]));
+
+			PRINT_DEBUG_DEC("%d, ", position);
+
+			aux_position[j] = position;
 			j += 1;
 		}
 	}
-#ifdef DEBUG_P
-	printf("\n");
-#endif
+
+	PRINT_DEBUG_DEC("\n");
+
 	polynomial_free(sigma);
 	//Element for determining the value of errors
 	if (check_positions(aux_position, st / 2)) {
 		return -1;
 	}
-#ifdef DEBUG_P
-	printf("decoding error_position: ");
-	for (int i = 0; i < weight; i++) {
-		printf("%d, ", aux_position[i]);
+#ifdef DEBUG
+	PRINT_DEBUG_DEC("decoding error_position: ");
+	for (i = 0; i < weight; i++) {
+		PRINT_DEBUG_DEC("%d, ", aux_position[i]);
 	}
-	printf("\n");
+	PRINT_DEBUG_DEC("\n");
 #endif
 	pos = create_polynomial(st / 2);
 	for (i = 0; i < st / 2; i++) {
@@ -137,65 +142,48 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	}
 	polynomial_get_update_degree(pos);
 	if (pos->degree == -1) {
-		return -1;
+		return EXIT_FAILURE;
 	}
 
-#ifdef DEBUG_P
-	printf("Computing evaluating error position");
-	printf("\n");
-#endif
+	PRINT_DEBUG_DEC("Computing evaluating error position\n");
 	app = create_polynomial(pos->degree);
 	for (j = 0; j <= pos->degree; j++) {
 		pol_gf = 1;
-		for (i = 0; i <= pos->degree; i++) {
-			if (i != j) {
-				tmp = gf_q_m_mult(v[pos->coefficient[i]],
-						gf_q_m_inv(v[pos->coefficient[j]]));
-				tmp = gf_add(1, tmp);
-				pol_gf = gf_q_m_mult(pol_gf, tmp);
-			}
+		for (i = 0; i < j; i++) {
+			tmp = gf_q_m_mult(v[pos->coefficient[i]],
+					gf_q_m_inv(v[pos->coefficient[j]]));
+			tmp = gf_add(1, tmp);
+			pol_gf = gf_q_m_mult(pol_gf, tmp);
+		}
+		for (i = j + 1; i <= pos->degree; i++) {
+			tmp = gf_q_m_mult(v[pos->coefficient[i]],
+					gf_q_m_inv(v[pos->coefficient[j]]));
+			tmp = gf_add(1, tmp);
+			pol_gf = gf_q_m_mult(pol_gf, tmp);
 		}
 		o = polynomial_evaluation(omega, gf_q_m_inv(v[pos->coefficient[j]]));
 		tmp1 = gf_q_m_mult(y[pos->coefficient[j]], pol_gf);
 		if (tmp1 != 0) {
-			gf result_tmp = gf_div_f_q_m(o, tmp1);
-			app->coefficient[j] = result_tmp;
+			app->coefficient[j] = gf_div_f_q_m(o, tmp1);
 		}
 	}
 	polynomial_get_update_degree(app);
 	polynomial_free(omega);
-#if defined(DAGS_TOY) | defined(DAGS_3) | defined(DAGS_5)
-	gf exp_alpha = (F_q_m_size - 1) / (F_q_size - 1);
-	alpha = gf_pow_f_q_m(2, exp_alpha); //b^((q^m)-1)/(q-1)
-#endif
-#if defined(DAGS_1)
-	alpha = 197;
-#endif
-#ifdef DEBUG_P
-	printf("Reconstruction of the error vector");
-	printf("\n");
-#endif
-	k = 0;
+
+
+	PRINT_DEBUG_DEC("Reconstruction of the error vector\n");
+
 	//Reconstruction of the error vector
 	for (i = 0; i <= app->degree; i++) {
 		k = discrete_logarithm(app->coefficient[i], alpha);
-		gf correction = gf_pow_f_q(2, k);
-		error[pos->coefficient[i]] = correction;
-
+		error[pos->coefficient[i]] = gf_pow_f_q(2, k); // Correction
 	}
 	polynomial_free(app);
 	polynomial_free(pos);
 
-#ifdef DEBUG_P
-	printf("decoding_error:\n");
-	/*for (i = 0; i < code_length; i++) {
-	 printf(" %" PRIu16 ", ", error[i]);
-	 }
-	 printf("\n");*/
-#endif
 	//Reconstruction of code_word
 	for (i = 0; i < code_length; i++) {
 		code_word[i] = (c[i] ^ error[i]) & F_q_m_order;
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }

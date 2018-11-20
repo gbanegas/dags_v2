@@ -46,6 +46,12 @@ typedef struct polynomial polynomial;
 	#define PRINT_DEBUG(s, ...) do {} while (0)
 #endif
 
+#ifdef DEBUG_DECODING
+	#define PRINT_DEBUG_DEC(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
+#else
+	#define PRINT_DEBUG_DEC(s, ...) do {} while (0)
+#endif
+
 #ifdef DEBUG
 	#define print_vector(vector, size) {\
 		PRINT_DEBUG("[");\
@@ -55,7 +61,7 @@ typedef struct polynomial polynomial;
 		PRINT_DEBUG("]\n");\
 	}
 #else
-	#define print_vector(vector, size){return 1;}
+	#define print_vector(vector, size){return EXIT_SUCCESS;}
 #endif
 
 #endif /* SRC_DEFINITIONS_H_ */

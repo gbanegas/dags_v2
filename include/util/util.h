@@ -46,4 +46,6 @@ extern gf discrete_logarithm(const gf a, const gf b);
 
 extern void generate_int_list_of_size(int *list, int length);
 
+void generate_elements_in_F_q_m(gf * set_of_elements_in_F_q_m, int start_value);
+
 #endif /* INCLUDE_UTIL_UTIL_H_ */

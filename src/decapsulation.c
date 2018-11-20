@@ -45,7 +45,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_2 of the decapsulation :  Output ⊥ if decoding fails or wt(e) != n0_w
 	 */
 
-	if (decode_value == -1 || compute_weight(e_prime, code_length) != weight) {
+	if (decode_value == EXIT_FAILURE || compute_weight(e_prime, code_length) != weight) {
 		return -1;
 	}
 
