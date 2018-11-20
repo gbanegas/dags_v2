@@ -38,7 +38,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 #endif
 
 	//Compute Syndrome normally
-	PRINT_DEBUG("Decoding:Computing syndrom\n");
+	PRINT_DEBUG_DEC("Decoding:Computing syndrom\n");
 
 	syndrom = create_polynomial(st - 1);
 	compute_syndrom(v, y, c, syndrom);
@@ -61,7 +61,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 	dr = syndrom->degree;
 
-	PRINT_DEBUG("Computing re,u,quotient\n");
+	PRINT_DEBUG_DEC("Computing re,u,quotient\n");
 	while (dr >= (st / 2)) {
 
 		quotient = poly_quo(re, syndrom);
@@ -92,7 +92,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(app);
 
 
-	PRINT_DEBUG("Computing delta, omega, sigma\n");
+	PRINT_DEBUG_DEC("Computing delta, omega, sigma\n");
 
 	delta = create_polynomial(0);
 	// u over z with z = 0
@@ -108,21 +108,21 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 	j = 0;
 
-	PRINT_DEBUG("Computing error position\n");
+	PRINT_DEBUG_DEC("Computing error position\n");
 
 	for (i = 0; i < F_q_m_size; i++) {
 		// If the polynomial evaluates to zero
 		if (!polynomial_evaluation(sigma, aux_perm[i])) {
 			position = index_of_element(v, gf_q_m_inv(aux_perm[i]));
 
-			PRINT_DEBUG("Error position %d,", pos);
+			PRINT_DEBUG_DEC("%d, ", position);
 
 			aux_position[j] = position;
 			j += 1;
 		}
 	}
 
-	PRINT_DEBUG("\n");
+	PRINT_DEBUG_DEC("\n");
 
 	polynomial_free(sigma);
 	//Element for determining the value of errors
@@ -130,11 +130,11 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 		return -1;
 	}
 #ifdef DEBUG
-	PRINT_DEBUG("decoding error_position: ");
+	PRINT_DEBUG_DEC("decoding error_position: ");
 	for (i = 0; i < weight; i++) {
-		PRINT_DEBUG("%d, ", aux_position[i]);
+		PRINT_DEBUG_DEC("%d, ", aux_position[i]);
 	}
-	PRINT_DEBUG("\n");
+	PRINT_DEBUG_DEC("\n");
 #endif
 	pos = create_polynomial(st / 2);
 	for (i = 0; i < st / 2; i++) {
@@ -145,7 +145,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 		return EXIT_FAILURE;
 	}
 
-	PRINT_DEBUG("Computing evaluating error position\n");
+	PRINT_DEBUG_DEC("Computing evaluating error position\n");
 	app = create_polynomial(pos->degree);
 	for (j = 0; j <= pos->degree; j++) {
 		pol_gf = 1;
@@ -171,7 +171,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(omega);
 
 
-	PRINT_DEBUG("Reconstruction of the error vector\n");
+	PRINT_DEBUG_DEC("Reconstruction of the error vector\n");
 
 	//Reconstruction of the error vector
 	for (i = 0; i <= app->degree; i++) {
