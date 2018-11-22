@@ -592,7 +592,7 @@ void key_gen(gf *v, gf *y, matrix *G) {
 	}
 	// Only generate_elements in F_q_m once and copied when used in build_support()
 	// With starting value of 1
-	generate_elements_in_F_q_m(elements_in_F_q_m_constant, 1);
+	generate_elements_in_order(elements_in_F_q_m_constant, 1, F_q_m_size);
 
 	do {
 		if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))

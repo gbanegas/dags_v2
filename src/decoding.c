@@ -104,7 +104,7 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	polynomial_free(delta);
 	polynomial_free(u);
 
-	generate_elements_in_F_q_m(aux_perm, 0);
+	generate_elements_in_order(aux_perm, 0, F_q_m_size);
 
 	j = 0;
 
