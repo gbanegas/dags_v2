@@ -140,9 +140,10 @@ void generate_int_list_of_size(int *list, int length) {
  * 	The list that is generated is a list of elements 1,2,3 ...
  * 	all the way up to F_q_m
  */
-void generate_elements_in_F_q_m(gf * set_of_elements_in_F_q_m, int start_value) {
+void generate_elements_in_order(gf * set_of_elements_in_F_q_m, int start_value,
+		unsigned int size) {
 	int i;
-	for (i = 0; i < F_q_m_size; i++) {
+	for (i = 0; i < size; i++) {
 		set_of_elements_in_F_q_m[i] = start_value + i;
 	}
 }

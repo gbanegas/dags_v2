@@ -6,28 +6,38 @@
  */
 
 #include "../include/encapsulation.h"
-#define cus_len 4
+
+/*
+ * encapsulation:
+ *   This function produces the ciphert_text given the shared secret and
+ *   public key
+ *
+ * Params:
+ * 	cipher_text: Provide an array that can hold the size of the ciphertext
+ * 	secret_shared: Provide the shared secret
+ * 	public_key: Provide the public_key
+ */
 int encapsulation(unsigned char *ciphert_text, unsigned char *secret_shared,
 		const unsigned char *public_key) {
+	int result;
+	matrix *G = NULL;
 
-#ifdef DEBUG_P
-	printf("Creating Matrix G: \n");
-#endif
-	matrix *G = make_matrix(code_dimension, code_length);
-#ifdef DEBUG_P
-	printf("Recovering Matrix G: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Creating Matrix G: \n");
+	G = make_matrix(code_dimension, code_length);
+	PRINT_DEBUG_ENCAP("Recovering Matrix G: \n");
 	recover_public_key(public_key, G);
 	print_matrix(G);
 
-	return encrypt(ciphert_text, secret_shared, G);
+	result = encrypt(ciphert_text, secret_shared, G);
+	free_matrix(G);
+	G = NULL;
+	return result;
 }
 
 int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		matrix *G) {
 
 	int i;
-	const unsigned char *custom = (unsigned char *) "DAGs";
 	unsigned char m[code_length] = { 0 }; //[k_prime] = { 0 };
 	unsigned char d[k_prime] = { 0 };
 	unsigned char rho[k_sec] = { 0 };
@@ -35,33 +45,30 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	unsigned char sigma[(code_dimension - k_sec)] = { 0 };
 	unsigned char hash_sigma[code_length] = { 0 };
 
-	unsigned char u[code_dimension] = { 0 }; //calloc(code_dimension + 1, sizeof(unsigned char));
+	unsigned char u[code_dimension] = { 0 };
 	gf c[code_length] = { 0 };
 	unsigned char r[code_dimension] = { 0 };
 	unsigned char dd[k_prime] = { 0 };
 	unsigned char K[ss_length] = { 0 };
 
-#ifdef DEBUG_P
-	printf("Generation Random M: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Generation Random M: \n");
 	random_m(m);
 	for (i = 0; i < k_prime; i++) {
 		m[i] = m[i] % F_q_size;
 	}
 
-#ifdef DEBUG_P
+#ifdef DEBUG_ENCAP
 
-	for (int i = 0; i < k_prime; i++) {
-		printf(" %" PRIu16 ", ", m[i]);
+	for (i = 0; i < k_prime; i++) {
+		PRINT_DEBUG_ENCAP(" %" PRIu16 ", ", m[i]);
 	}
-	printf("\n");
-	printf("Starting hashing: \n");
+	PRINT_DEBUG_ENCAP("\nStarting hashing: \n");
 #endif
-	int test = KangarooTwelve(m, k_prime, r, code_dimension, custom, cus_len);
+	int test = KangarooTwelve(m, k_prime, r, code_dimension, K12_custom, K12_custom_len);
 	assert(test == 0); // Catch Error
 
 	// m: input type unsigned char len k_prime | d: output type unsigned char len k_prime
-	test = KangarooTwelve(m, k_prime, d, k_prime, custom, cus_len);
+	test = KangarooTwelve(m, k_prime, d, k_prime, K12_custom, K12_custom_len);
 	assert(test == 0); // Catch Error
 
 	// Type conversion
@@ -76,9 +83,7 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	 dd[i] = (unsigned char) (d[i] & F_q_order);
 	 }*/
 
-#ifdef DEBUG_P
-	printf("Generating sigma and rho: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Generating sigma and rho: \n");
 	for (i = 0; i < code_dimension; i++) {
 		if (i < k_sec) {
 			// Optimize modulo
@@ -91,9 +96,7 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		}
 	}
 
-#ifdef DEBUG_P
-	printf("Expanding m: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Expanding m: \n");
 
 	for (i = 0; i < code_dimension; i++) {
 		if (i < k_sec) {
@@ -103,35 +106,28 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		}
 	}
 
-#ifdef DEBUG_P
-	printf("Generating error_array: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Generating error_array: \n");
 	/*SHAKE256(hash_sigma, code_length, sigma, k_prime);*/
-	test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, custom,
-	cus_len);
+	test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom,
+	K12_custom_len);
 	assert(test == 0); // Catch Error
 	random_e(hash_sigma, error_array);
 
-#ifdef DEBUG_P
-	printf("message:\n");
+#ifdef DEBUG_ENCAP
+	PRINT_DEBUG_ENCAP("message:\n");
 	for (i = 0; i < code_dimension - k_sec; i++)
-		printf(" %" PRIu16 ", ", u[i]);
-	printf("\n");
-	printf("encaps_error_array:\n");
+		PRINT_DEBUG_ENCAP(" %" PRIu16 ", ", u[i]);
+	PRINT_DEBUG_ENCAP("\nEncaps_error_array:\n");
 	for (i = 0; i < code_length; i++) {
 		printf(" %" PRIu16 ", ", error_array[i]);
 	}
-	printf("\n");
+	PRINT_DEBUG_ENCAP("\n");
 #endif
 
-#ifdef DEBUG_P
-	//printf("Computing m*G: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Computing m*G: \n");
 	multiply_vector_matrix(u, G, c);//c = message*G
 
-#ifdef DEBUG_P
-	//printf("Computing (m*G) + error: \n");
-#endif
+	PRINT_DEBUG_ENCAP("Computing (m*G) + error: \n");
 	for (i = 0; i < code_length + k_prime; i++) {
 		if (i < code_length) {
 			ciphert_text[i] = (c[i] ^ error_array[i]); //c + error
@@ -140,14 +136,13 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		}
 	}
 
-#ifdef DEBUG_P
+#ifdef DEBUG_ENCAP
 	for (i = 0; i < code_length; i++)
-		printf(" %" PRIu16 ", ", ciphert_text[i]);
-	printf("|\n");
-	printf("hashing (m*G) + error: \n");
+		PRINT_DEBUG_ENCAP(" %" PRIu16 ", ", ciphert_text[i]);
+	PRINT_DEBUG_ENCAP("|\nHashing (m*G) + error: \n");
 #endif
 	//SHAKE256(K, ss_length, m, k_prime);
-	test = KangarooTwelve(m, k_prime, K, ss_length, custom, cus_len);
+	test = KangarooTwelve(m, k_prime, K, ss_length, K12_custom, K12_custom_len);
 	assert(test == 0); // Catch Error
 	for (i = 0; i < ss_length; i++) {
 		secret_shared[i] = K[i];

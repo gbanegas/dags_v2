@@ -11,6 +11,8 @@
 #include <stdint.h>
 
 #define ERROR_ZERO_IN_A_POSITION -1
+static const unsigned char* K12_custom = (unsigned char*)"DAGs";
+#define K12_custom_len 4
 
 typedef uint16_t gf;
 typedef uint32_t gf_p;
@@ -46,11 +48,24 @@ typedef struct polynomial polynomial;
 	#define PRINT_DEBUG(s, ...) do {} while (0)
 #endif
 
+#ifdef DEBUG_DECAP
+	#define PRINT_DEBUG_DECAP(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
+#else
+	#define PRINT_DEBUG_DECAP(s, ...) do {} while (0)
+#endif
+
 #ifdef DEBUG_DECODING
 	#define PRINT_DEBUG_DEC(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
 #else
 	#define PRINT_DEBUG_DEC(s, ...) do {} while (0)
 #endif
+
+#ifdef DEBUG_ENCAP
+	#define PRINT_DEBUG_ENCAP(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
+#else
+	#define PRINT_DEBUG_ENCAP(s, ...) do {} while (0)
+#endif
+
 
 #ifdef DEBUG
 	#define print_vector(vector, size) {\
