@@ -66,6 +66,12 @@ typedef struct polynomial polynomial;
 	#define PRINT_DEBUG_ENCAP(s, ...) do {} while (0)
 #endif
 
+#ifdef DEBUG_UTIL
+	#define PRINT_DEBUG_UTIL(s, ...) fprintf(stdout, s, ##__VA_ARGS__);
+#else
+	#define PRINT_DEBUG_UTIL(s, ...) do {} while (0)
+#endif
+
 
 #ifdef DEBUG
 	#define print_vector(vector, size) {\

@@ -4,7 +4,7 @@
  *  Created on: May 4, 2018
  *      Author: vader
  */
-
+#include <limits.h>
 #include "../include/encapsulation.h"
 
 /*
@@ -38,9 +38,8 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		matrix *G) {
 
 	int i;
-	unsigned char m[k_prime] = { 0 }; //[k_prime] = { 0 };
+	unsigned char m[code_dimension] = { 0 }; //[k_prime] = { 0 };
 	unsigned char d[k_prime] = { 0 };
-	unsigned char rho[k_sec] = { 0 };
 	unsigned char error_array[code_length] = { 0 };
 	unsigned char sigma[(code_dimension - k_sec)] = { 0 };
 	unsigned char hash_sigma[code_length] = { 0 };
@@ -48,17 +47,19 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	unsigned char u[code_dimension] = { 0 };
 	gf c[code_length] = { 0 };
 	unsigned char r[code_dimension] = { 0 };
-	unsigned char dd[k_prime] = { 0 };
 	unsigned char K[ss_length] = { 0 };
 
 	PRINT_DEBUG_ENCAP("Generation Random M: \n");
+
 	random_m(m);
-	for (i = 0; i < k_prime; i++) {
-		m[i] = m[i] % F_q_size;
+	// Only required for DAGs_1 at the moment but do not want to hard code it.
+	if (F_q_size < UCHAR_MAX){
+		for (i = 0; i < k_prime; i++) {
+			m[i] = m[i] % F_q_size;
+		}
 	}
 
 #ifdef DEBUG_ENCAP
-
 	for (i = 0; i < k_prime; i++) {
 		PRINT_DEBUG_ENCAP(" %" PRIu16 ", ", m[i]);
 	}
@@ -72,39 +73,20 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	assert(test == 0); // Catch Error
 
 	// Type conversion
-	for (i = 0; i < k_prime; i++)
-		// Optimize modulo
-		dd[i] = (unsigned char) (d[i] % F_q_size);
-	/*SHAKE256(r, code_dimension, m, k_prime);
-	 SHAKE256(d, k_prime, m, k_prime);
-
-	 for (i = 0; i < k_prime; i++) {
-	 // Optimize modulo
-	 dd[i] = (unsigned char) (d[i] & F_q_order);
-	 }*/
+	if (F_q_size < UCHAR_MAX) {
+		for (i = 0; i < k_prime; i++) {
+			d[i] = d[i] % F_q_size;
+		}
+		for (i = 0; i < code_dimension; i++) {
+			r[i] = r[i] % F_q_size;
+		}
+	}
 
 	PRINT_DEBUG_ENCAP("Generating sigma and rho: \n");
-	for (i = 0; i < code_dimension; i++) {
-		if (i < k_sec) {
-			// Optimize modulo
-
-			rho[i] = (unsigned char) (r[i] % F_q_size); //rho recovery
-		} else {
-			// Optimize modulo
-
-			sigma[i - k_sec] = (unsigned char) (r[i] % F_q_size); // sigma recovery
-		}
-	}
-
+	memcpy(sigma, &r[k_sec], code_dimension - k_sec);
 	PRINT_DEBUG_ENCAP("Expanding m: \n");
-
-	for (i = 0; i < code_dimension; i++) {
-		if (i < k_sec) {
-			u[i] = ((unsigned char) rho[i]);
-		} else {
-			u[i] = ((unsigned char) m[i - k_sec]);
-		}
-	}
+	memcpy(u, r, k_sec );
+	memcpy(&u[k_sec], m, code_dimension - k_sec);
 
 	PRINT_DEBUG_ENCAP("Generating error_array: \n");
 	/*SHAKE256(hash_sigma, code_length, sigma, k_prime);*/
@@ -128,13 +110,10 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	multiply_vector_matrix(u, G, c);//c = message*G
 
 	PRINT_DEBUG_ENCAP("Computing (m*G) + error: \n");
-	for (i = 0; i < code_length + k_prime; i++) {
-		if (i < code_length) {
-			ciphert_text[i] = (c[i] ^ error_array[i]); //c + error
-		} else {
-			ciphert_text[i] = dd[i - code_length];
-		}
+	for (i = 0; i < code_length; i++) {
+		ciphert_text[i] = (c[i] ^ error_array[i]); //c + error
 	}
+	memcpy(&ciphert_text[code_length], d, k_prime);
 
 #ifdef DEBUG_ENCAP
 	for (i = 0; i < code_length; i++)
@@ -144,8 +123,7 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	//SHAKE256(K, ss_length, m, k_prime);
 	test = KangarooTwelve(m, k_prime, K, ss_length, K12_custom, K12_custom_len);
 	assert(test == 0); // Catch Error
-	for (i = 0; i < ss_length; i++) {
-		secret_shared[i] = K[i];
-	}
-	return 0;
+
+	memcpy(secret_shared, K, ss_length);
+	return EXIT_SUCCESS;
 }

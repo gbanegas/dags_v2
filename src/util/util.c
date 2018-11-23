@@ -148,57 +148,78 @@ void generate_elements_in_order(gf * set_of_elements_in_F_q_m, int start_value,
 	}
 }
 
+/*
+ * random_m:
+ * 	Currently this function is used to allow changes to the random byte function
+ * 	called without having to affect change multiple location in code.
+ */
 void random_m(unsigned char *m) {
-	//const unsigned char seed[32U] = { 1 };
 	randombytes_buf(m, k_prime);
-	//randombytes(m, k_prime);
-	/*unsigned char data_m[] = { 114, 194, 6, 152, 244, 38, 43, 140, 189, 83, 66,
-	 48 };
-	 for (i = 0; i < k_prime; i++) {
-	 m[i] = data_m[i] & F_q_order;
-	 }*/
 }
 
-int index_of_element_in_a_vector(unsigned int *v, int j, int size) {
+/*
+ *	element_in_vector:
+ *		This function goes through and checks if "value_to_check" in array v up to
+ *		"size" elements in the array.
+ *
+ *	Param:
+ *		v:	Provide the array to check for the value in
+ *		value_to_check: Provide the value that needs to be checked for
+ *		size:	Provide the number of elements in the array that need to be checked.
+ *
+ *	Return:
+ *		Return EXIT_SUCCESS if the value is not contained in the array otherwise
+ *		EXIT_FAILURE if it is.
+ */
+int element_in_vector(unsigned int *v, int value_to_check, int size) {
 	int i;
 	for (i = 0; i < size; i++) {
-		if (v[i] == j)
-			return 1;
+		if (v[i] == value_to_check) {
+			return EXIT_FAILURE;
+		}
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
+/*
+ * random_e:
+ * 	Put errors into the error array based on the sigma provided
+ *
+ * Param:
+ * 	sigma:  Provide the hash_sigma
+ * 	error_array:	Provide an array to hold the values and locations of the errors
+ */
 void random_e(const unsigned char *sigma, unsigned char *error_array) {
 	int i, j = 0, k = 0, jeton = 0;
-	unsigned int v[code_length] = { 0 };
-#ifdef DEBUG_P
-	printf("error_position: ");
-#endif
+	unsigned char gf_sigma;
+	unsigned int v[weight] = { 0 };
+
+	PRINT_DEBUG_UTIL("error_position: ");
 	for (i = 0; i < code_length; i++) {
-		if (sigma[i] % F_q_size == 0) {
+		gf_sigma = sigma[i] % F_q_size;
+		if (gf_sigma == 0) {
 			continue;
-		}
-		if (j == weight) {
-			break;
 		}
 		do {
 			jeton = (sigma[k + 1] ^ (sigma[k] << 4)) % code_length;
 			k++;
-		} while (index_of_element_in_a_vector(v, jeton, j + 1) == 1); //Only check j elements
+		} while (element_in_vector(v, jeton, j + 1) == 1); //Only check j elements
 		v[j] = jeton;
-		error_array[jeton] = sigma[i] % F_q_size;
-#ifdef DEBUG_P
-		printf("%d, ", jeton);
-#endif
-		jeton = 0;
+		error_array[jeton] = gf_sigma;
+		PRINT_DEBUG_UTIL("%d, ", jeton);
 		j++;
+
+		// Onlyl need to find weight errors
+		if (j == weight) {
+			break;
+		}
 	}
-#ifdef DEBUG_P
-	printf("\n");
+#ifdef DEBUG_UTIL
+	PRINT_DEBUG_UTIL("\n");
 	for (int i = 0; i < code_length; i++) {
-		printf("%d, ", error_array[i]);
+		PRINT_DEBUG_UTIL("%d, ", error_array[i]);
 	}
-	printf("\n");
+	PRINT_DEBUG_UTIL("\n");
 #endif
 }
 
