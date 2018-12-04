@@ -7,8 +7,17 @@
 
 #include "../include/decapsulation.h"
 
-#define cus_len 4
-
+/*
+ * Decapsulation:
+ *   This function can be used to decrypt the cipher_text.
+ *   The secret_key is used to obtain both v and y for the decrypt function
+ *
+ * Param:
+ *   secret_shard: Provide the shared secret
+ *   cipher_text:  Provide the cipher text
+ *   secret_key:   Provide the secret key
+ * Returns: the results from decrypt() based on provided input
+ */
 int decapsulation(unsigned char *secret_shared,
 		const unsigned char *cipher_text, const unsigned char *secret_key) {
 	gf v[code_length] = { 0 };
@@ -19,8 +28,7 @@ int decapsulation(unsigned char *secret_shared,
 
 int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 		const gf *v, const gf *y) {
-	const unsigned char *custom = (unsigned char *) "DAGs"; // customization = "DAGs";
-	int i, decode_value;
+	int i, decode_value, check_return;
 	unsigned char word[code_length] = { 0 };
 	unsigned char m1[k_prime] = { 0 };
 	unsigned char rho1[k_sec] = { 0 };
@@ -38,7 +46,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * We obtain codeword mot = u1G and error e
 	 */
 
-	//printf("starting decoding...\n");
+	PRINT_DEBUG_DECAP("Starting decoding...\n");
 	decode_value = decoding(v, y, cipher_text, e_prime, word);
 
 	/*
@@ -60,20 +68,15 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_4 of the decapsulation :  Compute r1 = G(m1) and d1 = H(m1)
 	 */
 
-	//KangarooTwelve(m1, k_prime, r1, code_dimension, custom, cus_len);
+	//KangarooTwelve(m1, k_prime, r1, code_dimension, K12_custom, K12_custom_len);
 	//SHAKE256(r1, code_dimension, m1, k_prime);
-	int test = KangarooTwelve(m1, k_prime, r1, code_dimension, custom, cus_len);
-	assert(test == 0); // Catch Error
+	check_return = KangarooTwelve(m1, k_prime, r1, code_dimension, K12_custom, K12_custom_len);
+	assert(check_return == 0); // Catch Error
 
 	// Compute d1 = H(m1) where H is  sponge SHA-512 function
 
-	test = KangarooTwelve(m1, k_prime, d1, k_prime, custom, cus_len);
-	assert(test == 0); // Catch Error
-
-	// Compute d1 = H(m1) where H is  sponge SHA-512 function
-
-	//KangarooTwelve(m1, k_prime, d1, k_prime, custom, cus_len);
-	//SHAKE256(d1, k_prime, m1, k_prime);
+	check_return = KangarooTwelve(m1, k_prime, d1, k_prime, K12_custom, K12_custom_len);
+	assert(check_return == 0); // Catch Error
 
 	for (i = 0; i < k_prime; i++) {
 		d1[i] = d1[i] % F_q_size;
@@ -81,7 +84,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	// Return -1 if d distinct d1.
 	// d starts at ct+code_length.
 	if (memcmp(cipher_text + code_length, d1, k_prime) != 0) {
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	/*
@@ -107,11 +110,11 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * weight n0_w from sigma1
 	 */
 
-	//test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, custom, cus_len);
+	//test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom, K12_custom_len);
 	//SHAKE256(hash_sigma, code_length, sigma, k_prime);
-	test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, custom,
-	cus_len);
-	assert(test == 0); // Catch Error
+	check_return = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom,
+	K12_custom_len);
+	assert(check_return == 0); // Catch Error
 
 	//Generate error vector e2 of length code_length and weight n0_w from
 	//hash_sigma1 by using random_e function.
@@ -128,10 +131,10 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_7 of the decapsulation: If the previous condition is not satisfied,
 	 * compute the shared secret ss by using KangarooTwelve
 	 */
-	//test = KangarooTwelve(m1, k_prime, ss, ss_length, custom, cus_len);
+	//test = KangarooTwelve(m1, k_prime, ss, ss_length, K12_custom, K12_custom_len);
 	//SHAKE256(secret_shared, ss_length, m1, k_prime);
-	test = KangarooTwelve(m1, k_prime, secret_shared, ss_length, custom, cus_len);
-	assert(test == 0); // Catch Error
+	check_return = KangarooTwelve(m1, k_prime, secret_shared, ss_length, K12_custom, K12_custom_len);
+	assert(check_return == 0); // Catch Error
 
 	return 0;
 }
