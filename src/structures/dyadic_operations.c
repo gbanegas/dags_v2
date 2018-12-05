@@ -15,10 +15,10 @@ void dyadic_inverse(int n, gf *signature, gf* signature_inverse) {
 	for (i = 0; i < n; i++) {
 		det = gf_sum(det, signature[i]);
 	}
-	det = gf_mult_fast(det, det);
+	det = gf_mult(det, det);
 	gf det_inv = gf_inv(det);
 	for (i = 0; i < n; i++) {
-		sig_inv[i] = gf_mult_fast(det_inv, signature[i]);
+		sig_inv[i] = gf_mult(det_inv, signature[i]);
 	}
 
 	for (i = 0; i < n; i++) {
@@ -39,9 +39,9 @@ void dyadic_sum(int n, gf *signature_a, gf *signature_b, gf *signature_result) {
 void dyadic_product(int n, gf *signature_a, gf *signature_b,
 		gf *signature_result) {
 
-	karatsuba_gf((1<<n), signature_a, signature_b, signature_result);
+	//karatsuba_gf((1<<n), signature_a, signature_b, signature_result);
 
-	//std_multiplication_gf(n, signature_a, signature_b, signature_result);
+	std_multiplication_gf(n, signature_a, signature_b, signature_result);
 
 	//multiply_dyadic_convolution_gf(n, signature_a, signature_b, signature_result);
 
@@ -51,7 +51,7 @@ void dyadic_product(int n, gf *signature_a, gf *signature_b,
 		gf current_product = 0;
 		for (j = 0; j < n; j++) {
 			int dec_position = i^j;
-			gf sum_term = gf_mult_fast(signature_a[j],
+			gf sum_term = gf_mult(signature_a[j],
 					signature_b[dec_position]);
 			current_product = gf_sum(current_product, sum_term);
 		}

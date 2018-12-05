@@ -1,4 +1,4 @@
-#include "sylvester_hadamard.h"
+#include "../../karatsuba/sylvester_hadamard.h"
 
 matrix *make_walsh_hadamard_matrix(int n) {
 	matrix *h = make_matrix(n, n);

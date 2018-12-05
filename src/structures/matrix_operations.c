@@ -36,7 +36,7 @@ matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
 	matrix *ret_val = NULL;
 	matrix *m;
 
-	if (NULL == (m = (matrix *) malloc(sizeof(matrix)))){
+	if (NULL == (m = (matrix *) malloc(sizeof(matrix)))) {
 		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix\n");
 	}
 
@@ -45,7 +45,7 @@ matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
 	m->cols = n_cols;
 
 	// allocate a double array of length rows * cols
-	if (NULL == (m->data = (gf *)calloc(n_rows * n_cols, sizeof(gf)))){
+	if (NULL == (m->data = (gf *) calloc(n_rows * n_cols, sizeof(gf)))) {
 		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix");
 		goto failout;
 	}
@@ -55,8 +55,7 @@ matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
 	}
 
 	ret_val = m;
-failout:
-	return ret_val;
+	failout: return ret_val;
 }
 
 matrix* matrix_multiply(const matrix *a, const matrix *b) {
@@ -71,7 +70,7 @@ matrix* matrix_multiply(const matrix *a, const matrix *b) {
  * 	Frees the memory that was allocated by make_matrix
  */
 void free_matrix(matrix* mtx) {
-	if (NULL != mtx){
+	if (NULL != mtx) {
 		free(mtx->data);
 		free(mtx);
 	}
@@ -143,7 +142,6 @@ void echelon_form(matrix *a) {
 
 	}
 
-
 }
 
 matrix * transpose_matrix(matrix *a) {
@@ -192,23 +190,22 @@ void quasi_dyadic_bloc_matrix(matrix *M, gf *sig, int ind_col, int ind_rown) {
 }
 
 matrix* make_matrix_with_value(int n_rows, int n_cols, gf value) {
+	int i, j;
+	matrix * m = (matrix *) malloc(sizeof(matrix));
+	// set dimensions
+	m->rows = n_rows;
+	m->cols = n_cols;
 
-	struct matrix* matrix = malloc(sizeof(matrix));
-	matrix->rows = n_rows;
-	matrix->cols = n_cols;
-	gf** data = malloc(sizeof(gf*) * n_rows);
-	for (int x = 0; x < n_rows; x++) {
-		data[x] = calloc(n_cols, sizeof(gf));
-	}
-	for (int x = 0; x < n_rows; x++) {
-		for (int y = 0; y < n_cols; y++) {
-			data[x][y] = value;
+	// allocate a double array of length rows * cols
+	m->data = (gf *) calloc(n_rows * n_cols, sizeof(gf));
+
+	for (i = 0; i < m->rows; i++) {
+		for (j = 0; j < m->cols; j++) {
+			m->data[i * m->cols + j] = value;
 		}
 	}
-	matrix->data = data;
-	return matrix;
+
+	return m;
 
 }
-
-
 

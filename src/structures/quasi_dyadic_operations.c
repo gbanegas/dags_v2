@@ -21,11 +21,11 @@ void multiply_quasi_dyadic_matrices(matrix *a, matrix *b, int rows, int cols,
 				gf temp_2[cols];
 				int count = 0;
 				for (int k = (v - 1) * cols + 1; k < v * cols; k++) {
-					temp[count] = a->data[i][k];
+					temp[count] = a->data[i * a->cols + k];
 				}
 				count = 0;
 				for (int k = (j - 1) * cols + 1; k < j * cols; k++) {
-					temp_1[count] = b->data[i][k];
+					temp_1[count] = b->data[i * b->cols + k];
 				}
 
 				for (int k = 0; k < cols; k++) {
@@ -37,7 +37,7 @@ void multiply_quasi_dyadic_matrices(matrix *a, matrix *b, int rows, int cols,
 			}
 			int count = 0;
 			for (int k = (j - 1) * cols + 1; k < j * cols; k++) {
-				matrix_temp->data[i][k] = val[count];
+				matrix_temp->data[i * matrix_temp->cols + k] = val[count];
 				count++;
 			}
 			free(val);
@@ -47,7 +47,8 @@ void multiply_quasi_dyadic_matrices(matrix *a, matrix *b, int rows, int cols,
 
 	for (i = 0; i < rows; i++) {
 		for (j = 0; j < rows * cols; j++) {
-			result->data[i][j] = matrix_temp->data[i][j];
+			result->data[i * result->cols + j] = matrix_temp->data[i
+					* matrix_temp->cols + j];
 		}
 	}
 	free_matrix(matrix_temp);
@@ -61,11 +62,11 @@ void quasidyadic_col_block_product(matrix *a, gf *sig_B, int k, int n,
 
 	for (i = 0; i < n; i++) {
 		for (j = 0; j < n; j++) {
-			int pos = i^j;
+			int pos = i ^ j;
 			gf element = sig_B[pos];
 			for (v = 0; v < k; v++) {
-				gf result_mult = gf_mult_fast(a->data[v][j], element);
-				temp_matrix->data[v][i] = gf_sum(temp_matrix->data[v][i],
+				gf result_mult = gf_mult(a->data[v*a->cols + j], element);
+				temp_matrix->data[v*temp_matrix->cols + i] = gf_sum(temp_matrix->data[v*temp_matrix->cols + i],
 						result_mult);
 			}
 		}
@@ -74,7 +75,7 @@ void quasidyadic_col_block_product(matrix *a, gf *sig_B, int k, int n,
 
 	for (i = 0; i < k; i++) {
 		for (j = 0; j < n; j++) {
-			result->data[i][j] = temp_matrix->data[i][j];
+			result->data[i*result->cols + j] = temp_matrix->data[i*temp_matrix->cols + j];
 		}
 
 	}
@@ -100,17 +101,17 @@ void quasidyadic_invert_matrix(matrix *input_matrix, int m, int n,
 			gf signature_temp[n];
 			gf dyadic_sum_result[n];
 			gf signature_inverse[n];
-		    gf temp_result[n];
+			gf temp_result[n];
 
 			for (l = 0; l < j - 1; l++) {
 				counter = 0;
 				for (int k = (l) * n + 1; k < (l + 1) * n; k++) {
-					temp_1[counter] = input_matrix->data[j][k];
+					temp_1[counter] = input_matrix->data[j*input_matrix->cols + k];
 					counter++;
 				}
 				counter = 0;
 				for (int k = (i) * n + 1; k < (i + 1) * n; k++) {
-					temp_2[counter] = temp->data[j][k];
+					temp_2[counter] = temp->data[j*temp->cols + k];
 					counter++;
 				}
 				dyadic_product(n, temp_1, temp_2, signature_temp);
@@ -122,12 +123,12 @@ void quasidyadic_invert_matrix(matrix *input_matrix, int m, int n,
 
 			counter = 0;
 			for (int k = j * n + 1; k < (j + 1) * n; k++) {
-				temp_1[counter] = input_matrix->data[j][k];
+				temp_1[counter] = input_matrix->data[j*input_matrix->cols + k];
 				counter++;
 			}
 			counter = 0;
 			for (int k = (i) * n + 1; k < (i + 1) * n; k++) {
-				temp_2[counter] = temp->data[j][k];
+				temp_2[counter] = temp->data[j*temp->cols + k];
 				counter++;
 			}
 			dyadic_inverse(n, temp_1, signature_inverse);
@@ -142,7 +143,7 @@ void quasidyadic_invert_matrix(matrix *input_matrix, int m, int n,
 	}
 	for (i = 0; i < temp_val; i++) {
 		for (j = 0; j < m; j++) {
-			result->data[i][j] = temp->data[i][j];
+			result->data[i*result->cols + j] = temp->data[i*temp->cols + j];
 		}
 	}
 
@@ -165,7 +166,7 @@ void quasidyadic_LU(matrix *a, int m, int n, gf* permutated_row) {
 		gf sig_temp_result[n];
 		int count = 0;
 		for (i = j * n + 1; i < (j + 1) * n; i++) {
-			temp_row[count] = a->data[j][i];
+			temp_row[count] = a->data[j*a->cols + i];
 			count++;
 		}
 		dyadic_inverse(n, temp_row, sig_temp_result);
@@ -178,7 +179,7 @@ void quasidyadic_LU(matrix *a, int m, int n, gf* permutated_row) {
 		for (int k = j + 1; k < a->rows; k++) {
 			int cols_count = 0;
 			for (int y = (j) * n + 1; y < (j + 1) * n; y++) {
-				a->data[k][y] = C->data[row_count][cols_count];
+				a->data[k*a->cols+y] = C->data[row_count*C->cols + cols_count];
 				cols_count++;
 			}
 			row_count++;
@@ -192,12 +193,12 @@ void quasidyadic_LU(matrix *a, int m, int n, gf* permutated_row) {
 				gf temp_b[n];
 				int count = 0;
 				for (int x = (j) * n + 1; x < (j + 1) * n; x++) {
-					temp_a[count] = a->data[v][x];
+					temp_a[count] = a->data[v*a->cols + x];
 					count++;
 				}
 				count = 0;
 				for (int x = (k) * n + 1; x < (k + 1) * n; x++) {
-					temp_b[count] = a->data[v][x];
+					temp_b[count] = a->data[v*a->cols + x];
 					count++;
 				}
 				dyadic_product(n, temp_a, temp_b, sig_term);
@@ -205,7 +206,7 @@ void quasidyadic_LU(matrix *a, int m, int n, gf* permutated_row) {
 				dyadic_sum(n, temp_b, sig_term, sig_result);
 				count = 0;
 				for (int x = (k) * n + 1; x < (k + 1) * n; x++) {
-					a->data[v][x] = sig_result[count];
+					a->data[v*a->cols + x] = sig_result[count];
 					count++;
 				}
 
@@ -223,9 +224,9 @@ int quasidyadic_pivot(matrix *a, int m, int n, int k, gf* permutated_row) {
 	int flag_inv = 0;
 	int temp_value = (m / n);
 	for (i = k; i < temp_value; i++) {
-		gf det = a->data[i][(k) * n + 1]; //(i,(k-1)*n+1);
+		gf det = a->data[i*a->cols + (k) * n + 1]; //(i,(k-1)*n+1);
 		for (j = 1; j < n; j++) {
-			det = gf_sum(det, a->data[i][n * (k) + j]); //(i,n*(k-1)+j))
+			det = gf_sum(det, a->data[i*a->cols + n * (k) + j]); //(i,n*(k-1)+j))
 		}
 		if (det >= 0) {
 			flag_inv = i;
@@ -233,9 +234,9 @@ int quasidyadic_pivot(matrix *a, int m, int n, int k, gf* permutated_row) {
 			permutated_row[k] = permutated_row[flag_inv];
 			permutated_row[flag_inv] = z;
 			for (j = 0; j < m; j++) {
-				gf w = a->data[k][j];
-				a->data[k][j] = a->data[flag_inv][j];
-				a->data[flag_inv][j] = w;
+				gf w = a->data[k*a->cols+j];
+				a->data[k*a->cols+j] = a->data[flag_inv*a->cols + j];
+				a->data[flag_inv*a->cols + j] = w;
 			}
 
 		}

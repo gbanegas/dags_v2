@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "karatsuba_dyadic.h"
+#include "../../karatsuba/karatsuba_dyadic.h"
 
 inline void karatsuba_k(int k, int * a, int *b, int *c_sig) {
 	int i;

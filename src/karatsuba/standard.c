@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "standard.h"
+#include "../../karatsuba/standard.h"
 
 void std_multiplication(int n, int *a, int *b, int *result) {
 	int k = 1 << n;
@@ -20,14 +20,14 @@ void std_multiplication(int n, int *a, int *b, int *result) {
 
 }
 
-inline void std_multiplication_gf(int n, gf *a, gf *b, gf *result) {
+void std_multiplication_gf(int n, gf *a, gf *b, gf *result) {
 	int k = 1 << n;
-	result[0] = gf_mult_fast(a[0] , b[0]);
+	result[0] = gf_mult(a[0] , b[0]);
 	for (int i = 1; i < k; i++) {
-		result[0] = result[0]^ gf_mult_fast(a[i] , b[i]);
+		result[0] = result[0]^ gf_mult(a[i] , b[i]);
 		for (int j = 0; j < k; j++) {
 			int result_sum = i ^ j;
-			result[i] = result[i] ^ gf_mult_fast(a[j] , b[result_sum]);
+			result[i] = result[i] ^ gf_mult(a[j] , b[result_sum]);
 		}
 	}
 
