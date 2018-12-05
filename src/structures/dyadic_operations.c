@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "dyadic_operations.h"
+#include "../../include/structures/dyadic_operations.h"
 
 void dyadic_inverse(int n, gf *signature, gf* signature_inverse) {
 	int i;

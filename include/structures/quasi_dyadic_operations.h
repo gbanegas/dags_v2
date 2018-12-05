@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "param.h"
+#include "../parameters/param.h"
 #include "matrix_utils.h"
 #include "matrix_operations.h"
-#include "definitions.h"
+#include "../definitions.h"
 #include "dyadic_operations.h"
-#include "gf/gf_6.h"
+#include "../gf/gf.h"
 
 extern void multiply_quasi_dyadic_matrices(matrix *a, matrix *b, int rows,
 		int cols, matrix *result);

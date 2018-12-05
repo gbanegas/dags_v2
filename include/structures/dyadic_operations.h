@@ -11,13 +11,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "definitions.h"
-#include "gf/gf_6.h"
-#include "param.h"
-#include "utils.h"
-#include "multiplications/karatsuba_dyadic.h"
-#include "multiplications/standard.h"
-#include "multiplications/sylvester_hadamard.h"
+#include "../definitions.h"
+#include "../gf/gf.h"
+#include "../parameters/param.h"
+
+#include "../karatsuba/karatsuba_dyadic.h"
+#include "../karatsuba/standard.h"
+#include "../karatsuba/sylvester_hadamard.h"
 
 extern void dyadic_inverse(int n , gf *sig, gf *signature_inverse);
 

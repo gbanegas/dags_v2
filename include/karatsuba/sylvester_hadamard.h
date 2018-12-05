@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 
-#include "matrix_operations.h"
-#include "definitions.h"
-#include "gf.h"
-#include "param.h"
+#include "../structures/matrix_operations.h"
+#include "../definitions.h"
+#include "../gf/gf.h"
+#include "../parameters/param.h"
 
 extern void sylvester_hadamard_multiplication(int n, const int *a, int * result);
 

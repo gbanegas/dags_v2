@@ -190,3 +190,25 @@ void quasi_dyadic_bloc_matrix(matrix *M, gf *sig, int ind_col, int ind_rown) {
 		}
 	}
 }
+
+matrix* make_matrix_with_value(int n_rows, int n_cols, gf value) {
+
+	struct matrix* matrix = malloc(sizeof(matrix));
+	matrix->rows = n_rows;
+	matrix->cols = n_cols;
+	gf** data = malloc(sizeof(gf*) * n_rows);
+	for (int x = 0; x < n_rows; x++) {
+		data[x] = calloc(n_cols, sizeof(gf));
+	}
+	for (int x = 0; x < n_rows; x++) {
+		for (int y = 0; y < n_cols; y++) {
+			data[x][y] = value;
+		}
+	}
+	matrix->data = data;
+	return matrix;
+
+}
+
+
+

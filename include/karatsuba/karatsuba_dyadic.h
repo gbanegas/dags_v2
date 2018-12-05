@@ -11,11 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "param.h"
-#include "definitions.h"
-#include "gf.h"
-#include "matrix_operations.h"
-#include "matrix_utils.h"
+#include "../parameters/param.h"
+#include "../definitions.h"
+#include "../gf/gf.h"
+#include "../structures/matrix_operations.h"
+#include "../structures/matrix_utils.h"
 
 
 inline void slicing_array(int *input, int start, int end, int *output) {

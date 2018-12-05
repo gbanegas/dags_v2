@@ -10,9 +10,9 @@
 
 #include <stdlib.h>
 
-#include "random_generator.h"
-#include "definitions.h"
-#include "param.h"
+#include "../random/random_generator.h"
+#include "../definitions.h"
+#include "../parameters/param.h"
 
 extern gf* generate_vector(int size);
 extern int* generate_vector_of_integers(int size);

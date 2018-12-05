@@ -12,12 +12,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "param.h"
-#include "definitions.h"
-#include "matrix_operations.h"
-#include "matrix_utils.h"
-#include "utils.h"
-#include "gf.h"
+#include "../parameters/param.h"
+#include "../definitions.h"
+#include "../structures/matrix_operations.h"
+#include "../structures/matrix_utils.h"
+#include "../gf/gf.h"
 
 extern void std_multiplication(int n, int *a, int *b, int *result);
 

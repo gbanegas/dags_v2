@@ -15,6 +15,7 @@
 
 #include "../util/util.h"
 #include "../gf/gf.h"
+#include "../parameters/param.h"
 
 #include "../definitions.h"
 

@@ -18,6 +18,7 @@
 
 #include "../structures/matrix_operations.h"
 
+#include "../parameters/param.h"
 #include "../random/rng.h"
 #include "../definitions.h"
 #include "../gf/gf.h"

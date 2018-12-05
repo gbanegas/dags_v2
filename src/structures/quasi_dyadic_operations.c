@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "quasi_dyadic_operations.h"
+#include "../../include/structures/quasi_dyadic_operations.h"
 
 void multiply_quasi_dyadic_matrices(matrix *a, matrix *b, int rows, int cols,
 		matrix *result) {

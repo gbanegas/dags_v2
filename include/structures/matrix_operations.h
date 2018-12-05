@@ -40,5 +40,10 @@ extern void multiply_vector_matrix(const unsigned char* u, matrix *G, gf *c);
 
 extern void quasi_dyadic_bloc_matrix( matrix *M, gf *sig, int ind_col, int ind_rown);
 
+extern gf matrix_determinant(matrix *a);
+
+extern matrix* make_matrix_with_value(int n_rows, int n_cols, gf value);
+
+
 
 #endif /* INCLUDE_STRUCTURES_MATRIX_OPERATIONS_H_ */
