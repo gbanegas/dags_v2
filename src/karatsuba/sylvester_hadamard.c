@@ -1,32 +1,32 @@
-#include "../../karatsuba/sylvester_hadamard.h"
+#include "../../include/karatsuba/sylvester_hadamard.h"
 
 matrix *make_walsh_hadamard_matrix(int n) {
 	matrix *h = make_matrix(n, n);
 	int ii, xx, yy;
 
-	h->data[0][0] = 1;
+	h->data[0*h->cols+0] = 1;
 
 	for (ii = 2; ii <= n; ii *= 2) {
 		//Top right quadrant.
 		for (xx = 0; xx < (ii / 2); ++xx) {
 			for (yy = (ii / 2); yy < ii; ++yy) {
-				h->data[xx][yy] = h->data[xx][yy - (ii / 2)];
+				h->data[xx*h->cols+yy] = h->data[xx*h->cols+yy - (ii / 2)];
 			}
 		}
 		//Bottom left quadrant.
 		for (yy = 0; yy < (ii / 2); ++yy) {
 			for (xx = (ii / 2); xx < ii; ++xx) {
-				h->data[xx][yy] = h->data[xx - (ii / 2)][yy];
+				h->data[xx*h->cols+yy] = h->data[(xx - (ii / 2))*h->cols+yy];
 			}
 		}
 		//Bottom right quadrant, inverse of other quadrants.
 		for (xx = (ii / 2); xx < ii; ++xx) {
 			for (yy = (ii / 2); yy < ii; ++yy) {
-				h->data[xx][yy] = h->data[xx - (ii / 2)][yy - (ii / 2)];
-				if (h->data[xx][yy] == 1) {
-					h->data[xx][yy] = -1;
+				h->data[xx*h->cols+yy] = h->data[(xx - (ii / 2))*h->cols+(yy - (ii / 2))];
+				if (h->data[xx*h->cols+yy] == 1) {
+					h->data[xx*h->cols+yy] = -1;
 				} else {
-					h->data[xx][yy] = 1;
+					h->data[xx*h->cols+yy] = 1;
 				}
 			}
 		}

@@ -5,8 +5,8 @@
 -include ../makefile.init
 
 RM := rm -rf
-#CC=gcc
-CC=clang
+CC=gcc
+#CC=clang
 #Select the desired dags you would like to build
 DAGSVER=-DDAGS_1
 #DAGSVER=-DDAGS_3
@@ -24,6 +24,7 @@ LIBS=-lcrypto -lm -lsodium -lkeccak
 -include src/structures/subdir.mk
 -include src/random/subdir.mk
 -include src/gf/subdir.mk
+-include src/karatsuba/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -35,7 +36,7 @@ endif
 endif
 
 -include ../makefile.defs
-SRC=$(wildcard src/*.c src/gf/*.c src/random/*.c src/structures/*.c src/util/*.c)
+SRC=$(wildcard src/*.c src/gf/*.c src/random/*.c src/structures/*.c src/karatsuba/*.c src/util/*.c)
 # Add inputs and outputs from these tool invocations to the build variables 
 # All Target
 all: dags

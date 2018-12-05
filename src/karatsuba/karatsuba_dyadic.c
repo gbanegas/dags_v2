@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "../../karatsuba/karatsuba_dyadic.h"
+#include "../../include/karatsuba/karatsuba_dyadic.h"
 
 inline void karatsuba_k(int k, int * a, int *b, int *c_sig) {
 	int i;
@@ -69,8 +69,8 @@ inline void karatsuba_k(int k, int * a, int *b, int *c_sig) {
 inline void karatsuba_gf(int k, gf * a, gf *b, gf *c_sig) {
 	int i;
 	if (k <= 2) {
-		c_sig[0] = gf_mult_fast(a[0] , b[0]) ^ gf_mult_fast(a[1] , b[1]);
-		c_sig[1] = gf_mult_fast(a[0] , b[1]) ^ gf_mult_fast(a[1] , b[0]);
+		c_sig[0] = gf_mult(a[0] , b[0]) ^ gf_mult(a[1] , b[1]);
+		c_sig[1] = gf_mult(a[0] , b[1]) ^ gf_mult(a[1] , b[0]);
 	} else {
 		int k_2 = k / 2;
 		//First half of the result
@@ -129,8 +129,8 @@ void karatsuba_n1_gf(int pos0, gf *a, gf*b ){
 	int pos1=pos0+1;
 	gf tmp_a=a[pos0]^a[pos1];
 	gf tmp_b=b[pos0]^b[pos1];
-	a[pos0]=gf_mult_fast(a[pos0],b[pos0])^gf_mult_fast(a[pos1],b[pos1]);
-	a[pos1]=a[pos0]^gf_mult_fast(tmp_a,tmp_b);
+	a[pos0]=gf_mult(a[pos0],b[pos0])^gf_mult(a[pos1],b[pos1]);
+	a[pos1]=a[pos0]^gf_mult(tmp_a,tmp_b);
 }
 
 void karatsuba_n2_gf(int pos0, gf *a, gf*b ){

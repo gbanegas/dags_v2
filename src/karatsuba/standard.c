@@ -5,7 +5,7 @@
  *      Author: vader
  */
 
-#include "../../karatsuba/standard.h"
+#include "../../include/karatsuba/standard.h"
 
 void std_multiplication(int n, int *a, int *b, int *result) {
 	int k = 1 << n;
