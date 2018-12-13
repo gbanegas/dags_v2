@@ -43,7 +43,14 @@ long long t_gen[1001];
 long long t_enc[1001];
 long long t_dec[1001];
 
+long long t_gen_avg;
+long long t_enc_avg;
+long long t_dec_avg;
+
 int main(void) {
+	t_gen_avg = 0;
+	t_enc_avg = 0;
+	t_dec_avg = 0;
 	if (sodium_init() < 0) {
 		/* panic! the library couldn't be initialized, it is not safe to use */
 		return 1;
@@ -151,15 +158,17 @@ int main(void) {
 		int ret_val = 0;
 		printf("Starting iteration: %d\n", counter);
 		long long start = cpucycles();
-
 		key_gen(v, y, &G);
 		//int ret_val = key_pair_generation(pk, sk);
 		long long final = cpucycles();
+		t_gen_avg = t_gen_avg + (final-start);
 		printf("Key pair generation: %lld\n", final - start);
 		start = cpucycles();
 		//ret_val = encapsulation(ct, ss, pk);
 		encrypt(ct, ss, &G);
 		final = cpucycles();
+		
+		t_enc_avg = t_enc_avg + (final-start);
 
 		printf("Encaps: %lld\n", final - start);
 		if (ret_val != 0) {
@@ -171,12 +180,13 @@ int main(void) {
 		//ret_val = decapsulation(ct, ss, pk);
 		ret_val = decrypt(ss, ct, v, y);
 		final = cpucycles();
+		t_dec_avg = t_dec_avg + (final-start);
 
 		printf("decaps: %lld\n", final - start);
 		if (ret_val != 0) {
 			printf("FAIL\n");
 			fails++;
-			return -1;
+			//return -1;
 		} else {
 			printf("SUCCESS\n\n");
 			success++;
@@ -185,6 +195,10 @@ int main(void) {
 	} while (counter < 100);
 	printf("SUCCESS: %d\n", success);
 	printf("fails: %d\n", fails);
+	printf("gen_avg: %lld\n", (t_gen_avg/counter));
+	printf("enc_avg: %lld\n", (t_enc_avg/counter));
+	printf("dec_avg: %lld\n", (t_dec_avg/counter));
+
 	//free(sk);
 	return 0;
 }
