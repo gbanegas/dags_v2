@@ -28,7 +28,7 @@ int decapsulation(unsigned char *secret_shared,
 
 int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 		const gf *v, const gf *y) {
-	int i, decode_value, check_return;
+	int i, decode_value;
 	unsigned char word[code_length] = { 0 };
 	unsigned char m1[k_prime] = { 0 };
 	unsigned char rho1[k_sec] = { 0 };
