@@ -353,7 +353,7 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
  * Return:
  * 	EXIT_SUCCES if trapdoor is build otherwise EXIT_FAILURE
  */
-int build_trapdoor(const matrix *H_cauchy, const gf *v,
+int build_trapdoor(matrix* restrict H_cauchy, const gf *v,
 		const gf *u, gf *y,	matrix *H) {
 	gf z[code_length] = { 0 };
 	gf random_el = 0;

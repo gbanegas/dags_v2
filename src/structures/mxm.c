@@ -40,8 +40,7 @@ void mxm_block_reorder(gf *C, const gf *A, const gf *B, int m, int n, int p) {
 
 }
 
-void mxm_block_reorder_reuse(gf *C, const gf *A, const gf *B, int m, int n,
-		int p) {
+void mxm_block_reorder_reuse(gf* restrict C,  gf* restrict A,  gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -169,7 +168,7 @@ void mxm(gf *C, const gf *A, const gf *B, int m, int n, int p, int uf) {
 }
 
 // Cmxp = Amxn * Bnxp
-void mxm_product(gf *dest, const gf *a, const gf *b, int m, int n, int p) {
+void mxm_product(gf* restrict dest, gf* restrict a, gf*  restrict b, const int m, const int n, const int p) {
 	mxm_block_reorder_reuse(dest, a, b, m, n, p);
 	/*
 	int uf;

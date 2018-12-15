@@ -7,7 +7,7 @@
 
 #include "../gf/gf.h"
 
-void mxm_product(gf *dest, const gf *a, const gf *b, int m, int n, int p);
+void mxm_product(gf* restrict dest, gf* restrict a, gf*  restrict b, const int m, const int n, const int p);
 
 #endif  /* MXM_H */
 

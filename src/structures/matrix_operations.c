@@ -59,7 +59,7 @@ failout:
 	return ret_val;
 }
 
-matrix* matrix_multiply(const matrix *a, const matrix *b) {
+matrix* matrix_multiply(matrix* restrict a, matrix* restrict b) {
 	matrix *m = make_matrix(a->rows, b->cols);
 	mxm_product(m->data, a->data, b->data, a->rows, a->cols, b->cols);
 	return m;
