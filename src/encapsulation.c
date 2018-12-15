@@ -65,9 +65,14 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	}
 	PRINT_DEBUG_ENCAP("\nStarting hashing: \n");
 #endif
-	
+
+#if defined(DAGS_3) || defined(DAGS_5)
+	shake256(r, code_dimension, m, k_prime);
+	shake256(d, k_prime, m, k_prime);
+#else
 	shake128(r, code_dimension, m, k_prime);
 	shake128(d, k_prime, m, k_prime);
+#endif
 	
 	// Type conversion
 	if (F_q_size < UCHAR_MAX) {
@@ -86,8 +91,11 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	memcpy(&u[k_sec], m, code_dimension - k_sec);
 
 	PRINT_DEBUG_ENCAP("Generating error_array: \n");
-	
+#if defined(DAGS_3) || defined(DAGS_5)
+	shake256(hash_sigma, code_length, sigma, k_prime);
+#else
 	shake128(hash_sigma, code_length, sigma, k_prime);
+#endif
 	
 	random_e(hash_sigma, error_array);
 
@@ -116,9 +124,13 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 		PRINT_DEBUG_ENCAP(" %" PRIu16 ", ", ciphert_text[i]);
 	PRINT_DEBUG_ENCAP("|\nHashing (m*G) + error: \n");
 #endif
-	//SHAKE256(K, ss_length, m, k_prime);
+
+#if defined(DAGS_3) || defined(DAGS_5)
+	shake256(K, ss_length, m, k_prime);
+#else
 	shake128(K, ss_length, m, k_prime);
-	
+#endif
+
 	memcpy(secret_shared, K, ss_length);
 	return EXIT_SUCCESS;
 }
