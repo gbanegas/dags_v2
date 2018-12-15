@@ -28,7 +28,7 @@ int decapsulation(unsigned char *secret_shared,
 
 int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 		const gf *v, const gf *y) {
-	int i, decode_value, check_return;
+	int i, decode_value;
 	unsigned char word[code_length] = { 0 };
 	unsigned char m1[k_prime] = { 0 };
 	unsigned char rho1[k_sec] = { 0 };
@@ -68,18 +68,15 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_4 of the decapsulation :  Compute r1 = G(m1) and d1 = H(m1)
 	 */
 
-	//KangarooTwelve(m1, k_prime, r1, code_dimension, K12_custom, K12_custom_len);
-	//SHAKE256(r1, code_dimension, m1, k_prime);
-	check_return = KangarooTwelve(m1, k_prime, r1, code_dimension, K12_custom, K12_custom_len);
-	assert(check_return == 0); // Catch Error
-
+	
+	shake128(r1, code_dimension, m1, k_prime);
+	
 	// Compute d1 = H(m1) where H is  sponge SHA-512 function
 
-	check_return = KangarooTwelve(m1, k_prime, d1, k_prime, K12_custom, K12_custom_len);
-	assert(check_return == 0); // Catch Error
-
+	shake128(d1, k_prime, m1, k_prime);
+	
 	for (i = 0; i < k_prime; i++) {
-		d1[i] = d1[i] % F_q_size;
+		d1[i] = d1[i] & (F_q_size - 1);
 	}
 	// Return -1 if d distinct d1.
 	// d starts at ct+code_length.
@@ -93,10 +90,10 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	for (i = 0; i < code_dimension; i++) {
 		if (i < k_sec) {
 			// Optimize modulo
-			rho2[i] = r1[i] % F_q_size; //rho2 recovery
+			rho2[i] = r1[i] & (F_q_size - 1); //rho2 recovery
 		} else {
 			// Optimize modulo
-			sigma[i - k_sec] = r1[i] % F_q_size; // sigma1 recovery
+			sigma[i - k_sec] = r1[i] & (F_q_size - 1); // sigma1 recovery
 		}
 	}
 
@@ -112,10 +109,8 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 
 	//test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom, K12_custom_len);
 	//SHAKE256(hash_sigma, code_length, sigma, k_prime);
-	check_return = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom,
-	K12_custom_len);
-	assert(check_return == 0); // Catch Error
-
+	shake128(hash_sigma, code_length, sigma, k_prime);
+	
 	//Generate error vector e2 of length code_length and weight n0_w from
 	//hash_sigma1 by using random_e function.
 	random_e(hash_sigma, e2);
@@ -133,8 +128,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 */
 	//test = KangarooTwelve(m1, k_prime, ss, ss_length, K12_custom, K12_custom_len);
 	//SHAKE256(secret_shared, ss_length, m1, k_prime);
-	check_return = KangarooTwelve(m1, k_prime, secret_shared, ss_length, K12_custom, K12_custom_len);
-	assert(check_return == 0); // Catch Error
-
+	shake128(secret_shared, ss_length, m1, k_prime);
+	
 	return 0;
 }

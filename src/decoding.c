@@ -19,9 +19,9 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 	int i, k, j, dr, position;
 	int st = (signature_block_size * pol_deg);
 	polynomial *syndrom;
-	polynomial *omega, *sigma, *re, *uu, *u, *quotient, *rest, *app, *temp,
-			*temp_sum;
-	polynomial *delta, *pos;
+	polynomial *omega, *sigma, *re, *uu, *u, *quotient;
+	polynomial *rest, *app, *temp, *temp_sum,*delta, *pos;
+	
 	gf pol_gf, tmp, tmp1, o;
 	gf alpha;
 

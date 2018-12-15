@@ -65,20 +65,17 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	}
 	PRINT_DEBUG_ENCAP("\nStarting hashing: \n");
 #endif
-	int test = KangarooTwelve(m, k_prime, r, code_dimension, K12_custom, K12_custom_len);
-	assert(test == 0); // Catch Error
-
-	// m: input type unsigned char len k_prime | d: output type unsigned char len k_prime
-	test = KangarooTwelve(m, k_prime, d, k_prime, K12_custom, K12_custom_len);
-	assert(test == 0); // Catch Error
-
+	
+	shake128(r, code_dimension, m, k_prime);
+	shake128(d, k_prime, m, k_prime);
+	
 	// Type conversion
 	if (F_q_size < UCHAR_MAX) {
 		for (i = 0; i < k_prime; i++) {
-			d[i] = d[i] % F_q_size;
+			d[i] = d[i] & (F_q_size - 1);
 		}
 		for (i = 0; i < code_dimension; i++) {
-			r[i] = r[i] % F_q_size;
+			r[i] = r[i] & (F_q_size - 1);
 		}
 	}
 
@@ -89,10 +86,9 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	memcpy(&u[k_sec], m, code_dimension - k_sec);
 
 	PRINT_DEBUG_ENCAP("Generating error_array: \n");
-	/*SHAKE256(hash_sigma, code_length, sigma, k_prime);*/
-	test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom,
-	K12_custom_len);
-	assert(test == 0); // Catch Error
+	
+	shake128(hash_sigma, code_length, sigma, k_prime);
+	
 	random_e(hash_sigma, error_array);
 
 #ifdef DEBUG_ENCAP
@@ -121,9 +117,8 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	PRINT_DEBUG_ENCAP("|\nHashing (m*G) + error: \n");
 #endif
 	//SHAKE256(K, ss_length, m, k_prime);
-	test = KangarooTwelve(m, k_prime, K, ss_length, K12_custom, K12_custom_len);
-	assert(test == 0); // Catch Error
-
+	shake128(K, ss_length, m, k_prime);
+	
 	memcpy(secret_shared, K, ss_length);
 	return EXIT_SUCCESS;
 }

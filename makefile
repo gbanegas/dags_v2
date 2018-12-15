@@ -5,19 +5,19 @@
 -include ../makefile.init
 
 RM := rm -rf
-#CC=gcc
-CC=clang
+CC=gcc
+#CC=clang
 #Select the desired dags you would like to build
-DAGSVER=-DDAGS_1
-#DAGSVER=-DDAGS_3
+#DAGSVER=-DDAGS_1
+DAGSVER=-DDAGS_3
 #DAGSVER=-DDAGS_5
 
 #clang CFLAGS
 #CFLAGS=-O3 -g3 -Wall -ffunction-sections -fdata-sections -march=native -DDEBUG
-CFLAGS=-O3 -g3 -Wall -ffunction-sections -fdata-sections -march=native
+CFLAGS=-O3 -g3 -Wall -ffunction-sections -fdata-sections -march=native -mtune=native -fomit-frame-pointer
 #CFLAGS=-O3 -g3 -Wall -DDEBUG
 #CFLAGS=-O3 -g3 -Wall
-LIBS=-lcrypto -lm -lsodium -lkeccak
+LIBS=-lcrypto -lm -lsodium
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/util/subdir.mk

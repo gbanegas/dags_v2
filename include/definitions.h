@@ -11,8 +11,6 @@
 #include <stdint.h>
 
 #define ERROR_ZERO_IN_A_POSITION -1
-static const unsigned char* K12_custom = (unsigned char*)"DAGs";
-#define K12_custom_len 4
 
 typedef uint16_t gf;
 typedef uint32_t gf_p;
