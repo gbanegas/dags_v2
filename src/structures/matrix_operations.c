@@ -81,18 +81,18 @@ matrix* submatrix(const matrix* m, const int i, const int j, const int nr_row, c
 
 	matrix* m_new = make_matrix(nr_row, nr_col);
 	int j_temp = j;
-
+	int i_temp = i;
 	int new_row = 0;
 	for (int row = 0; row < nr_row; row++) {
 		int new_col = 0;
 		j_temp = j;
 		for (int col = 0; col < nr_col; col++) {
 			m_new->data[new_row * nr_col + new_col] 
-										= m->data[i * m->cols + j_temp];
+										= m->data[i_temp * m->cols + j_temp];
 			new_col++;
 			j_temp++;
 		}
-		i++;
+		i_temp++;
 		new_row++;
 	}
 	return m_new;
