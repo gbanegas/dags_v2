@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <keccak/KangarooTwelve.h>
+#include "fips202.h"
 
 
 #include "structures/matrix_operations.h"

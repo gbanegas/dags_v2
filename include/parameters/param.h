@@ -17,7 +17,7 @@
 #endif
 
 #define extension 2 //m
-#define field_extension field*extension //
+#define field_extension (field*extension) //
 
 #define F_q_m_size (1 << field_extension) // #F_q_m
 
