@@ -115,7 +115,7 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 
 	PRINT_DEBUG_ENCAP("Computing (m*G) + error: \n");
 	for (i = 0; i < code_length; i++) {
-		ciphert_text[i] = (c[i] ^ error_array[i]); //c + error
+		ciphert_text[i] = gf_add(c[i] , error_array[i]); //c + error
 	}
 	memcpy(&ciphert_text[code_length], d, k_prime);
 
