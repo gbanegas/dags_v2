@@ -28,7 +28,7 @@ int decapsulation(unsigned char *secret_shared,
 
 int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 		const gf *v, const gf *y) {
-	int i, decode_value;
+	int i,j, decode_value;
 	unsigned char word[code_length] = { 0 };
 	unsigned char m1[k_prime] = { 0 };
 	unsigned char rho1[k_sec] = { 0 };
@@ -91,14 +91,12 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	/*
 	 * Step_5 of the decapsulation: Parse r1 as (rho2||sigma1)
 	 */
-	for (i = 0; i < code_dimension; i++) {
-		if (i < k_sec) {
-			// Optimize modulo
-			rho2[i] = r1[i] & (F_q_size - 1); //rho2 recovery
-		} else {
-			// Optimize modulo
-			sigma[i - k_sec] = r1[i] & (F_q_size - 1); // sigma1 recovery
-		}
+
+	for (i = 0; i < k_sec; i++){
+		rho2[i] = r1[i] & (F_q_size - 1);
+	}
+	for (j= i-k_sec; i < code_dimension; i++, j++){
+		sigma[j] = r1[i] & (F_q_size - 1);
 	}
 
 	//Return ⊥ if rho1 distinct rho2

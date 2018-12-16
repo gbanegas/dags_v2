@@ -32,6 +32,18 @@
 # Debug files
 *.dSYM/
 
+# Profile
+*.out.*
+
+# Test file 
+*.req
+*.rsp
+
+# Compiled binary file 
+dags*
+
 /Release/
 /Debug/
 binaries/
+.vscode/
+makefile

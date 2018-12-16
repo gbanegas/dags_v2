@@ -18,7 +18,7 @@
  * return:
  * 	Returns a pointer to the matrix
  */
-matrix* make_matrix(int n_rows, int n_cols) {
+matrix* make_matrix(const int n_rows, const int n_cols) {
 
 	matrix * m = (matrix *) malloc(sizeof(matrix));
 	// set dimensions
@@ -31,7 +31,7 @@ matrix* make_matrix(int n_rows, int n_cols) {
 	return m;
 }
 
-matrix* diagonal_matrix(gf* z, int n_rows, int n_cols) {
+matrix* diagonal_matrix(gf* z, const int n_rows, const int n_cols) {
 	int i;
 	matrix *ret_val = NULL;
 	matrix *m;
@@ -59,7 +59,7 @@ failout:
 	return ret_val;
 }
 
-matrix* matrix_multiply(const matrix *a, const matrix *b) {
+matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b) {
 	matrix *m = make_matrix(a->rows, b->cols);
 	mxm_product(m->data, a->data, b->data, a->rows, a->cols, b->cols);
 	return m;
@@ -77,41 +77,36 @@ void free_matrix(matrix* mtx) {
 	}
 }
 
-matrix* submatrix(const matrix* m, int i, int j, int nr_row, int nr_col) {
+matrix* submatrix(const matrix* m, const int i, const int j, const int nr_row, const int nr_col) {
 
 	matrix* m_new = make_matrix(nr_row, nr_col);
 	int j_temp = j;
-
+	int i_temp = i;
 	int new_row = 0;
 	for (int row = 0; row < nr_row; row++) {
 		int new_col = 0;
 		j_temp = j;
 		for (int col = 0; col < nr_col; col++) {
-			m_new->data[new_row * nr_col + new_col] = m->data[i * m->cols
-					+ j_temp];
+			m_new->data[new_row * nr_col + new_col] 
+										= m->data[i_temp * m->cols + j_temp];
 			new_col++;
 			j_temp++;
 		}
-		i++;
+		i_temp++;
 		new_row++;
 	}
 	return m_new;
 
 }
 
-matrix* augment(const matrix *a, const matrix *b) {
-	int n_rows = a->rows;
-	int n_cols = a->cols + b->cols;
+matrix* augment(const matrix* restrict a, const matrix* restrict b) {
+	const int n_rows = a->rows;
+	const int n_cols = a->cols + b->cols;
 	matrix *result = make_matrix(n_rows, n_cols);
 
 	for (int i = 0; i < n_rows; i++) {
-		for (int j = 0; j < a->cols; j++) {
-			result->data[result->cols * i + j] = a->data[a->cols * i + j];
-		}
-		for (int j = a->cols; j < n_cols; j++) {
-			result->data[result->cols * i + j] = b->data[(b->cols * i)
-					+ (j - a->cols)];
-		}
+		memcpy(&result->data[result->cols * i], &a->data[a->cols * i], a->cols*sizeof(gf));
+		memcpy(&result->data[result->cols * i + a->cols], &b->data[b->cols * i], (n_cols-a->cols)*sizeof(gf) );
 	}
 	return result;
 }
@@ -119,31 +114,37 @@ matrix* augment(const matrix *a, const matrix *b) {
 void echelon_form(matrix *a) {
 	int nrows = a->rows;
 	int ncols = a->cols;
-
+	int c;
 	int lead = 0;
 
+	int d, m;
 	while (lead < nrows) {
-		float d, m;
 
 		for (int r = 0; r < nrows; r++) { // for each row ...
 			/* calculate divisor and multiplier */
 			d = a->data[lead * ncols + lead];
 			m = gf_div(a->data[r * ncols + lead], a->data[lead * ncols + lead]);
 
-			for (int c = 0; c < ncols; c++) { // for each column ...
-				if (r == lead)
+			// for (int c = 0; c < ncols; c++) { // for each column ...
+			// 	if (r == lead)
+			// 		a->data[r * ncols + c] = gf_div(a->data[r * ncols + c], d); // make pivot = 1
+			// 	else
+			// 		a->data[r * ncols + c] ^= gf_mult(a->data[lead * ncols + c], m); // make other = 0
+			// }
+
+			if (r == lead){
+				for (c = 0; c < ncols; c++){
 					a->data[r * ncols + c] = gf_div(a->data[r * ncols + c], d); // make pivot = 1
-				else
-					a->data[r * ncols + c] ^= gf_mult(a->data[lead * ncols + c],
-							m); // make other = 0
+				}
+			}
+			else{
+				for (c = 0; c < ncols; c++){
+					a->data[r * ncols + c] ^= gf_mult(a->data[lead * ncols + c], m); // make other = 0
+				}
 			}
 		}
-
 		lead++;
-
 	}
-
-
 }
 
 matrix * transpose_matrix(matrix *a) {
@@ -171,7 +172,7 @@ void print_matrix(matrix* m) {
 	printf("\n");
 }
 
-void multiply_vector_matrix(const unsigned char* u, matrix *G, gf *c) {
+void multiply_vector_matrix( unsigned char* restrict u, matrix *G, gf* c) {
 
 	int i, k;
 	for (i = 0; i < G->cols; i++) {
@@ -179,14 +180,13 @@ void multiply_vector_matrix(const unsigned char* u, matrix *G, gf *c) {
 			c[i] ^= gf_mult(G->data[k * G->cols + i], u[k]);
 		}
 	}
-
 }
 
-void quasi_dyadic_bloc_matrix(matrix *M, gf *sig, int ind_col, int ind_rown) {
+void quasi_dyadic_bloc_matrix(matrix *M, gf *sig, const int ind_col, const int ind_rown) {
 	int i, j;
 	for (i = ind_rown; i < signature_block_size + ind_rown; i++) {
 		for (j = ind_col; j < signature_block_size + ind_col; j++) {
-			M->data[i * M->cols + j] = sig[(i ^ j) % signature_block_size];
+			M->data[i * M->cols + j] = sig[(i ^ j) & (signature_block_size-1)];
 		}
 	}
 }

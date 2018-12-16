@@ -18,17 +18,17 @@
 #include "../definitions.h"
 #include "../gf/gf.h"
 
-extern matrix* make_matrix(int n_rows, int n_cols);
+extern matrix* make_matrix(const int n_rows, const int n_cols);
 
-extern matrix* diagonal_matrix(gf* data, int n_rows, int n_cols);
+extern matrix* diagonal_matrix(gf* data, const int n_rows, const int n_cols);
 
 extern void free_matrix(matrix* m);
 
 extern void print_matrix(matrix* m);
 
-extern matrix* matrix_multiply(const matrix* a,const  matrix* b);
+extern matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b);
 
-extern matrix* submatrix(const matrix* m, int star_row, int end_row, int start_column, int end_column);
+extern matrix* submatrix(const matrix* m, const int star_row, const int end_row, const int start_column, const int end_column);
 
 extern matrix* augment(const matrix *a, const matrix *b);
 
@@ -36,9 +36,9 @@ extern void echelon_form(matrix *a);
 
 extern matrix* transpose_matrix(matrix *a);
 
-extern void multiply_vector_matrix(const unsigned char* u, matrix *G, gf *c);
+extern void multiply_vector_matrix(unsigned char* restrict u, matrix *G, gf  *c);
 
-extern void quasi_dyadic_bloc_matrix( matrix *M, gf *sig, int ind_col, int ind_rown);
+extern void quasi_dyadic_bloc_matrix( matrix *M, gf  *sig, const int ind_col, const int ind_rown);
 
 
 #endif /* INCLUDE_STRUCTURES_MATRIX_OPERATIONS_H_ */

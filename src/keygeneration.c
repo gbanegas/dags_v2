@@ -288,7 +288,7 @@ void build_support(gf *signature_h, gf *u, gf *v, gf *elements) {
 
 	memcpy(elements_in_F_q_m, elements, code_length);
 
-	//PRINT_DEBUG("build_support start\n");
+	PRINT_DEBUG("build_support start\n");
 	for (i = 0; i < code_length; i++) {
 		signature_h_inv[i] = gf_q_m_inv(signature_h[i]);
 		aux[i] = h0_inv ^ signature_h_inv[i];
@@ -353,13 +353,13 @@ void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy) {
  * Return:
  * 	EXIT_SUCCES if trapdoor is build otherwise EXIT_FAILURE
  */
-int build_trapdoor(const matrix *H_cauchy, const gf *v,
-		const gf *u, gf *y,	matrix *H) {
+int build_trapdoor(const matrix* restrict H_cauchy, const gf* restrict v,
+		const gf* restrict u,  gf* restrict y,	matrix* restrict H) {
 	gf z[code_length] = { 0 };
 	gf random_el = 0;
 	gf pol, sum_u_v, result;
 	int i, j, ret_val = EXIT_FAILURE;
-	matrix *diagonal_z_matrix = NULL, *H3 = NULL;
+	matrix *diagonal_z_matrix =NULL , *H3 =NULL ;
 
 	PRINT_DEBUG("build_trapdoor start\n");
 
@@ -380,14 +380,13 @@ int build_trapdoor(const matrix *H_cauchy, const gf *v,
 		PRINT_DEBUG("Failed to create diagonal_matrix\n");
 		goto failout;
 	}
+	PRINT_DEBUG("Critical section\n");
 	H3 = matrix_multiply(H_cauchy, diagonal_z_matrix);
-
+	PRINT_DEBUG("DONE Critical section\n");
 	memcpy(H->data, H3->data, sizeof(gf) * H3->rows * H3->cols);
-	free_matrix(H3);
-	free_matrix(diagonal_z_matrix);
-	H3 = NULL;
-	diagonal_z_matrix = NULL;
-
+	PRINT_DEBUG("H3 row cols = %d %d \n", H3->rows, H3->cols);
+	PRINT_DEBUG("free 1 \n");
+	
 	for (i = 0; i < code_length; i++) {
 		pol = 1;
 		for (j = 0; j < signature_block_size; j++) {
@@ -400,6 +399,7 @@ int build_trapdoor(const matrix *H_cauchy, const gf *v,
 	ret_val = EXIT_SUCCESS;
 failout:
 	free_matrix(H3);
+	PRINT_DEBUG("free 2 \n");
 	free_matrix(diagonal_z_matrix);
 	return ret_val;
 }
@@ -422,21 +422,26 @@ void project_H_on_F_q(const matrix *H, matrix *Hbase) {
 
 int generate_systematic_matrix(const matrix* Hbase) {
 
-	int mm, i, j, l = 0, test = 0;
+	int mm, i, j, l = 0;
 	int num_cols = Hbase->cols;
 	int num_rows = Hbase->rows;
 	gf invPiv = 1;
+	gf piv_align;
 
 	for (i = 0; i < num_rows; i++) {
-		test = 0;
 		l = 0;
 		j = i + num_cols - num_rows;
 		if (Hbase->data[(i * num_cols) + j] == 0) { //We're looking for a non-zero pivot
-			test = 1;
+			
 			//printf("search Pivot\n");
 			for (l = i + 1; l < num_rows; l++) {
 				if (Hbase->data[l * num_cols + j]) {
 					//printf("Find Pivot\n");
+					for (mm = 0; mm < num_cols; mm++) {
+						Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
+						Hbase->data[(i * num_cols) + mm] ^= Hbase->data[(l * num_cols) + mm];
+						Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
+					}
 					break;
 				}
 			}
@@ -445,19 +450,15 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			printf("Non systematic Matrix %d\num_cols", l);
 			return EXIT_FAILURE;
 		}
-		if (test == 1) { // We switches the lines l and i
-			test = 0;
-			//printf("Permut line\n");
-			//temp=P[i+n-num_rows];
-			//P[i+n-num_rows]=P[j];
-			//P[j]=temp;
+		// if (test == 1) { // We switches the lines l and i
+		// 	test = 0;
+		// 	//printf("Permut line\n");
+		// 	//temp=P[i+n-num_rows];
+		// 	//P[i+n-num_rows]=P[j];
+		// 	//P[j]=temp;
 
-			for (mm = 0; mm < num_cols; mm++) {
-				Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
-				Hbase->data[(i * num_cols) + mm] ^= Hbase->data[(l * num_cols) + mm];
-				Hbase->data[(l * num_cols) + mm] ^= Hbase->data[(i * num_cols) + mm];
-			}
-		}
+			
+		// }
 
 
 		//   Matrix standardization
@@ -465,25 +466,48 @@ int generate_systematic_matrix(const matrix* Hbase) {
 			invPiv = gf_inv(Hbase->data[(i * num_cols) + j]);
 			Hbase->data[(i * num_cols) + j] = 1;
 
-			for (mm = 0; mm < num_cols; mm++) {
-				if (mm != j) {
-					// continue;
-					Hbase->data[(i * num_cols) + mm] = gf_mult(
-							Hbase->data[(i * num_cols) + mm], invPiv);
-				}
+			// for (mm = 0; mm < num_cols; mm++) {
+			// 	if (mm != j) {
+			// 		// continue;
+			// 		Hbase->data[(i * num_cols) + mm] = gf_mult(
+			// 				Hbase->data[(i * num_cols) + mm], invPiv);
+			// 	}
+			// }
+			for (mm = 0; mm < j; mm++) {
+				Hbase->data[(i * num_cols) + mm] = gf_mult(Hbase->data[(i * num_cols) + mm], invPiv);
 			}
+			for (mm = j+1; mm < num_cols; mm++) {
+				Hbase->data[(i * num_cols) + mm] = gf_mult(Hbase->data[(i * num_cols) + mm], invPiv);
+			}
+			
 		}
 
 		//Here we do the elimination on column i + num_cols-num_rows
 		// TODO: BLOCKING LOOP
-		gf piv_align;
-		for (l = 0; l < num_rows; l++) {
-			if (l != i) {				
-				if (Hbase->data[(l * num_cols) + j]) {
-					piv_align = Hbase->data[(l * num_cols) + j];
-					for (mm = 0; mm < num_cols; mm++) {
-						Hbase->data[(l * num_cols) + mm] ^= gf_mult(piv_align,Hbase->data[(i * num_cols) + mm]);
-					}
+		
+		// for (l = 0; l < num_rows; l++) {
+		// 	if (l != i) {				
+		// 		if (Hbase->data[(l * num_cols) + j]) {
+		// 			piv_align = Hbase->data[(l * num_cols) + j];
+		// 			for (mm = 0; mm < num_cols; mm++) {
+		// 				Hbase->data[(l * num_cols) + mm] ^= gf_mult(piv_align,Hbase->data[(i * num_cols) + mm]);
+		// 			}
+		// 		}
+		// 	}
+		// }
+		for (l = 0; l < i; l++) {
+			if (Hbase->data[(l * num_cols) + j]) {
+				piv_align = Hbase->data[(l * num_cols) + j];
+				for (mm = 0; mm < num_cols; mm++) {
+					Hbase->data[(l * num_cols) + mm] ^= gf_mult(piv_align,Hbase->data[(i * num_cols) + mm]);
+				}
+			}
+		}
+		for (l = i+1; l < num_rows; l++) {
+			if (Hbase->data[(l * num_cols) + j]) {
+				piv_align = Hbase->data[(l * num_cols) + j];
+				for (mm = 0; mm < num_cols; mm++) {
+					Hbase->data[(l * num_cols) + mm] ^= gf_mult(piv_align,Hbase->data[(i * num_cols) + mm]);
 				}
 			}
 		}
@@ -541,9 +565,7 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 	matrix G;
 	G.cols = code_length;
 	G.rows = code_length - ((signature_block_size * pol_deg) * extension);
-	gf data_G[code_length
-			* (code_length - ((signature_block_size * pol_deg) * extension))] =
-			{ 0 };
+	gf data_G[code_length * (code_length - ((signature_block_size * pol_deg) * extension))] = { 0 };
 	G.data = data_G;
 	key_gen(v, y, &G);
 	store(&G, pk);
@@ -574,6 +596,7 @@ void key_gen(gf *v, gf *y, matrix *G) {
 	H.rows = signature_block_size * pol_deg;
 	H.cols = code_length;
 	H.data = data_H;
+	PRINT_DEBUG("H row col = %d %d\n", H.rows, H.cols);
 
 	matrix Hbase;
 	Hbase.rows = (signature_block_size * pol_deg) * extension;
