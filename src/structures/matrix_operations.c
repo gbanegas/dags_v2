@@ -59,7 +59,7 @@ failout:
 	return ret_val;
 }
 
-matrix* matrix_multiply(matrix* restrict a, matrix* restrict b) {
+matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b) {
 	matrix *m = make_matrix(a->rows, b->cols);
 	mxm_product(m->data, a->data, b->data, a->rows, a->cols, b->cols);
 	return m;
@@ -99,19 +99,14 @@ matrix* submatrix(const matrix* m, const int i, const int j, const int nr_row, c
 
 }
 
-matrix* augment(const matrix *a, const matrix *b) {
+matrix* augment(const matrix* restrict a, const matrix* restrict b) {
 	const int n_rows = a->rows;
 	const int n_cols = a->cols + b->cols;
 	matrix *result = make_matrix(n_rows, n_cols);
 
 	for (int i = 0; i < n_rows; i++) {
-		for (int j = 0; j < a->cols; j++) {
-			result->data[result->cols * i + j] = a->data[a->cols * i + j];
-		}
-		for (int j = a->cols; j < n_cols; j++) {
-			result->data[result->cols * i + j] 
-								= b->data[(b->cols * i) + (j - a->cols)];
-		}
+		memcpy(&result->data[result->cols * i], &a->data[a->cols * i], a->cols*sizeof(gf));
+		memcpy(&result->data[result->cols * i + a->cols], &b->data[b->cols * i], (n_cols-a->cols)*sizeof(gf) );
 	}
 	return result;
 }

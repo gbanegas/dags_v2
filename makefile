@@ -5,8 +5,8 @@
 -include ../makefile.init
 
 RM := rm -rf
-CC=gcc
-#CC=clang
+#CC=gcc
+CC=clang
 #Select the desired dags you would like to build
 #DAGSVER=-DDAGS_1
 DAGSVER=-DDAGS_3

@@ -40,7 +40,7 @@ void mxm_block_reorder(gf *C, const gf *A, const gf *B, int m, int n, int p) {
 
 }
 
-void mxm_block_reorder_reuse(gf* restrict C,  gf* restrict A,  gf* restrict B, const int m, const int n, const int p) {
+void mxm_block_reorder_reuse(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -54,8 +54,7 @@ void mxm_block_reorder_reuse(gf* restrict C,  gf* restrict A,  gf* restrict B, c
 					}
 }
 
-void mxm_block_reorder_reuse_unroll_2(gf *C, const gf *A, const gf *B, int m,
-		int n, int p) {
+void mxm_block_reorder_reuse_unroll_2(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -71,8 +70,7 @@ void mxm_block_reorder_reuse_unroll_2(gf *C, const gf *A, const gf *B, int m,
 					}
 }
 
-void mxm_block_reorder_reuse_unroll_4(gf *C, const gf *A, const gf *B, int m,
-		int n, int p) {
+void mxm_block_reorder_reuse_unroll_4(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -90,8 +88,7 @@ void mxm_block_reorder_reuse_unroll_4(gf *C, const gf *A, const gf *B, int m,
 					}
 }
 
-void mxm_block_reorder_reuse_unroll_8(gf *C, const gf *A, const gf *B, int m,
-		int n, int p) {
+void mxm_block_reorder_reuse_unroll_8(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -113,8 +110,7 @@ void mxm_block_reorder_reuse_unroll_8(gf *C, const gf *A, const gf *B, int m,
 					}
 }
 
-void mxm_block_reorder_reuse_unroll_16(gf *C, const gf *A, const gf *B, int m,
-		int n, int p) {
+void mxm_block_reorder_reuse_unroll_16(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p) {
 	int i, j, k, ii, jj, kk, Aik, bs = BLK_SIZE;
 
 	for (ii = 0; ii < m; ii += bs)
@@ -124,6 +120,7 @@ void mxm_block_reorder_reuse_unroll_16(gf *C, const gf *A, const gf *B, int m,
 					for (k = kk; k < min(n, kk + bs); k++) {
 						Aik = A[n * i + k];
 						for (j = jj; j < min(p, jj + bs); j += 16) {
+						// PRINT_DEBUG("i j = %d %d %d\n",i, j, 0);
 							C[p * i + j] ^= gf_q_m_mult(Aik , B[p * k + j]);
 							C[p * i + j + 1] ^= gf_q_m_mult(Aik , B[p * k + j + 1]);
 							C[p * i + j + 2] ^= gf_q_m_mult(Aik , B[p * k + j + 2]);
@@ -144,10 +141,11 @@ void mxm_block_reorder_reuse_unroll_16(gf *C, const gf *A, const gf *B, int m,
 					}
 }
 
-void mxm(gf *C, const gf *A, const gf *B, int m, int n, int p, int uf) {
+void mxm(gf* restrict C, const gf* restrict A, const gf* restrict B, const int m, const int n, const int p, const int uf) {
 	//mxm_naive(C, A, B, m, n, p);
 	//mxm_block(C, A, B, m, n, p);
 	//mxm_block_reorder(C, A, B, m, n, p);
+	PRINT_DEBUG("m n p = %d %d %d\n", m, n, p);
 	switch (uf) {
 	case 16:
 		mxm_block_reorder_reuse_unroll_16(C, A, B, m, n, p);
@@ -168,9 +166,9 @@ void mxm(gf *C, const gf *A, const gf *B, int m, int n, int p, int uf) {
 }
 
 // Cmxp = Amxn * Bnxp
-void mxm_product(gf* restrict dest, gf* restrict a, gf*  restrict b, const int m, const int n, const int p) {
-	mxm_block_reorder_reuse(dest, a, b, m, n, p);
-	/*
+void mxm_product(gf* restrict dest,const gf* restrict a, const gf* restrict b, const int m, const int n, const int p) {
+	// mxm_block_reorder_reuse(dest, a, b, m, n, p);
+	
 	int uf;
 
 	if (p % 16 == 0)
@@ -188,7 +186,6 @@ void mxm_product(gf* restrict dest, gf* restrict a, gf*  restrict b, const int m
 	printf("Block size: %d\n", BLK_SIZE);
 	printf("Unrolls: %d\n", uf);
 
-	//mxm_naive(dest, a, b, m, n, p);
 	mxm(dest, a, b, m, n, p, uf);
-	*/
+	
 }

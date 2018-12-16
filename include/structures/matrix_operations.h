@@ -26,7 +26,7 @@ extern void free_matrix(matrix* m);
 
 extern void print_matrix(matrix* m);
 
-extern matrix* matrix_multiply(matrix* restrict a, matrix* restrict b);
+extern matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b);
 
 extern matrix* submatrix(const matrix* m, const int star_row, const int end_row, const int start_column, const int end_column);
 
