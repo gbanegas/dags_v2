@@ -16,7 +16,7 @@
 #include "../definitions.h"
 #include "../parameters/param.h"
 
-static gf gf_mult(gf in0, gf in1);
+static inline uint8_t gf_mult(gf in0, gf in1);
 static inline gf gf_q_m_mult(gf in0, gf in1);
 static inline gf relative_field_representation(gf a, int k);
 
@@ -37,67 +37,66 @@ extern void print_F_q_element(gf a);
 extern void print_F_q_m_element(gf a);
 
 #if defined(DAGS_3) || defined(DAGS_5) || defined(DAGS_TOY)
-static inline gf gf_mult(gf in0, gf in1) {
+uint8_t gf_mult(const gf in0, const  gf in1) {
 	gf reduction;
-	gf i, tmp;
+	gf tmp;
 	gf t0 = in0, t1 = in1;
+	int i;
 
 	//Multiplication
 	tmp = 0;
 
-	for (i = 0; i < 10; i++)
-	tmp ^= (t0 * (t1 & (1 << i)));
+	for (i = 0; i < 10; i++){
+		tmp ^= (t0 * (t1 & (1 << i)));
+	}
 
-	//reduction
-	tmp = tmp & 0x7FFF;// tmp & 0111 1111 1111 1111
 	//first step of reduction
-	reduction = (tmp >> 8);
+	reduction = (tmp >> 8) & 0x7F;
 	tmp = tmp & 0xFF;
-	tmp = tmp ^ reduction;
-	tmp = tmp ^ reduction << 2;
-	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ (reduction << 4);
+	tmp ^= reduction;
+	for (i=2; i <= 4; i++){
+		tmp ^= reduction << i;
+	}
+	
 	//second step of reduction
 	reduction = (tmp >> 8);
-	tmp = tmp ^ reduction;
-	tmp = tmp ^ reduction << 2;
-	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ (reduction << 4);
-
-	tmp = tmp & 0xFF;
+	tmp ^= reduction;
+	for (i=2; i <= 4; i++){
+		tmp ^= reduction << i;
+	}
 	return tmp;
 }
 //todo: finish here
-static inline gf gf_q_m_mult(gf in0, gf in1) {
+gf gf_q_m_mult(const gf in0, const  gf in1) {
 	gf reduction; 
-	uint32_t i, tmp;
+	uint32_t tmp;
 	gf t0 = in0, t1 = in1;
+	int i; 
 
 	//Multiplication
 	tmp = 0;
 
-	for (i = 0; i < 18; i++)
-	tmp ^= (t0 * (t1 & (1 << i)));
+	for (i = 0; i < 18; i++){
+		tmp ^= (t0 * (t1 & (1 << i)));
+	}
 
-	//reduction
-	tmp = tmp & 0x7FFFFFFF;// tmp & 0111 1111 1111 1111
 	//first step of reduction
-	reduction = (tmp >> 16);
+	reduction = (tmp >> 16) & 0x7fff;
 	tmp = tmp & 0xFFFF;
-	tmp = tmp ^ reduction;
-	tmp = tmp ^ (reduction << 2);
-	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ (reduction << 5);
+	tmp ^= reduction;
+	tmp ^= reduction << 2;
+	tmp ^= reduction << 3;
+	tmp ^= reduction << 5;
 	//second step of reduction
 	reduction = (tmp >> 16);
-	tmp = tmp ^ reduction;
-	tmp = tmp ^ (reduction << 2);
-	tmp = tmp ^ (reduction << 3);
-	tmp = tmp ^ (reduction << 5);
+	tmp ^= reduction;
+	tmp ^= reduction << 2;
+	tmp ^= reduction << 3;
+	tmp ^= reduction << 5;
 
-	tmp = tmp & 0xFFFF;
 	return tmp;
 }
+
 
 static inline gf relative_field_representation(gf a, int k) {
 	gf x[extension] = {0};
@@ -118,52 +117,6 @@ static inline gf relative_field_representation(gf a, int k) {
 	uint8_t b_14_t = (a & 0x4000) >> 14;
 	uint8_t b_15_t = (a & 0x8000) >> 15;
 
-	/*
-	a0 = '089abc'
-	a1 = '23458bde'
-	a2 = '468bde'
-	a3 = '3589abf'
-	a4 = '6789a'
-	a5 = '45678abcdf'
-
-	a6 = '6789ace'
-	a7 = '5789def'
-	a8 = '12347acdf'
-
-	a9 = '3589bcdf'
-	a10 = '24bef'
-	a11 = '56abf'
-	a12 = '345679abcef'
-
-	a13 = '56789bd'
-	a14 = '4678cdef'
-	a15 = '789abf'
-
-	JE      0b
-	MH      2b
-	H       46b
-	AE      35a
-	EF      a
-	JAFP    48
-	JEF     e
-	EP      7ef
-	J       12347df
-	AEP     3c
-	A       24e
-	A       56a
-	JAFM    9e
-	EFP     b
-	HF      4cf
-	E       7a
-
-	A = bf 
-	E = 89 
-	F = 67 
-	H = 8de 
-	J = ac 
-	M = 345 
-	P = 5d 
-	*/
 
 	uint8_t A = b_5_t ^ b_9_t ^ b_11_t ^ b_12_t ^ b_13_t ^ b_15_t;
 	uint8_t B = b_2_t ^ b_3_t ^ b_4_t ^ b_5_t;

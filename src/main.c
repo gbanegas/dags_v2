@@ -162,7 +162,7 @@ int main(void) {
 		//int ret_val = key_pair_generation(pk, sk);
 		long long final = cpucycles();
 		t_gen_avg = t_gen_avg + (final-start);
-		printf("Key pair generation: %lld\n", final - start);
+		printf("Key pair generation: %lld\n", (final - start)/1000000);
 		start = cpucycles();
 		//ret_val = encapsulation(ct, ss, pk);
 		encrypt(ct, ss, &G);
@@ -170,7 +170,7 @@ int main(void) {
 		
 		t_enc_avg = t_enc_avg + (final-start);
 
-		printf("Encaps: %lld\n", final - start);
+		printf("Encaps: %lld\n", (final - start)/1000000);
 		if (ret_val != 0) {
 			printf("fail encrypt");
 			return KAT_CRYPTO_FAILURE;
@@ -182,7 +182,7 @@ int main(void) {
 		final = cpucycles();
 		t_dec_avg = t_dec_avg + (final-start);
 
-		printf("decaps: %lld\n", final - start);
+		printf("decaps: %lld\n", (final - start)/1000000);
 		if (ret_val != 0) {
 			printf("FAIL\n");
 			fails++;

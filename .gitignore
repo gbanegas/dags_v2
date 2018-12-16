@@ -46,3 +46,4 @@ dags*
 /Debug/
 binaries/
 .vscode/
+makefile

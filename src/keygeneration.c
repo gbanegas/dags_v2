@@ -288,7 +288,7 @@ void build_support(gf *signature_h, gf *u, gf *v, gf *elements) {
 
 	memcpy(elements_in_F_q_m, elements, code_length);
 
-	//PRINT_DEBUG("build_support start\n");
+	PRINT_DEBUG("build_support start\n");
 	for (i = 0; i < code_length; i++) {
 		signature_h_inv[i] = gf_q_m_inv(signature_h[i]);
 		aux[i] = h0_inv ^ signature_h_inv[i];

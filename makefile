@@ -14,7 +14,7 @@ DAGSVER=-DDAGS_3
 
 #clang CFLAGS
 #CFLAGS=-O3 -g3 -Wall -ffunction-sections -fdata-sections -march=native -DDEBUG
-CFLAGS=-O3 -g3 -Wall -march=native -mtune=native -fomit-frame-pointer # -ffunction-sections -fdata-sections 
+CFLAGS=-O3 -g3 -Wall -march=native -mtune=native -fomit-frame-pointer -DDEBUG # -ffunction-sections -fdata-sections 
 #CFLAGS=-O3 -g3 -Wall -DDEBUG
 #CFLAGS=-O3 -g3 -Wall
 LIBS=-lcrypto -lm -lsodium
