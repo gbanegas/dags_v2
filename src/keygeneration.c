@@ -422,18 +422,17 @@ void project_H_on_F_q(const matrix *H, matrix *Hbase) {
 
 int generate_systematic_matrix(const matrix* Hbase) {
 
-	int mm, i, j, l = 0, test = 0;
+	int mm, i, j, l = 0;
 	int num_cols = Hbase->cols;
 	int num_rows = Hbase->rows;
 	gf invPiv = 1;
 	gf piv_align;
 
 	for (i = 0; i < num_rows; i++) {
-		test = 0;
 		l = 0;
 		j = i + num_cols - num_rows;
 		if (Hbase->data[(i * num_cols) + j] == 0) { //We're looking for a non-zero pivot
-			test = 1;
+			
 			//printf("search Pivot\n");
 			for (l = i + 1; l < num_rows; l++) {
 				if (Hbase->data[l * num_cols + j]) {

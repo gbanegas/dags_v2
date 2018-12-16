@@ -324,8 +324,7 @@ polynomial* p_rem(polynomial* divi, polynomial* divisor) {
 		remainder = create_polynomial(degree_dividend);
 
 		for (int i = 0; i < dividend->degree; i++) {
-			remainder->coefficient[i] = dividend->coefficient[i]
-					^ temp->coefficient[i];
+			remainder->coefficient[i] = dividend->coefficient[i] ^ temp->coefficient[i];
 
 		}
 
