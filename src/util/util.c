@@ -27,38 +27,51 @@ void store(matrix *src, unsigned char *dst) {
 }
 
 void store_u_y(gf *v, gf *y, unsigned char *sk) {
-	int i, a = 0;
-	gf c1, c2;
-	unsigned char c;
+	for (int i = 0; i < 2 * code_length; i = i + 2) {
+		gf a = v[i / 2] >> 8;
+		gf b = v[i / 2] & 0xFF;
+		sk[i] = a;
+		sk[i + 1] = b;
+	}
+	for (int i = 2 * code_length; i < 4 * code_length; i = i + 2) {
+		gf a = y[i / 4] >> 8;
+		gf b = y[i / 4] & 0xFF;
+		sk[i] = a;
+		sk[i + 1] = b;
+	}
 
-	for (i = 0; i < (code_length / 2); i++) {
-		c1 = v[2 * i];
-		c2 = v[2 * i + 1];
-		c = c1 >> 4;
-		sk[a] = c;
-		a += 1;
-		c1 = c1 & 15;
-		c = (c1 << 4) ^ (c2 >> 8);
-		sk[a] = c;
-		a += 1;
-		c = c2 & 255;
-		sk[a] = c;
-		a += 1;
-	}
-	for (i = 0; i < (code_length / 2); i++) {
-		c1 = y[2 * i];
-		c2 = y[2 * i + 1];
-		c = c1 >> 4;
-		sk[a] = c;
-		a += 1;
-		c1 = c1 & 15;
-		c = (c1 << 4) ^ (c2 >> 8);
-		sk[a] = c;
-		a += 1;
-		c = c2 & 255;
-		sk[a] = c;
-		a += 1;
-	}
+	/*int i, a = 0;
+	 gf c1, c2;
+	 unsigned char c;
+
+	 for (i = 0; i < (code_length / 2); i++) {
+	 c1 = v[2 * i];
+	 c2 = v[2 * i + 1];
+	 c = c1 >> 4;
+	 sk[a] = c;
+	 a += 1;
+	 c1 = c1 & 15;
+	 c = (c1 << 4) ^ (c2 >> 8);
+	 sk[a] = c;
+	 a += 1;
+	 c = c2 & 255;
+	 sk[a] = c;
+	 a += 1;
+	 }
+	 for (i = 0; i < (code_length / 2); i++) {
+	 c1 = y[2 * i];
+	 c2 = y[2 * i + 1];
+	 c = c1 >> 4;
+	 sk[a] = c;
+	 a += 1;
+	 c1 = c1 & 15;
+	 c = (c1 << 4) ^ (c2 >> 8);
+	 sk[a] = c;
+	 a += 1;
+	 c = c2 & 255;
+	 sk[a] = c;
+	 a += 1;
+	 }*/
 
 }
 
@@ -71,14 +84,10 @@ void recover_G(const unsigned char *public_key, matrix *G) {
 	for (int i = 0;
 			i
 					< min(
-							code_length
-									- ((signature_block_size * pol_deg)
-											* extension), code_dimension);
-			i++) {
+							code_length - ((signature_block_size * pol_deg) * extension),
+							code_dimension); i++) {
 		G->data[i * G->cols + i] = z[i];
 	}
-
-
 
 	int counter = 0;
 	for (int i = 0; i < G->rows; i++) {
