@@ -21,6 +21,7 @@
 #include "../random/rng.h"
 #include "../definitions.h"
 #include "../gf/gf.h"
+#include "../api.h"
 
 extern void store(matrix *src, unsigned char *dst);
 
@@ -31,6 +32,8 @@ extern void random_m(unsigned char *m);
 extern void random_e(const unsigned char *sigma, unsigned char *error_array);
 
 extern void recover_public_key(const unsigned char *public_key, matrix *G);
+
+void recover_G(const unsigned char *public_key, matrix *G);
 
 extern void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk);
 

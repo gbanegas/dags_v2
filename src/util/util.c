@@ -7,39 +7,23 @@
 
 #include "../../include/util/util.h"
 
+#define min(a,b) (((a)<(b))?(a):(b))
+
 void store(matrix *src, unsigned char *dst) {
-	int i, j, k, p, d, a = 0;
-	k = code_dimension / (signature_block_size);
-	p = (code_length - code_dimension) / 4;
-	gf c1 = 0, c2 = 0, c3 = 0, c4 = 0;
-	unsigned char c = 0;
-
-	for (i = 0; i < k; i++) {
-		d = i * (signature_block_size);
-		for (j = 0; j < p; j++) {
-			c1 = src->data[4 * j * src->cols + d];
-			c2 = src->data[(4 * j + 1) * src->cols + d];
-			c3 = src->data[(4 * j + 2) * src->cols + d];
-			c4 = src->data[(4 * j + 3) * src->cols + d];
-			c = (c1 << 2) ^ (c2 >> 4);
-			//printf("--c= %d \t",c);
-			dst[a] = c;
-			a += 1;
-			c1 = (c2 & 15);
-			c = (c1 << 4) ^ (c3 >> 2);
-			//printf("--c= %d \t",c);
-			dst[a] = c;
-			a += 1;
-			c1 = (c3 & 3);
-			c = (c1 << 6) ^ c4;
-			//printf("--c= %d \t",c);
-			dst[a] = c;
-
-			a += 1;
+	int counter = 0;
+	for (int i = 0; i < src->rows; i++) {
+		for (int j = code_dimension; j < src->cols; j++) {
+			dst[counter] = src->data[i * src->cols + j];
+			counter++;
+			//printf(" %d, \n", counter);
 		}
-		//affiche_vecteur(L,code_length-code_dimension);
-		//printf(" \n");
 	}
+	//printf(" %d, \n", counter);
+	/*print_matrix(src);
+	 for (int i = 0; i < CRYPTO_PUBLICKEYBYTES; i++) {
+	 printf(" %" PRIu16 ", ", dst[i]);
+	 }
+	 printf("\n");*/
 }
 
 void store_u_y(gf *v, gf *y, unsigned char *sk) {
@@ -74,6 +58,34 @@ void store_u_y(gf *v, gf *y, unsigned char *sk) {
 		c = c2 & 255;
 		sk[a] = c;
 		a += 1;
+	}
+
+}
+
+void recover_G(const unsigned char *public_key, matrix *G) {
+	gf z[code_dimension] = { 0 };
+	for (int i = 0; i < code_dimension; i++) {
+		z[i] = 1;
+	}
+
+	for (int i = 0;
+			i
+					< min(
+							code_length
+									- ((signature_block_size * pol_deg)
+											* extension), code_dimension);
+			i++) {
+		G->data[i * G->cols + i] = z[i];
+	}
+
+
+
+	int counter = 0;
+	for (int i = 0; i < G->rows; i++) {
+		for (int j = code_dimension; j < G->cols; j++) {
+			G->data[i * G->cols + j] = public_key[counter];
+			counter++;
+		}
 	}
 
 }
