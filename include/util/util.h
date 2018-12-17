@@ -25,7 +25,7 @@
 
 extern void store(matrix *src, unsigned char *dst);
 
-extern void store_u_y(gf *v, gf *y, unsigned char *sk);
+extern void store_u_y(const gf *v,const gf *y, unsigned char *sk);
 
 extern void random_m(unsigned char *m);
 
@@ -36,6 +36,8 @@ extern void recover_public_key(const unsigned char *public_key, matrix *G);
 void recover_G(const unsigned char *public_key, matrix *G);
 
 extern void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk);
+
+extern void recover_sk(const unsigned char * sk, gf* v, gf * y);
 
 extern int compute_weight(unsigned char *r, int size);
 

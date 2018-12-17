@@ -26,7 +26,7 @@ void store(matrix *src, unsigned char *dst) {
 	 printf("\n");*/
 }
 
-void store_u_y(gf *v, gf *y, unsigned char *sk) {
+void store_u_y(const gf *v, const gf *y, unsigned char *sk) {
 	for (int i = 0; i < 2 * code_length; i = i + 2) {
 		gf a = v[i / 2] >> 8;
 		gf b = v[i / 2] & 0xFF;
@@ -34,8 +34,8 @@ void store_u_y(gf *v, gf *y, unsigned char *sk) {
 		sk[i + 1] = b;
 	}
 	for (int i = 2 * code_length; i < 4 * code_length; i = i + 2) {
-		gf a = y[i / 4] >> 8;
-		gf b = y[i / 4] & 0xFF;
+		gf a = y[(i / 2) - code_length] >> 8;
+		gf b = y[(i / 2) - code_length] & 0xFF;
 		sk[i] = a;
 		sk[i + 1] = b;
 	}
@@ -72,6 +72,18 @@ void store_u_y(gf *v, gf *y, unsigned char *sk) {
 	 sk[a] = c;
 	 a += 1;
 	 }*/
+
+}
+
+void recover_sk(const unsigned char * sk, gf* v, gf * y) {
+
+	for (int i = 0; i < 2 * code_length; i = i + 2) {
+		v[i / 2] = sk[i + 1] | (sk[i] << 8);
+	}
+	for (int i = 2 * code_length; i < 4 * code_length; i = i + 2) {
+		y[(i / 2) - code_length] = sk[i + 1] | (sk[i] << 8);
+
+	}
 
 }
 
