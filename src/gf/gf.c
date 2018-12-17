@@ -74,7 +74,7 @@ gf absolut_field_representation(gf *element) {
 #endif
 
 #ifdef DAGS_1
-static inline gf relative_field_representation(gf a, int k) {
+gf relative_field_representation(gf a, int k) {
 	gf x[extension] = { 0 };
 	gf b_0_t = a & 0x1;
 	gf b_1_t = (a & 0x2) >> 1;
@@ -90,38 +90,24 @@ static inline gf relative_field_representation(gf a, int k) {
 	gf b_11_t = (a & 0x800) >> 11;
 
 	gf b_0 = b_0_t ^ b_2_t ^ b_6_t ^ b_7_t ^ b_8_t ^ b_9_t ^ b_10_t ^ b_11_t;
-
 	gf b_1 = b_4_t ^ b_6_t ^ b_9_t ^ b_10_t;
-
 	gf b_2 = b_2_t ^ b_3_t ^ b_5_t ^ b_6_t ^ b_8_t;
-
 	gf b_3 = b_2_t ^ b_7_t ^ b_8_t ^ b_9_t;
-
 	gf b_4 = b_2_t ^ b_5_t ^ b_7_t ^ b_8_t ^ b_9_t;
-
 	gf b_5 = b_2_t ^ b_4_t ^ b_7_t ^ b_8_t ^ b_11_t;
-
 	gf b_6 = b_1_t ^ b_2_t ^ b_4_t ^ b_5_t ^ b_7_t ^ b_11_t;
-
 	gf b_7 = b_2_t ^ b_4_t ^ b_5_t ^ b_6_t ^ b_8_t ^ b_11_t;
-
 	gf b_8 = b_4_t;
-
 	gf b_9 = b_3_t ^ b_4_t ^ b_8_t ^ b_10_t ^ b_11_t;
-
 	gf b_10 = b_3_t ^ b_5_t ^ b_8_t ^ b_9_t ^ b_11_t;
-
 	gf b_11 = b_3_t ^ b_5_t ^ b_8_t ^ b_9_t;
 
-	x[0] = (b_0) | (b_1 << 1) | (b_2 << 2) | (b_3 << 3) | (b_4 << 4)
-			| (b_5 << 5);
-	x[1] = (b_6) | (b_7 << 1) | (b_8 << 2) | (b_9 << 3) | (b_10 << 4)
-			| (b_11 << 5);
-	return x[k];
+	x[0] = (b_0) | (b_1 << 1) | (b_2 << 2) | (b_3 << 3) | (b_4 << 4) | (b_5 << 5);
+	x[1] = (b_6) | (b_7 << 1) | (b_8 << 2) | (b_9 << 3) | (b_10 << 4) | (b_11 << 5);
 	return x[k];
 }
 
-static inline gf absolut_field_representation(gf *element) {
+gf absolut_field_representation(gf *element) {
 	gf beta = 197;
 	gf tmp1 = 0, tmp2 = 0, in0 = element[0], in1 = element[1];
 

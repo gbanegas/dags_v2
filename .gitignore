@@ -47,3 +47,4 @@ dags*
 binaries/
 .vscode/
 makefile
+result
