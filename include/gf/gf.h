@@ -88,11 +88,12 @@ static inline gf gf_q_m_mult(const gf in0, const  gf in1) {
 
 
 #ifdef DAGS_1
-static inline gf gf_mult(gf in0, gf in1) {
-	uint64_t i, tmp, t0 = in0, t1 = in1;
 
+static inline gf gf_mult(gf in0, gf in1) {
+	int i; 
+	gf tmp = 0; 
+	gf t0 = in0, t1 = in1;
 	//Multiplication
-	tmp = 0;
 
 	for (i = 0; i < 7; i++)
 		tmp ^= (t0 * (t1 & (1 << i)));
@@ -100,28 +101,28 @@ static inline gf gf_mult(gf in0, gf in1) {
 	//reduction
 	tmp = tmp & 0xFFF;	// tmp & 0000 1111 1111 1111
 	tmp ^= (tmp >> 6);
-	tmp ^= (tmp >> 5) ;
+	tmp ^= (tmp >> 5) & 0x3E;
 	tmp = tmp & 0x3F;
 	return tmp;
 }
 
 static inline gf gf_q_m_mult(gf in0, gf in1) {
-	int i, tmp; 
+	int i; 
+	uint32_t tmp = 0; 
 	gf t0 = in0, t1 = in1;
-	gf reduction
+	gf reduction;
 	//Multiplication
-	tmp = t0 * (t1 & 1);
 
-	for (i = 1; i < 18; i++)
+	for (i = 0; i < 18; i++)
 		tmp ^= (t0 * (t1 & (1 << i)));
 
 	//reduction
-	tmp = tmp & 0x7FFFFF;	// tmp & 0111 1111 1111 1111
+	// tmp = tmp & 0x7FFFFF;	// tmp & 0111 1111 1111 1111
 	//first step of reduction
 	//second step of reduction
 	
 	for (i=0; i < 2; i++){
-		reduction = (tmp >> 12);
+		reduction = (tmp >> 12) & 0x7FF;
 		tmp = tmp & 0xFFF;
 		tmp ^= reduction;
 		tmp ^= reduction << 1;
@@ -132,6 +133,7 @@ static inline gf gf_q_m_mult(gf in0, gf in1) {
 	tmp = tmp & 0xFFF;
 	return tmp;
 }
+
 #endif
 
 
