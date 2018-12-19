@@ -153,6 +153,7 @@ int main(void) {
 		//int ret_val = key_pair_generation(pk, sk);
 		long long final = cpucycles();
 		t_gen_avg = t_gen_avg + (final - start);
+		printf("KeyGen: %lld\n", (final - start) / 1000000);
 
 		start = cpucycles();
 		ret_val = encapsulation(ct, ss, pk);
