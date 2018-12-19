@@ -558,14 +558,14 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 			* (code_length - ((signature_block_size * pol_deg) * extension))] =
 			{ 0 };
 	G.data = data_G;
-	key_gen(v, y, &G);
+	int ret = key_gen(v, y, &G);
 	store_public_key(&G, pk);
 	store_secret_key(v, y, sk);
 
-	return 0;
+	return ret;
 }
 
-void key_gen(gf *v, gf *y, matrix *G) {
+int key_gen(gf *v, gf *y, matrix *G) {
 	int ret_value = 0;
 	gf signature_h[code_length];
 	gf *elements_in_F_q_m = NULL;
@@ -650,5 +650,5 @@ void key_gen(gf *v, gf *y, matrix *G) {
 	} while (ret_value);
 	failout: free(elements_in_F_q_m);
 	free(elements_in_F_q_m_constant);
-	return;
+	return ret_value;
 }

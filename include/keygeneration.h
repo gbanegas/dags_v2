@@ -31,7 +31,7 @@
  */
 extern int key_pair_generation(unsigned char *pk, unsigned char *sk);
 
-extern void  key_gen(gf *v, gf *y, matrix *G);
+extern int  key_gen(gf *v, gf *y, matrix *G);
 
 extern int build_dyadic_signature(gf *dyadic_signature);
 
