@@ -22,13 +22,14 @@ int decapsulation(unsigned char *secret_shared,
 		const unsigned char *cipher_text, const unsigned char *secret_key) {
 	gf v[code_length] = { 0 };
 	gf y[code_length] = { 0 };
-	set_vy_from_sk(v, y, secret_key);
+	//recover_sk(sk, v_sk, y_vk);
+	recover_secret_key(secret_key, v, y);
 	return decrypt(secret_shared, cipher_text, v, y);
 }
 
 int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 		const gf *v, const gf *y) {
-	int i,j, decode_value;
+	int i, j, decode_value;
 	unsigned char word[code_length] = { 0 };
 	unsigned char m1[k_prime] = { 0 };
 	unsigned char rho1[k_sec] = { 0 };
@@ -39,6 +40,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	unsigned char e2[code_length] = { 0 };
 	unsigned char hash_sigma[code_length] = { 0 };
 	unsigned char e_prime[code_length] = { 0 };
+
 
 	/*
 	 * Step_1 of the decapsulation :  Decode the noisy codeword C received as
@@ -53,7 +55,8 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_2 of the decapsulation :  Output ⊥ if decoding fails or wt(e) != n0_w
 	 */
 
-	if (decode_value == EXIT_FAILURE || compute_weight(e_prime, code_length) != weight) {
+	if (decode_value == EXIT_FAILURE
+			|| compute_weight(e_prime, code_length) != weight) {
 		return -1;
 	}
 
@@ -68,8 +71,6 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_4 of the decapsulation :  Compute r1 = G(m1) and d1 = H(m1)
 	 */
 
-	
-	
 	// Compute d1 = H(m1) where H is  sponge SHA-512 function
 #if defined(DAGS_3) || defined(DAGS_5)
 	shake256(r1, code_dimension, m1, k_prime);
@@ -78,7 +79,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	shake128(r1, code_dimension, m1, k_prime);
 	shake128(d1, k_prime, m1, k_prime);
 #endif
-	
+
 	for (i = 0; i < k_prime; i++) {
 		d1[i] = d1[i] & (F_q_size - 1);
 	}
@@ -92,10 +93,10 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 * Step_5 of the decapsulation: Parse r1 as (rho2||sigma1)
 	 */
 
-	for (i = 0; i < k_sec; i++){
+	for (i = 0; i < k_sec; i++) {
 		rho2[i] = r1[i] & (F_q_size - 1);
 	}
-	for (j= i-k_sec; i < code_dimension; i++, j++){
+	for (j = i - k_sec; i < code_dimension; i++, j++) {
 		sigma[j] = r1[i] & (F_q_size - 1);
 	}
 
@@ -116,7 +117,7 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 #else
 	shake128(hash_sigma, code_length, sigma, k_prime);
 #endif 
-	
+
 	//Generate error vector e2 of length code_length and weight n0_w from
 	//hash_sigma1 by using random_e function.
 	random_e(hash_sigma, e2);
@@ -139,6 +140,6 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 #else
 	shake128(hash_sigma, code_length, sigma, k_prime);
 #endif
-	
+
 	return 0;
 }

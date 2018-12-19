@@ -18,6 +18,7 @@ void store(matrix *src, unsigned char *dst) {
 			//printf(" %d, \n", counter);
 		}
 	}
+	printf("counter: %d, \n", counter);
 	//printf(" %d, \n", counter);
 	/*print_matrix(src);
 	 for (int i = 0; i < CRYPTO_PUBLICKEYBYTES; i++) {
@@ -26,7 +27,7 @@ void store(matrix *src, unsigned char *dst) {
 	 printf("\n");*/
 }
 
-void store_u_y(const gf *v, const gf *y, unsigned char *sk) {
+void store_v_y(const gf *v, const gf *y, unsigned char *sk) {
 	for (int i = 0; i < 2 * code_length; i = i + 2) {
 		gf a = v[i / 2] >> 8;
 		gf b = v[i / 2] & 0xFF;
@@ -75,7 +76,7 @@ void store_u_y(const gf *v, const gf *y, unsigned char *sk) {
 
 }
 
-void recover_sk(const unsigned char * sk, gf* v, gf * y) {
+void recover_sk(const unsigned char* sk, gf* v, gf* y) {
 
 	for (int i = 0; i < 2 * code_length; i = i + 2) {
 		v[i / 2] = sk[i + 1] | (sk[i] << 8);

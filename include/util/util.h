@@ -25,7 +25,7 @@
 
 extern void store(matrix *src, unsigned char *dst);
 
-extern void store_u_y(const gf *v,const gf *y, unsigned char *sk);
+extern void store_v_y(const gf *v,const gf *y, unsigned char *sk);
 
 extern void random_m(unsigned char *m);
 
