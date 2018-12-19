@@ -20,17 +20,11 @@
 int encapsulation(unsigned char *ciphert_text, unsigned char *secret_shared,
 		const unsigned char *public_key) {
 	int result;
-	matrix *G = NULL;
-
-	PRINT_DEBUG_ENCAP("Creating Matrix G: \n");
-	G = make_matrix(code_dimension, code_length);
-	PRINT_DEBUG_ENCAP("Recovering Matrix G: \n");
-	recover_public_key(public_key, G);
-	print_matrix(G);
-
-	result = encrypt(ciphert_text, secret_shared, G);
-	free_matrix(G);
-	G = NULL;
+	matrix *M = make_matrix((code_length - ((signature_block_size * pol_deg) * extension)), code_length);
+	recover_public_key_from_array(public_key, M);
+	result = encrypt(ciphert_text, secret_shared, M);
+	free_matrix(M);
+	M = NULL;
 	return result;
 }
 

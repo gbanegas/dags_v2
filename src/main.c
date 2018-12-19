@@ -20,6 +20,7 @@
 #include "../include/decapsulation.h"
 #include "../include/gf/gf.h"
 #include "../include/structures/polynomial.h"
+#include "../include/definitions.h"
 
 #include "cpucycles.h"
 
@@ -76,9 +77,9 @@ int main(void) {
 	unsigned char entropy_input[48];
 
 	int count = 0;
-	//unsigned char pk[CRYPTO_PUBLICKEYBYTES];
-	unsigned char ct[CRYPTO_CIPHERTEXTBYTES], ss[CRYPTO_BYTES];//, ss1[CRYPTO_BYTES];
-	//unsigned char *sk;
+	unsigned char pk[CRYPTO_PUBLICKEYBYTES] = { 0 };
+	unsigned char ct[CRYPTO_CIPHERTEXTBYTES], ss[CRYPTO_BYTES]; //, ss1[CRYPTO_BYTES];
+	unsigned char sk[CRYPTO_SECRETKEYBYTES] = { 0 };
 	int byte_count = 48;
 	int counter = 0;
 	int i;
@@ -98,8 +99,7 @@ int main(void) {
 
 	FILE *fp_urandom;
 	fp_urandom = fopen("/dev/urandom", "r");
-	if (0 == fread(&entropy_input, 1, byte_count, fp_urandom))
-	{
+	if (0 == fread(&entropy_input, 1, byte_count, fp_urandom)) {
 		PRINT_DEBUG("Failed to read in entropy input\n");
 		return EXIT_FAILURE;
 	}
@@ -127,8 +127,7 @@ int main(void) {
 
 	//sk = malloc(CRYPTO_SECRETKEYBYTES);
 
-	if(EOF == fscanf(fp_req, "%d", &count))
-	{
+	if (EOF == fscanf(fp_req, "%d", &count)) {
 		PRINT_DEBUG("Failed to fscanf %d:%s\n", errno, strerror(errno));
 		return EXIT_FAILURE;
 	}
@@ -145,44 +144,36 @@ int main(void) {
 	int fails = 0;
 
 	do {
-		gf v[code_length] = { 0 };
-		gf y[code_length] = { 0 };
-		matrix G;
-		G.cols = code_length;
-		G.rows = code_length - ((signature_block_size * pol_deg) * extension);
-		gf data_G[code_length
-				* (code_length
-						- ((signature_block_size * pol_deg) * extension))] = {
-				0 };
-		G.data = data_G;
 		int ret_val = 0;
 		printf("Starting iteration: %d\n", counter);
+
 		long long start = cpucycles();
-		key_gen(v, y, &G);
+		//key_gen(v, y, &G);
+		ret_val = key_pair_generation(pk, sk);
 		//int ret_val = key_pair_generation(pk, sk);
 		long long final = cpucycles();
-		t_gen_avg = t_gen_avg + (final-start);
-		printf("Key pair generation: %lld\n", (final - start)/1000000);
-		start = cpucycles();
-		//ret_val = encapsulation(ct, ss, pk);
-		encrypt(ct, ss, &G);
-		final = cpucycles();
-		
-		t_enc_avg = t_enc_avg + (final-start);
+		t_gen_avg = t_gen_avg + (final - start);
+		printf("KeyGen: %lld\n", (final - start) / 1000000);
 
-		printf("Encaps: %lld\n", (final - start)/1000000);
+		start = cpucycles();
+		ret_val = encapsulation(ct, ss, pk);
+		//encrypt(ct, ss, &G);
+		final = cpucycles();
+
+		t_enc_avg = t_enc_avg + (final - start);
+
+		printf("Encaps: %lld\n", (final - start) / 1000000);
 		if (ret_val != 0) {
 			printf("fail encrypt");
 			return KAT_CRYPTO_FAILURE;
 		}
-
 		start = cpucycles();
-		//ret_val = decapsulation(ct, ss, pk);
-		ret_val = decrypt(ss, ct, v, y);
+		ret_val = decapsulation(ss, ct, sk);
+		//ret_val = decrypt(ss, ct, v_k, y_k);
 		final = cpucycles();
-		t_dec_avg = t_dec_avg + (final-start);
+		t_dec_avg = t_dec_avg + (final - start);
 
-		printf("decaps: %lld\n", (final - start)/1000000);
+		printf("decaps: %lld\n", (final - start) / 1000000);
 		if (ret_val != 0) {
 			printf("FAIL\n");
 			fails++;
@@ -192,14 +183,15 @@ int main(void) {
 			success++;
 		}
 		counter++;
+
 	} while (counter < 100);
 	printf("SUCCESS: %d\n", success);
 	printf("fails: %d\n", fails);
-	printf("gen_avg: %lld\n", (t_gen_avg/counter));
-	printf("enc_avg: %lld\n", (t_enc_avg/counter));
-	printf("dec_avg: %lld\n", (t_dec_avg/counter));
+	printf("gen_avg: %lld\n", (t_gen_avg / counter));
+	printf("enc_avg: %lld\n", (t_enc_avg / counter));
+	printf("dec_avg: %lld\n", (t_dec_avg / counter));
 
-	//free(sk);
+//free(sk);
 	return 0;
 }
 

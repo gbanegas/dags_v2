@@ -7,78 +7,94 @@
 
 #include "../../include/util/util.h"
 
-void store(matrix *src, unsigned char *dst) {
-	int i, j, k, p, d, a = 0;
-	k = code_dimension / (signature_block_size);
-	p = (code_length - code_dimension) / 4;
-	gf c1 = 0, c2 = 0, c3 = 0, c4 = 0;
-	unsigned char c = 0;
+#define min(a,b) (((a)<(b))?(a):(b))
 
-	for (i = 0; i < k; i++) {
-		d = i * (signature_block_size);
-		for (j = 0; j < p; j++) {
-			c1 = src->data[4 * j * src->cols + d];
-			c2 = src->data[(4 * j + 1) * src->cols + d];
-			c3 = src->data[(4 * j + 2) * src->cols + d];
-			c4 = src->data[(4 * j + 3) * src->cols + d];
-			c = (c1 << 2) ^ (c2 >> 4);
-			//printf("--c= %d \t",c);
-			dst[a] = c;
-			a += 1;
-			c1 = (c2 & 15);
-			c = (c1 << 4) ^ (c3 >> 2);
-			//printf("--c= %d \t",c);
-			dst[a] = c;
-			a += 1;
-			c1 = (c3 & 3);
-			c = (c1 << 6) ^ c4;
-			//printf("--c= %d \t",c);
-			dst[a] = c;
 
-			a += 1;
+/*
+ * store_public_key:
+ * Store matrix src that is the public key into array.
+ */
+
+void store_public_key(matrix *src, unsigned char *dst) {
+	int counter = 0;
+	for (int i = 0; i < src->rows; i++) {
+		for (int j = code_dimension; j < src->cols; j++) {
+			dst[counter] = src->data[i * src->cols + j];
+			counter++;
 		}
-		//affiche_vecteur(L,code_length-code_dimension);
-		//printf(" \n");
 	}
 }
 
-void store_u_y(gf *v, gf *y, unsigned char *sk) {
-	int i, a = 0;
-	gf c1, c2;
-	unsigned char c;
+/*
+ * store_secret_key:
+ * Store two vectors that is the secret key into array.
+ * The vectors are 16bits and the array is 8 bits.
+ */
 
-	for (i = 0; i < (code_length / 2); i++) {
-		c1 = v[2 * i];
-		c2 = v[2 * i + 1];
-		c = c1 >> 4;
-		sk[a] = c;
-		a += 1;
-		c1 = c1 & 15;
-		c = (c1 << 4) ^ (c2 >> 8);
-		sk[a] = c;
-		a += 1;
-		c = c2 & 255;
-		sk[a] = c;
-		a += 1;
+void store_secret_key(const gf *v, const gf *y, unsigned char *sk) {
+	for (int i = 0; i < 2 * code_length; i = i + 2) {
+		gf a = v[i / 2] >> 8;
+		gf b = v[i / 2] & 0xFF;
+		sk[i] = a;
+		sk[i + 1] = b;
 	}
-	for (i = 0; i < (code_length / 2); i++) {
-		c1 = y[2 * i];
-		c2 = y[2 * i + 1];
-		c = c1 >> 4;
-		sk[a] = c;
-		a += 1;
-		c1 = c1 & 15;
-		c = (c1 << 4) ^ (c2 >> 8);
-		sk[a] = c;
-		a += 1;
-		c = c2 & 255;
-		sk[a] = c;
-		a += 1;
+	for (int i = 2 * code_length; i < 4 * code_length; i = i + 2) {
+		gf a = y[(i / 2) - code_length] >> 8;
+		gf b = y[(i / 2) - code_length] & 0xFF;
+		sk[i] = a;
+		sk[i + 1] = b;
+	}
+
+
+
+}
+
+/*
+ * recover_sk:
+ * Recover two vectors that is the secret key from array.
+ * The vectors are 16bits and the array is 8 bits.
+ */
+void recover_secret_key(const unsigned char* sk, gf* v, gf* y) {
+
+	for (int i = 0; i < 2 * code_length; i = i + 2) {
+		v[i / 2] = sk[i + 1] | (sk[i] << 8);
+	}
+	for (int i = 2 * code_length; i < 4 * code_length; i = i + 2) {
+		y[(i / 2) - code_length] = sk[i + 1] | (sk[i] << 8);
+
 	}
 
 }
 
-void recover_public_key(const unsigned char *public_key, matrix *G) {
+/*
+ * recover_public_key_from_array:
+ * Recover the matrix G (that is the public key) from an array.
+ */
+void recover_public_key_from_array(const unsigned char *public_key, matrix *G) {
+	gf z[code_dimension] = { 0 };
+	for (int i = 0; i < code_dimension; i++) {
+		z[i] = 1;
+	}
+
+	for (int i = 0;
+			i
+					< min(
+							code_length - ((signature_block_size * pol_deg) * extension),
+							code_dimension); i++) {
+		G->data[i * G->cols + i] = z[i];
+	}
+
+	int counter = 0;
+	for (int i = 0; i < G->rows; i++) {
+		for (int j = code_dimension; j < G->cols; j++) {
+			G->data[i * G->cols + j] = public_key[counter];
+			counter++;
+		}
+	}
+
+}
+
+/*void recover_public_key(const unsigned char *public_key, matrix *G) {
 	int a = 0;
 	int i, j, k, p, l, m, q;
 	matrix *M = make_matrix(code_dimension, code_length - code_dimension);
@@ -127,7 +143,7 @@ void recover_public_key(const unsigned char *public_key, matrix *G) {
 		}
 	}
 	free_matrix(M);
-}
+}*/
 
 void generate_int_list_of_size(int *list, int length) {
 	for (int i = 0; i < length; i++) {
