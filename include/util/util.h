@@ -23,9 +23,9 @@
 #include "../gf/gf.h"
 #include "../api.h"
 
-extern void store(matrix *src, unsigned char *dst);
+extern void store_public_key(matrix *src, unsigned char *dst);
 
-extern void store_v_y(const gf *v,const gf *y, unsigned char *sk);
+extern void store_secret_key(const gf *v,const gf *y, unsigned char *sk);
 
 extern void random_m(unsigned char *m);
 
@@ -33,11 +33,11 @@ extern void random_e(const unsigned char *sigma, unsigned char *error_array);
 
 extern void recover_public_key(const unsigned char *public_key, matrix *G);
 
-void recover_G(const unsigned char *public_key, matrix *G);
+void recover_public_key_from_array(const unsigned char *public_key, matrix *G);
 
 extern void set_vy_from_sk(gf* v, gf * y, const unsigned char * sk);
 
-extern void recover_sk(const unsigned char * sk, gf* v, gf * y);
+extern void recover_secret_key(const unsigned char * sk, gf* v, gf * y);
 
 extern int compute_weight(unsigned char *r, int size);
 

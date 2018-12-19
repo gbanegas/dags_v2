@@ -560,16 +560,6 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 	G.data = data_G;
 	key_gen(v, y, &G);
 	store_public_key(&G, pk);
-	printf("[ ");
-	for (int i = 0; i < code_length; i++) {
-		printf(" %" PRIu16 " ,", v[i]);
-	}
-	printf("]\n");
-	printf("[ ");
-	for (int i = 0; i < code_length; i++) {
-		printf(" %" PRIu16 " ,", y[i]);
-	}
-	printf("]\n");
 	store_secret_key(v, y, sk);
 
 	return 0;
