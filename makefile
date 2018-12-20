@@ -8,9 +8,9 @@ RM := rm -rf
 CC=gcc
 #CC=clang
 #Select the desired dags you would like to build
-#DAGSVER=-DDAGS_1
+DAGSVER=-DDAGS_1
 #DAGSVER=-DDAGS_3
-DAGSVER=-DDAGS_5
+#DAGSVER=-DDAGS_5
 
 #clang CFLAGS
 #CFLAGS=-O3 -g3 -Wall -ffunction-sections -fdata-sections -march=native -DDEBUG
