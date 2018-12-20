@@ -10,6 +10,8 @@
 
 #include "fips202.h"
 
+#include "util/util_debug.h"
+
 #include "util/util.h"
 #include "structures/matrix_operations.h"
 

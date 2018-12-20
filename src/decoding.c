@@ -16,6 +16,7 @@
 
 int decoding(const gf* v, const gf* y, const unsigned char *c,
 		unsigned char *error, unsigned char *code_word) {
+
 	int i, k, j, dr, position;
 	int st = (signature_block_size * pol_deg);
 	polynomial *syndrom;

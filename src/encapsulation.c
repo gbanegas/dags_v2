@@ -104,8 +104,16 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	PRINT_DEBUG_ENCAP("\n");
 #endif
 
+#ifdef DEBUG
+	store_char_vector_in_file(u, code_dimension);
+#endif
 	PRINT_DEBUG_ENCAP("Computing m*G: \n");
 	multiply_vector_matrix(u, G, c);//c = message*G
+
+#ifdef DEBUG
+	store_matrix_in_file(G);
+	store_vector_in_file(c, code_length);
+#endif
 
 	PRINT_DEBUG_ENCAP("Computing (m*G) + error: \n");
 	for (i = 0; i < code_length; i++) {
