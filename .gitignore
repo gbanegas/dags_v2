@@ -39,6 +39,11 @@
 *.req
 *.rsp
 
+#Eclipse files
+.cproject
+.settings
+.project
+
 # Compiled binary file 
 dags*
 
