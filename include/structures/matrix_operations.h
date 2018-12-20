@@ -13,8 +13,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "mxm.h"
-
 #include "../definitions.h"
 #include "../gf/gf.h"
 
@@ -26,7 +24,7 @@ extern void free_matrix(matrix* m);
 
 extern void print_matrix(matrix* m);
 
-extern matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b);
+void matrix_multiply(matrix* restrict H, const matrix* restrict H_cauchy, const gf z[n0]);
 
 extern matrix* submatrix(const matrix* m, const int star_row, const int end_row, const int start_column, const int end_column);
 
@@ -34,7 +32,7 @@ extern matrix* augment(const matrix *a, const matrix *b);
 
 extern void echelon_form(matrix *a);
 
-extern matrix* transpose_matrix(matrix *a);
+extern matrix* transpose_matrix(const matrix* restrict a);
 
 extern void multiply_vector_matrix(unsigned char* restrict u, matrix *G, gf  *c);
 

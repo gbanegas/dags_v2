@@ -31,41 +31,78 @@ matrix* make_matrix(const int n_rows, const int n_cols) {
 	return m;
 }
 
-matrix* diagonal_matrix(gf* z, const int n_rows, const int n_cols) {
-	int i;
-	matrix *ret_val = NULL;
-	matrix *m;
 
-	if (NULL == (m = (matrix *) malloc(sizeof(matrix)))){
-		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix\n");
+
+void gf_q_m_mult_block( gf* restrict C,  const  gf* restrict B, const gf A) {
+	gf reduction[signature_block_size];
+	uint32_t tmp[signature_block_size] = {0};
+
+	int i,j;
+
+	//Multiplication
+	for (i = 0; i < 18; i++)	tmp[0] ^= (A * (B[0] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[1] ^= (A * (B[1] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[2] ^= (A * (B[2] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[3] ^= (A * (B[3] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[4] ^= (A * (B[4] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[5] ^= (A * (B[5] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[6] ^= (A * (B[6] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[7] ^= (A * (B[7] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[8] ^= (A * (B[8] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[9] ^= (A * (B[9] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[10] ^= (A * (B[10] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[11] ^= (A * (B[11] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[12] ^= (A * (B[12] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[13] ^= (A * (B[13] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[14] ^= (A * (B[14] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[15] ^= (A * (B[15] & (1 << i)));
+#if defined(DAGS_3) || defined(DAGS_5) || defined(DAGS_TOY)
+	for (i = 0; i < 18; i++)	tmp[16] ^= (A * (B[16] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[17] ^= (A * (B[17] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[18] ^= (A * (B[18] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[19] ^= (A * (B[19] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[20] ^= (A * (B[20] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[21] ^= (A * (B[21] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[22] ^= (A * (B[22] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[23] ^= (A * (B[23] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[24] ^= (A * (B[24] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[25] ^= (A * (B[25] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[26] ^= (A * (B[26] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[27] ^= (A * (B[27] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[28] ^= (A * (B[28] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[29] ^= (A * (B[29] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[30] ^= (A * (B[30] & (1 << i)));
+	for (i = 0; i < 18; i++)	tmp[31] ^= (A * (B[31] & (1 << i)));
+#endif
+
+	for (j = 0; j < signature_block_size; j++){
+		for (i = 0; i < 2; i++){
+            reduction[j] = (tmp[j] >> 16) &0x7fff;
+            tmp[j] = tmp[j] & 0xFFFF;
+            tmp[j] ^= reduction[j];
+            tmp[j] ^= reduction[j] << 2;
+            tmp[j] ^= reduction[j] << 3;
+            tmp[j] ^= reduction[j] << 5;
+        }
 	}
 
-	// set dimensions
-	m->rows = n_rows;
-	m->cols = n_cols;
-
-	// allocate a double array of length rows * cols
-	if (NULL == (m->data = (gf *)calloc(n_rows * n_cols, sizeof(gf)))){
-		PRINT_DEBUG("Failed to allocate memory for diagonal_matrix");
-		goto failout;
+	for (j = 0; j < signature_block_size; j++){
+		C[j] =  tmp[j];
 	}
-
-	for (i = 0; i < min(n_rows, n_cols); i++) {
-		m->data[i * n_cols + i] = z[i];
-	}
-
-	ret_val = m;
-failout:
-	return ret_val;
 }
 
-matrix* matrix_multiply(const matrix* restrict a, const  matrix* restrict b) {
-	matrix *m = make_matrix(a->rows, b->cols);
-	mxm_product(m->data, a->data, b->data, a->rows, a->cols, b->cols);
-	return m;
+
+void matrix_multiply(matrix* restrict H, const matrix* restrict H_cauchy, const gf z[n0]) {
+	int row, col;
+	int tmp_index;
+	for (row = 0; row < H_cauchy->rows; row++){
+		for (col = 0; col < n0; col++){
+			tmp_index = row*code_length + col*signature_block_size;
+			gf_q_m_mult_block(&H->data[tmp_index], &H_cauchy->data[tmp_index], z[col]);
+		}
+	}
 
 }
-
 /*
  * free_matrix
  * 	Frees the memory that was allocated by make_matrix
@@ -147,7 +184,7 @@ void echelon_form(matrix *a) {
 	}
 }
 
-matrix * transpose_matrix(matrix *a) {
+matrix * transpose_matrix(const matrix* restrict a) {
 
 	int n_a_cols = a->cols;
 	int n_a_rows = a->rows;

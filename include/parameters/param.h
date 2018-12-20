@@ -2,7 +2,6 @@
  * param.h
  *
  *  Created on: May 3, 2018
- *      Author: vader
  */
 
 #ifndef SRC_PARAMETERS_PARAM_H_
@@ -43,7 +42,7 @@
 #define weight 176
 #define ss_length 64
 #define k_sec (code_dimension - k_prime)
-#define n0 (code_length/signature_block_size)
+#define n0 (code_length/signature_block_size) // 50
 #endif
 
 #ifdef DAGS_3
@@ -59,7 +58,7 @@
 #define weight 176
 #define ss_length 64
 #define k_sec (code_dimension - k_prime)
-#define n0 (code_length/signature_block_size)
+#define n0 (code_length/signature_block_size) // 38
 #endif
 
 #ifdef DAGS_1
@@ -72,7 +71,7 @@
 #define weight 104
 #define ss_length 16
 #define k_sec (code_dimension - k_prime)
-#define n0 (code_length/signature_block_size)
+#define n0 (code_length/signature_block_size) // 52
 #endif
 
 #ifdef DAGS_TOY
@@ -88,7 +87,7 @@
 #define weight 176
 #define ss_length 64
 #define k_sec (code_dimension - k_prime)
-#define n0 (code_length/signature_block_size)
+#define n0 (code_length/signature_block_size) // 38
 #endif
 
 
