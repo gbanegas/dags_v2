@@ -130,7 +130,7 @@ int build_dyadic_signature_part_1(gf *signature_h)
 			}
 		}
 	}
-	// TODO: Gustavo, Need to check this???
+
 	if (EXIT_SUCCESS == contains_zero(signature_h, signature_block_size)){
 		return EXIT_SUCCESS;
 	}
