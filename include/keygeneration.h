@@ -31,11 +31,12 @@
  */
 extern int key_pair_generation(unsigned char *pk, unsigned char *sk);
 
-extern int  key_gen(gf *v, gf *y, matrix *G);
+extern void  key_gen(gf *v, gf *y, matrix *G);
 
 extern int build_dyadic_signature(gf *dyadic_signature);
 
-extern void build_support(gf *signature_h, gf *u, gf *v, gf *elements);
+void build_support(gf* restrict vector_u, gf* restrict vector_v,
+				const gf* restrict signature_h, const gf* restrict elements);
 
 extern void build_cauchy_matrix(gf *u, gf *v, matrix *H_cauchy);
 

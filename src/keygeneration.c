@@ -28,24 +28,7 @@ int contains_zero(gf *list, int length) {
 	return EXIT_SUCCESS;
 }
 
-/*
- * remove_integer:
- * 	This functions goes through a list and sets the element that is equal
- * 	to the @element variable to -1
- *
- * Function returns EXIT_SUCCESS if the if the element was found and set to -1
- * otherwise EXIT_FAILURE
- */
-int remove_integer(int element, int *list, int size) {
-	int i;
-	for (i = 0; i < size; i++) {
-		if (list[i] == element) {
-			list[i] = -1;
-			return EXIT_SUCCESS;
-		}
-	}
-	return EXIT_FAILURE;
-}
+
 
 /*
  * This function goes through and checks all of the entries in the length to make
@@ -76,18 +59,19 @@ int vector_contains(const gf *signature_h, const gf random_e, int length) {
  * 	to be dyadic return EXIT_FAILURE so additional checks do not have to be performed.
  */
 int build_dyadic_signature(gf *dyadic_signature) {
-	//PRINT_DEBUG("Build_dyadic_signature start\n");
+	PRINT_DEBUG("Build_dyadic_signature start\n");
 
 	int block_position[n0] = { 0 };
 	gf signature_h[F_q_m_size] = { 0 };
 	int i, aux_count_transfer_block = 0;
 
+	PRINT_DEBUG("Start build_dyadic_signature_part_1\n");
 	if (EXIT_SUCCESS != build_dyadic_signature_part_1(signature_h))
 	{
 		PRINT_DEBUG("build_dyadic_signature_part_1 failed\n");
 		return EXIT_FAILURE;
 	}
-
+	PRINT_DEBUG("Start build_dyadic_signature_part_2\n");
 	if(EXIT_SUCCESS != build_dyadic_signature_part2(signature_h, block_position))
 	{
 		PRINT_DEBUG("build_dyadic_signature_part_2 failed\n");
@@ -95,49 +79,49 @@ int build_dyadic_signature(gf *dyadic_signature) {
 	}
 
 	for (i = 0; i < n0; i++) {
-		memcpy(&dyadic_signature[aux_count_transfer_block],
-				&signature_h[signature_block_size * block_position[i]],
-				signature_block_size * sizeof(gf));
+		memcpy(&dyadic_signature[aux_count_transfer_block],&signature_h[signature_block_size * block_position[i]],signature_block_size * sizeof(gf));
 		aux_count_transfer_block += signature_block_size;
 	}
 
 	return EXIT_SUCCESS;
 }
 
-static int build_dyadic_signature_part_1(gf *signature_h)
+int build_dyadic_signature_part_1(gf *signature_h)
 {
+
 	gf h0 = 0, h0_inverse, i_inverse;
+	gf random_e, temp;
+
 	int t, i, j; //for loop variables
-	gf random_e, temp, temp_inv;
 
 	//Set h0 to anything but 0
-	do {
-		h0 = randombytes_uniform(F_q_m_size - 1);
-	} while (h0 == 0);
+	do { h0 = randombytes_uniform(F_q_m_size - 1); }
+	while (h0 == 0);
 
 	h0_inverse = gf_q_m_inv(h0);
 
 	signature_h[0] = h0;
-	for (t = 0; t < extension * subfield; t++) {
+
+	for (t = 0; t < field_extension; t++) {
 		i = 1 << t;
 		random_e = 0;
 
 		//random_e must be not in signature_h or equal 0
-		do {
-			random_e = randombytes_uniform(F_q_m_size - 1);
-		} while (random_e == 0
-				|| vector_contains(signature_h + i, random_e, code_length));
+		do { random_e = randombytes_uniform(F_q_m_size - 1);}
+		while (random_e == 0 || vector_contains(signature_h + i, random_e, code_length));
 
 		//Set signature_h[1<<t] to random_e
 		signature_h[i] = random_e;
+
 		//For loop through values from 1 to i setting signature_h values to the
 		i_inverse = gf_q_m_inv(signature_h[i]);
+
 		for (j = 1; j < i; j++) {
-			if (signature_h[i] != 0 && signature_h[j] != 0) {
+			if (signature_h[j] != 0) {
+				// 1/h_i + 1/h_j + h/h0
 				temp = i_inverse ^ gf_q_m_inv(signature_h[j]) ^ h0_inverse;
 				if (temp != 0) {
-					temp_inv = gf_q_m_inv(temp);
-					signature_h[i + j] = temp_inv;
+					signature_h[i + j] = gf_q_m_inv(temp);
 				} else {
 					signature_h[i + j] = 0;
 				}
@@ -146,12 +130,11 @@ static int build_dyadic_signature_part_1(gf *signature_h)
 			}
 		}
 	}
-	if (EXIT_SUCCESS == contains_zero(signature_h, signature_block_size))
-	{
+	// TODO: Gustavo, Need to check this???
+	if (EXIT_SUCCESS == contains_zero(signature_h, signature_block_size)){
 		return EXIT_SUCCESS;
 	}
-	else
-	{
+	else{
 		print_vector(signature_h, signature_block_size);
 		return EXIT_FAILURE;
 	}
@@ -159,48 +142,31 @@ static int build_dyadic_signature_part_1(gf *signature_h)
 
 int build_dyadic_signature_part2(gf *signature_h, int * block_position)
 {
-	int i, j; //for loop variables
-	int ll = 0;
-	int size_part = (F_q_m_size / signature_block_size) - 1;
-	int part[(F_q_m_size / signature_block_size) - 1] = { 0 };
-	int count_part = 0;
-	gf aux_list[signature_block_size] = { 0 };
-	gf temp_list[signature_block_size];// = { 0 };
+	int rand_num;
+	int upper_bound = (F_q_m_size / signature_block_size) - 1;
 
-	memcpy(temp_list, signature_h, signature_block_size * sizeof(gf));
+	// A hash table to generate distinct random number
+	gf tmp[(F_q_m_size / signature_block_size) - 1] = {0};
+	// Mark zero as used
+	tmp[0] = 1;
 
-	for (i = 0; i < size_part; i++) {
-		part[i] = randombytes_uniform(size_part - 1);
-	}
 
-	//Check to see if temp_list does not contain zeros
-		block_position[0] = ll;
-		ll++;
-		while (ll * signature_block_size != code_length) {
-			j = 0;
-			do {
-				j = part[count_part];
-				count_part++;
-			} while (j == 0 && count_part < size_part);
-
-			if (count_part >= size_part)
-			{
-				PRINT_DEBUG("Invalid index into part array\n");
-				return EXIT_FAILURE;
-			}
-
-			if (EXIT_FAILURE == remove_integer(j, part, size_part))
-			{
-				PRINT_DEBUG("Failed to remove int likely already occurred\n");
-			}
-
-			memcpy(aux_list, &signature_h[(j * signature_block_size)], signature_block_size * sizeof(gf));
-
-			if (EXIT_SUCCESS == contains_zero(aux_list, signature_block_size)) {
-				block_position[ll] = j;
+	block_position[0] = 0;
+	int ll = 1;
+	while (ll  <  n0) {
+		rand_num = randombytes_uniform(upper_bound-1);
+		if (tmp[rand_num] !=1){
+			// rand_num is not used before, make as used
+			tmp[rand_num] = 1;
+			if (EXIT_SUCCESS == contains_zero(&signature_h[(rand_num * signature_block_size)], signature_block_size)){
+				block_position[ll] = rand_num;
 				ll++;
 			}
+			else{
+				PRINT_DEBUG("vector contain zero %d\n", rand_num);
+			}
 		}
+	}
 	return EXIT_SUCCESS;
 }
 
@@ -268,17 +234,19 @@ void remove_elements(gf *to_remove, gf *elements, int length) {
 
 /*
  * build_support
- * 	This function is used to generate the u and v vectors from the signature_h
+ * 	This function is used to generate the vector_u and vector_v vectors from the signature_h
  *
  * params:
  * 	signature_h  Provide the signature vector
- * 	u and v			 Provide allocated vectors
+ * 	vector_u and vector_v			 Provide allocated vectors
  * 	elements		 Provide the generated elements vector to be copied from.
  *
  * 	Returns:
- * 	Vectors u and v are filled in appropriately
+ * 	Vectors vector_u and vector_v are filled in appropriately
  */
-void build_support(gf *signature_h, gf *u, gf *v, gf *elements) {
+void build_support(gf* restrict vector_u, gf* restrict vector_v,
+				const gf* restrict signature_h, const gf* restrict elements) {
+	// [1, F_q_m_size-1]
 	gf elements_in_F_q_m[code_length];
 	gf signature_h_inv[code_length];
 	gf aux[code_length] = { 0 };
@@ -303,12 +271,11 @@ void build_support(gf *signature_h, gf *u, gf *v, gf *elements) {
 	for (i = 0; i < code_length; i++) {
 		if (signature_h[i] != 0) {
 			if (i < signature_block_size){
-				u[i] = signature_h_inv[i] ^ omega;
-				v[i] = u[i] ^ h0_inv;
+				vector_u[i] = signature_h_inv[i] ^ omega;
+				vector_v[i] = vector_u[i] ^ h0_inv;
 			}
-			else
-			{
-				v[i] =  signature_h_inv[i] ^ h0_inv ^ omega;
+			else{
+				vector_v[i] =  signature_h_inv[i] ^ h0_inv ^ omega;
 			}
 		}
 	}
@@ -376,10 +343,18 @@ int build_trapdoor(const matrix* restrict H_cauchy, const gf* restrict v,
 		}
 		z_short[i] = random_el;
 	}
+	// ******
+	// TODO: apply this
+	// random_distinct(&z_short, n0);
+	/*
+	for (i = 0; i< n0; i++){
+		printf("%d ", z_short[i]);
+	}
+	*/
+	// ******
 
-	PRINT_DEBUG("Critical section\n");
+
 	matrix_multiply(H, H_cauchy, z_short);
-	PRINT_DEBUG("DONE Critical section\n");
 
 	for (i = 0; i < code_length; i++) {
 		pol = 1;
@@ -388,6 +363,8 @@ int build_trapdoor(const matrix* restrict H_cauchy, const gf* restrict v,
 			result = gf_pow_f_q_m(sum_u_v, pol_deg);
 			pol = gf_q_m_mult(pol, result);
 		}
+		// PRINT_DEBUG("-- %d / %d", z[i], pol);
+		// TODO: efficient cache for diff.
 		y[i] = gf_div_f_q_m(z[i], pol);
 	}
 	ret_val = EXIT_SUCCESS;
@@ -543,25 +520,22 @@ int key_pair_generation(unsigned char *pk, unsigned char *sk) {
 	matrix G;
 	G.cols = code_length;
 	G.rows = code_length - ((signature_block_size * pol_deg) * extension);
-	gf data_G[code_length
-			* (code_length - ((signature_block_size * pol_deg) * extension))] =
-			{ 0 };
+	gf data_G[code_length * (code_length - ((signature_block_size * pol_deg) * extension))] = { 0 };
 	G.data = data_G;
-	int ret = key_gen(v, y, &G);
+	key_gen(v, y, &G);
 	store_public_key(&G, pk);
 	store_secret_key(v, y, sk);
 
-	return ret;
+	return 0;
 }
 
 
 
-int key_gen(gf *v, gf *y, matrix *G) {
+void key_gen(gf *vector_v, gf *y, matrix *G) {
 	int ret_value = 0;
 	gf signature_h[code_length] = {0};
-	gf u[signature_block_size] = {0};
-	gf *elements_in_F_q_m = NULL;
-	gf *elements_in_F_q_m_constant = NULL;
+	gf vector_u[signature_block_size] = {0};
+
 	long build_support_failures = 0;
 	long build_dyadic_sig_failures =0;
 
@@ -588,30 +562,26 @@ int key_gen(gf *v, gf *y, matrix *G) {
 
 	PRINT_DEBUG("Key Gen start\n");
 
-	if (NULL == (elements_in_F_q_m_constant = calloc(F_q_m_size, sizeof(gf))))
-	{
-		PRINT_DEBUG("Failed to allocate memory for elements_in_F_q_m");
-		goto failout;
-	}
 	// Only generate_elements in F_q_m once and copied when used in build_support()
 	// With starting value of 1
-	generate_elements_in_order(elements_in_F_q_m_constant, 1, F_q_m_size);
+	gf start_value = 1;
+	gf elements_in_F_q_m_constant[F_q_m_size];
+	for (int i = 0; i < F_q_m_size; i++){
+		elements_in_F_q_m_constant[i] = start_value + i;
+	}
 
 	do {
-		if (NULL == (elements_in_F_q_m = calloc(F_q_m_size, sizeof(gf))))
-		{
-			PRINT_DEBUG("Failed to allocate memory for elements_in_F_q_m");
-			goto failout;
-		}
-		memcpy(elements_in_F_q_m, elements_in_F_q_m_constant, F_q_m_size * sizeof(gf));
+
 		do {
 			build_support_failures ++;
 			ret_value = build_dyadic_signature(signature_h);
 			if (ret_value == EXIT_SUCCESS){
-				build_support(signature_h, u, v, elements_in_F_q_m);
+				build_support(vector_u, vector_v, signature_h, elements_in_F_q_m_constant);
 			}
 			else
 			{
+
+				PRINT_DEBUG("Build dyadic failed!\n");
 				build_dyadic_sig_failures ++;
 				build_support_failures--;
 			}
@@ -619,15 +589,13 @@ int key_gen(gf *v, gf *y, matrix *G) {
 				PRINT_DEBUG("interations %ld vs %ld\n",build_support_failures, build_dyadic_sig_failures);
 			}
 
-		} while (ret_value != EXIT_SUCCESS || is_vectors_disjoint(u, v) || is_vector_disjoint(v, code_length)
-				|| is_vector_disjoint(u, signature_block_size));
+		} while (ret_value != EXIT_SUCCESS || is_vectors_disjoint(vector_u, vector_v) || is_vector_disjoint(vector_v, code_length)
+				|| is_vector_disjoint(vector_u, signature_block_size));
 
-		free(elements_in_F_q_m);
-		elements_in_F_q_m = NULL;
 
-		build_cauchy_matrix(u, v, &H_cauchy);
+		build_cauchy_matrix(vector_u, vector_v, &H_cauchy);
 
-		if (EXIT_FAILURE == (ret_value = build_trapdoor(&H_cauchy, v, u, y, &H))){
+		if (EXIT_FAILURE == (ret_value = build_trapdoor(&H_cauchy, vector_v, vector_u, y, &H))){
 			PRINT_DEBUG("Failed to build_trapdoor\n");
 			continue;
 		}
@@ -638,9 +606,5 @@ int key_gen(gf *v, gf *y, matrix *G) {
 		ret_value = generate_public_key(&Hbase, G);
 
 	} while (ret_value);
-	return ret_value;
-failout:
-	free(elements_in_F_q_m);
-	free(elements_in_F_q_m_constant);
-	return ret_value;
+	return;
 }

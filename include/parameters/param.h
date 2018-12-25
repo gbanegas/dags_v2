@@ -2,6 +2,7 @@
  * param.h
  *
  *  Created on: May 3, 2018
+ *      Author: vader
  */
 
 #ifndef SRC_PARAMETERS_PARAM_H_
