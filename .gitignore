@@ -53,3 +53,10 @@ binaries/
 .vscode/
 makefile
 result
+log
+makefile
+test.c
+testc
+src/main.c
+testcc
+src/main.c
