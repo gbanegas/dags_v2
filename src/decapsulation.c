@@ -72,13 +72,13 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 */
 
 	// Compute d1 = H(m1) where H is  sponge SHA-512 function
-#if defined(DAGS_3) || defined(DAGS_5)
+//#if defined(DAGS_3) || defined(DAGS_5)
 	shake256(r1, code_dimension, m1, k_prime);
 	shake256(d1, k_prime, m1, k_prime);
-#else 
-	shake128(r1, code_dimension, m1, k_prime);
-	shake128(d1, k_prime, m1, k_prime);
-#endif
+//#else
+	//shake128(r1, code_dimension, m1, k_prime);
+	//shake128(d1, k_prime, m1, k_prime);
+//#endif
 
 	for (i = 0; i < k_prime; i++) {
 		d1[i] = d1[i] & (F_q_size - 1);
@@ -112,11 +112,11 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 
 	//test = KangarooTwelve(sigma, k_prime, hash_sigma, code_length, K12_custom, K12_custom_len);
 	//SHAKE256(hash_sigma, code_length, sigma, k_prime);
-#if defined(DAGS_3) || defined(DAGS_5)
+//#if defined(DAGS_3) || defined(DAGS_5)
 	shake256(hash_sigma, code_length, sigma, k_prime);
-#else
-	shake128(hash_sigma, code_length, sigma, k_prime);
-#endif 
+//#else
+	//shake128(hash_sigma, code_length, sigma, k_prime);
+//#endif
 
 	//Generate error vector e2 of length code_length and weight n0_w from
 	//hash_sigma1 by using random_e function.
@@ -135,11 +135,11 @@ int decrypt(unsigned char *secret_shared, const unsigned char *cipher_text,
 	 */
 	//test = KangarooTwelve(m1, k_prime, ss, ss_length, K12_custom, K12_custom_len);
 	//SHAKE256(secret_shared, ss_length, m1, k_prime);
-#if defined(DAGS_3) || defined(DAGS_5)
+//#if defined(DAGS_3) || defined(DAGS_5)
 	shake256(hash_sigma, code_length, sigma, k_prime);
-#else
-	shake128(hash_sigma, code_length, sigma, k_prime);
-#endif
+//#else
+	//shake128(hash_sigma, code_length, sigma, k_prime);
+//#endif
 
 	return 0;
 }
