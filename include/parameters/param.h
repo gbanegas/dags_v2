@@ -64,15 +64,15 @@
 
 #ifdef DAGS_1
 // Define Poly primitive subfield: x^8 + x^4+ x^3 + x + 1
-#define code_length 832
-#define code_dimension 416 // number of line of each block matrix
-#define k_prime  43
+#define code_length 704
+#define code_dimension 352 // number of line of each block matrix
+#define k_prime  32
 #define signature_block_size (1<<4)
-#define pol_deg 13
-#define weight 104
+#define pol_deg 11
+#define weight 88
 #define ss_length 16
 #define k_sec (code_dimension - k_prime)
-#define n0 (code_length/signature_block_size) // 52
+#define n0 (code_length/signature_block_size)
 #endif
 
 #ifdef DAGS_TOY

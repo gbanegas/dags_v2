@@ -29,7 +29,7 @@ gf gf_div_f_q_m(gf a, gf b);
 void print_F_q_element(gf a);
 void print_F_q_m_element(gf a);
 
-#if defined(DAGS_3) || defined(DAGS_5) || defined(DAGS_TOY)
+
 static inline uint8_t gf_mult(const gf in0, const  gf in1) {
 	gf reduction;
 	gf tmp;
@@ -84,57 +84,7 @@ static inline gf gf_q_m_mult(const gf in0, const  gf in1) {
 
 	return tmp;
 }
-#endif
 
-
-#ifdef DAGS_1
-
-static inline gf gf_mult(gf in0, gf in1) {
-	int i; 
-	gf tmp = 0; 
-	gf t0 = in0, t1 = in1;
-	//Multiplication
-
-	for (i = 0; i < 7; i++)
-		tmp ^= (t0 * (t1 & (1 << i)));
-
-	//reduction
-	tmp = tmp & 0xFFF;	// tmp & 0000 1111 1111 1111
-	tmp ^= (tmp >> 6);
-	tmp ^= (tmp >> 5) & 0x3E;
-	tmp = tmp & 0x3F;
-	return tmp;
-}
-
-static inline gf gf_q_m_mult(gf in0, gf in1) {
-	int i; 
-	uint32_t tmp = 0; 
-	gf t0 = in0, t1 = in1;
-	gf reduction;
-	//Multiplication
-
-	for (i = 0; i < 18; i++)
-		tmp ^= (t0 * (t1 & (1 << i)));
-
-	//reduction
-	// tmp = tmp & 0x7FFFFF;	// tmp & 0111 1111 1111 1111
-	//first step of reduction
-	//second step of reduction
-	
-	for (i=0; i < 2; i++){
-		reduction = (tmp >> 12) & 0x7FF;
-		tmp = tmp & 0xFFF;
-		tmp ^= reduction;
-		tmp ^= reduction << 1;
-		tmp ^= reduction << 4;
-		tmp ^= reduction << 6;
-	}
-	
-	tmp = tmp & 0xFFF;
-	return tmp;
-}
-
-#endif
 
 
 static inline gf gf_add(gf a, gf b) {

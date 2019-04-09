@@ -30,12 +30,10 @@ int decoding(const gf* v, const gf* y, const unsigned char *c,
 
 	memset(aux_position, -1, weight * sizeof(int));
 
-#if defined(DAGS_TOY) | defined(DAGS_3) | defined(DAGS_5)
+
 	gf exp_alpha = (F_q_m_size - 1) / (F_q_size - 1);
 	alpha = gf_pow_f_q_m(2, exp_alpha); //b^((q^m)-1)/(q-1)
-#elif defined(DAGS_1)
-	alpha = 197;
-#endif
+
 
 	//Compute Syndrome normally
 	PRINT_DEBUG_DEC("Decoding:Computing syndrom\n");

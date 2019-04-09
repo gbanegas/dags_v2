@@ -60,13 +60,13 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	PRINT_DEBUG_ENCAP("\nStarting hashing: \n");
 #endif
 
-#if defined(DAGS_3) || defined(DAGS_5)
+//#if defined(DAGS_3) || defined(DAGS_5)
 	shake256(r, code_dimension, m, k_prime);
 	shake256(d, k_prime, m, k_prime);
-#else
-	shake128(r, code_dimension, m, k_prime);
-	shake128(d, k_prime, m, k_prime);
-#endif
+//#else
+//	shake128(r, code_dimension, m, k_prime);
+//	shake128(d, k_prime, m, k_prime);
+//#endif
 	
 	// Type conversion
 	if (F_q_size < UCHAR_MAX) {
