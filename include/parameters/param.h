@@ -66,7 +66,7 @@
 // Define Poly primitive subfield: x^8 + x^4+ x^3 + x + 1
 #define code_length 704
 #define code_dimension 352 // number of line of each block matrix
-#define k_prime  32
+#define k_prime  43
 #define signature_block_size (1<<4)
 #define pol_deg 11
 #define weight 88
