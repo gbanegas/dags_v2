@@ -46,12 +46,12 @@ int encrypt(unsigned char *ciphert_text, unsigned char *secret_shared,
 	PRINT_DEBUG_ENCAP("Generation Random M: \n");
 
 	random_m(m);
-	// Only required for DAGs_1 at the moment but do not want to hard code it.
+	/*// Only required for DAGs_1 at the moment but do not want to hard code it.
 	if (F_q_size < UCHAR_MAX){
 		for (i = 0; i < k_prime; i++) {
 			m[i] = m[i] % F_q_size;
 		}
-	}
+	}*/
 
 #ifdef DEBUG_ENCAP
 	for (i = 0; i < k_prime; i++) {

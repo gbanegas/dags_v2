@@ -8,13 +8,8 @@
 #ifndef SRC_PARAMETERS_PARAM_H_
 #define SRC_PARAMETERS_PARAM_H_
 
-#if defined(DAGS_5) || defined(DAGS_3) || defined(DAGS_TOY)
 #define field 8 //2^8
-#endif
 
-#ifdef DAGS_1
-#define field 6 //2^6
-#endif
 
 #define extension 2 //m
 #define field_extension (field*extension) //
